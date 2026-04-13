@@ -19,8 +19,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      dependency-graph: write
+      contents: write  ## Needed for the dependency graph upload step below
 
     steps:
     - uses: actions/checkout@v4
