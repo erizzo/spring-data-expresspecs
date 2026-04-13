@@ -11,7 +11,7 @@ child entities. You could easily end up with a derived query method like this:
 ```java
     Page<Customer> findByAddressZipCodeInOrCreditLimitGreaterThanAndIsActive(List<String> zipCodes, int minCredit, Pageable page);
 ```
-Query methods like this can be very cunbersome and difficult to maintain, espeically as the set of queryable properties grows. Even for a relatively small number
+Query methods like this can be very cumbersome and difficult to maintain, espeically as the set of queryable properties grows. Even for a relatively small number
 of parameters, these methods can be difficult to grok.
 
 Specifications, on the other hand, offer a composable model of querying that uses JPA's criteria API under the covers. The entry point to using Spring Data
@@ -141,7 +141,7 @@ Specification<Customer> spec = JPASpecifications.onDate("orders.datePlaced", tar
 ```
 
 ## Domain specific factory methods
-While useful in simplifying `Specification` creation for common cases, the true expressiveness of these is even more apparent if you define domain-specific
+While useful in simplifying `Specification` creation for common cases, the true expressiveness of the general-purpose methods in `JPASepcifications` is even more apparent if you define domain-specific
 factory methods for your entities (combined with Lombok's `@FieldNameConstants` annotation). For example:
 
 ```java
@@ -193,7 +193,7 @@ public interface CustomerSpecifications {
 }
 ```
 
-Using these kinds of factory methods (along with some static imports( makes the calling code even more expressive
+Using these kinds of factory methods (along with some static imports) makes the calling code even more expressive
 and intentional:
 ```java
 var zipCodes = Set.of("99762", "48169");
