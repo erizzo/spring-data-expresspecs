@@ -81,15 +81,40 @@ public class JPASpecificationsIntegrationTests {
 			entityManager.persistAndFlush(coyote.getAddress());
 			coyote = entityManager.persistAndFlush(coyote);
 
-			final Customer bugs = Customer.builder()
+			final Customer rabbit = Customer.builder()
 									.name("Bugs Bunny")
 									.address(Address.builder().city("Atlanta").build())
 									.build();
-			entityManager.persistAndFlush(bugs.getAddress());
-			entityManager.persistAndFlush(bugs);
+			entityManager.persistAndFlush(rabbit.getAddress());
+			entityManager.persistAndFlush(rabbit);
 
 			var path = PropertyPath.of(Customer.Fields.address, Address.Fields.city);
 			Specification<Customer> spec = JPASpecifications.contains(path, "que");
+
+			List<Customer> results = repo.findAll(spec);
+
+			assertThat(results).containsExactly(coyote);
+		}
+
+		@Test
+		void containsIgnoreCase_NestedProperty() {
+			Customer coyote = Customer.builder()
+								.name("Wile E. Coyote")
+								.address(Address.builder().city("Albuquerque").build())
+								.build();
+			entityManager.persistAndFlush(coyote.getAddress());
+			coyote = entityManager.persistAndFlush(coyote);
+
+			final Customer rabbit = Customer.builder()
+									.name("Bugs Bunny")
+									.address(Address.builder().city("Atlanta").build())
+									.build();
+			entityManager.persistAndFlush(rabbit.getAddress());
+			entityManager.persistAndFlush(rabbit);
+
+			var path = Customer.Fields.address + '.' + Address.Fields.city;
+			//Alternatively: var path = PropertyPath.of(Customer.Fields.address, Address.Fields.city);
+			Specification<Customer> spec = JPASpecifications.containsIgnoreCase(path, "QUE");
 
 			List<Customer> results = repo.findAll(spec);
 
@@ -105,19 +130,43 @@ public class JPASpecificationsIntegrationTests {
 		    entityManager.persistAndFlush(coyote.getAddress());
 		    coyote = entityManager.persistAndFlush(coyote);
 
-		    final Customer bugs = Customer.builder()
+		    final Customer rabbit = Customer.builder()
                 		            .name("Bugs Bunny")
                 		            .address(Address.builder().city("Atlanta").build())
                 		            .build();
-		    entityManager.persistAndFlush(bugs.getAddress());
-		    entityManager.persistAndFlush(bugs);
+		    entityManager.persistAndFlush(rabbit.getAddress());
+		    entityManager.persistAndFlush(rabbit);
 
 		    var path = Customer.Fields.address + '.' + Address.Fields.city;
 		    Specification<Customer> spec = JPASpecifications.doesNotContain(path, "que");
 
 		    List<Customer> results = repo.findAll(spec);
 
-		    assertThat(results).containsExactly(bugs);
+		    assertThat(results).containsExactly(rabbit);
+		}
+
+		@Test
+		void doesNotContainIgnoreCase_NestedProperty() {
+		    Customer coyote = Customer.builder()
+                		            .name("Wile E. Coyote")
+                		            .address(Address.builder().city("Albuquerque").build())
+                		            .build();
+		    entityManager.persistAndFlush(coyote.getAddress());
+		    coyote = entityManager.persistAndFlush(coyote);
+
+		    final Customer rabbit = Customer.builder()
+                		            .name("Bugs Bunny")
+                		            .address(Address.builder().city("Atlanta").build())
+                		            .build();
+		    entityManager.persistAndFlush(rabbit.getAddress());
+		    entityManager.persistAndFlush(rabbit);
+
+		    var path = Customer.Fields.address + '.' + Address.Fields.city;
+		    Specification<Customer> spec = JPASpecifications.doesNotContainIgnoreCase(path, "QUE");
+
+		    List<Customer> results = repo.findAll(spec);
+
+		    assertThat(results).containsExactly(rabbit);
 		}
 
 		@Test
@@ -138,6 +187,24 @@ public class JPASpecificationsIntegrationTests {
 		}
 
 		@Test
+		void containsAnyIgnoreCase() {
+			Customer coyote = Customer.builder()
+								.name("Wile E. Coyote")
+								.build();
+			coyote = entityManager.persistAndFlush(coyote);
+
+			entityManager.persistAndFlush(Customer.builder().name("Road Runner").build());
+
+			List<String> searchTerms = List.of("FUDD", "WILE", "BUGS");
+			Specification<Customer> spec = JPASpecifications.containsAnyIgnoreCase(
+					Customer.Fields.name, searchTerms);
+
+			List<Customer> results = repo.findAll(spec);
+
+			assertThat(results).containsExactly(coyote);
+		}
+
+		@Test
 		void containsAny_NestedProperty() {
 			Customer coyote = Customer.builder()
 								.name("Wile E. Coyote")
@@ -146,15 +213,40 @@ public class JPASpecificationsIntegrationTests {
 			entityManager.persistAndFlush(coyote.getAddress());
 			coyote = entityManager.persistAndFlush(coyote);
 
-			final Customer bugs = Customer.builder()
+			final Customer rabbit = Customer.builder()
 									.name("Bugs Bunny")
 									.address(Address.builder().city("Atlanta").build())
 									.build();
-			entityManager.persistAndFlush(bugs.getAddress());
-			entityManager.persistAndFlush(bugs);
+			entityManager.persistAndFlush(rabbit.getAddress());
+			entityManager.persistAndFlush(rabbit);
 
 			var path = PropertyPath.of(Customer.Fields.address, Address.Fields.city);
 			Specification<Customer> spec = JPASpecifications.containsAny(path, List.of("abc", "que", "xyz"));
+
+			List<Customer> results = repo.findAll(spec);
+
+			assertThat(results).containsExactly(coyote);
+		}
+
+		@Test
+		void containsAnyIgnoreCase_NestedProperty() {
+			Customer coyote = Customer.builder()
+								.name("Wile E. Coyote")
+								.address(Address.builder().city("Albuquerque").build())
+								.build();
+			entityManager.persistAndFlush(coyote.getAddress());
+			coyote = entityManager.persistAndFlush(coyote);
+
+			final Customer rabbit = Customer.builder()
+									.name("Bugs Bunny")
+									.address(Address.builder().city("Atlanta").build())
+									.build();
+			entityManager.persistAndFlush(rabbit.getAddress());
+			entityManager.persistAndFlush(rabbit);
+
+			var path = PropertyPath.of(Customer.Fields.address, Address.Fields.city);
+			Specification<Customer> spec = JPASpecifications.containsAnyIgnoreCase(path,
+					List.of("ABC", "QUE", "XYZ"));
 
 			List<Customer> results = repo.findAll(spec);
 
