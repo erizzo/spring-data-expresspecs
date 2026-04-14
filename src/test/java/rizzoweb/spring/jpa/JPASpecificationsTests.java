@@ -20,6 +20,8 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
+import rizzoweb.spring.jpa.specifications.JPASpecifications;
+import rizzoweb.spring.jpa.specifications.PropertyPath;
 
 @ExtendWith(MockitoExtension.class)
 class JPASpecificationsTests {

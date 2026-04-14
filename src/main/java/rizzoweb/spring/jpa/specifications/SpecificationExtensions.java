@@ -1,4 +1,4 @@
-package rizzoweb.spring.jpa;
+package rizzoweb.spring.jpa.specifications;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.jpa.domain.Specification;

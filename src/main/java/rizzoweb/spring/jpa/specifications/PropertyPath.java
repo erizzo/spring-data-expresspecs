@@ -1,4 +1,4 @@
-package rizzoweb.spring.jpa;
+package rizzoweb.spring.jpa.specifications;
 
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
