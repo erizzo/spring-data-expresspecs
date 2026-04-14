@@ -1,4 +1,4 @@
-package rizzoweb.spring.jpa.test;
+package rizzoweb.spring.jpa.specifications.test;
 
 import static lombok.AccessLevel.NONE;
 

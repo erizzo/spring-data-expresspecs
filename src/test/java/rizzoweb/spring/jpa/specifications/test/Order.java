@@ -1,8 +1,14 @@
-package rizzoweb.spring.jpa.test;
+package rizzoweb.spring.jpa.specifications.test;
+
+import static lombok.AccessLevel.PACKAGE;
+
+import java.time.LocalDate;
+import java.util.UUID;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,24 +20,26 @@ import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
 
 @Entity
-@Table(name = "customer_addresses")
+@Table(name = "orders")
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "customer")	// to avoid circular reference in toString()
 @FieldNameConstants
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Address {
+public class Order {
 
     @Id @GeneratedValue
-    @EqualsAndHashCode.Include
     private Long id;
 
-    private String street;
-    private String city;
-    private String state;
-    private String zipCode;
-    private boolean isPOBox;
+    @EqualsAndHashCode.Include
+    private final UUID orderID = UUID.randomUUID();
+
+    private LocalDate datePlaced;
+
+    @ManyToOne
+    @Setter(PACKAGE)
+    private Customer customer;
 }

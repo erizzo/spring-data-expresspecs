@@ -1,4 +1,4 @@
-package rizzoweb.spring.jpa.test;
+package rizzoweb.spring.jpa.specifications.test;
 
 /**
  * Marker interface used for including this package in @ComponentScan, @EntityScan, etc annotations.

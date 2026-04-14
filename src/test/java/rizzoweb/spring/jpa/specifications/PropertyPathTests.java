@@ -1,8 +1,7 @@
-package rizzoweb.spring.jpa;
+package rizzoweb.spring.jpa.specifications;
 
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
-import rizzoweb.spring.jpa.specifications.PropertyPath;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

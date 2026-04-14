@@ -1,4 +1,4 @@
-package rizzoweb.spring.jpa;
+package rizzoweb.spring.jpa.specifications;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,14 +14,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ContextConfiguration;
 
-import rizzoweb.spring.jpa.specifications.JPASpecifications;
-import rizzoweb.spring.jpa.specifications.PropertyPath;
-import rizzoweb.spring.jpa.test.Address;
-import rizzoweb.spring.jpa.test.Customer;
-import rizzoweb.spring.jpa.test.CustomerRepository;
-import rizzoweb.spring.jpa.test.CustomerSpecifications;
-import rizzoweb.spring.jpa.test.Order;
-import rizzoweb.spring.jpa.test.PhoneNumber;
+import rizzoweb.spring.jpa.specifications.test.Address;
+import rizzoweb.spring.jpa.specifications.test.Customer;
+import rizzoweb.spring.jpa.specifications.test.CustomerRepository;
+import rizzoweb.spring.jpa.specifications.test.CustomerSpecifications;
+import rizzoweb.spring.jpa.specifications.test.Order;
+import rizzoweb.spring.jpa.specifications.test.PhoneNumber;
 
 @DataJpaTest
 @ContextConfiguration(classes = TestJpaConfig.class)
@@ -410,7 +408,6 @@ public class JPASpecificationsIntegrationTests {
 			assertThat(results)
 				.containsExactlyInAnyOrder(bigSpender, cheapskate);
 
-			// Test lessThan()
 			spec = JPASpecifications.between(Customer.Fields.creditLimit, 0, 100);
 			results = repo.findAll(spec);
 			assertThat(results).isEmpty();
