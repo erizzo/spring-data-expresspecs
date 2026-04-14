@@ -521,10 +521,29 @@ public class JPASpecifications {
         };
     }
 
+    /**
+     * Creates a specification that matches entities where the specified date-time property falls on the
+     * given {@code targetDate} (inclusive of the start of the day and exclusive of the start of the
+     * following day).
+     *
+     * @param <T>          The entity type being queried.
+     * @param propertyPath Dot-delimited property path to compare.
+     * @param targetDate   The date to match.
+     * @see PropertyPath#from(String)
+     */
     public static <T> Specification<T> onDate(String propertyPath, LocalDate targetDate) {
     	return onDate(PropertyPath.from(propertyPath), targetDate);
     }
 
+    /**
+     * Creates a specification that matches entities where the specified date-time property falls on the
+     * given {@code targetDate} (inclusive of the start of the day and exclusive of the start of the
+     * following day).
+     *
+     * @param <T>          The entity type being queried.
+     * @param propertyPath Resolved property path to compare.
+     * @param targetDate   The date to match.
+     */
     public static <T> Specification<T> onDate(PropertyPath propertyPath, LocalDate targetDate) {
         if (targetDate == null) { return null; }
 
@@ -538,10 +557,29 @@ public class JPASpecifications {
     }
 
 
+    /**
+     * Creates a specification that matches entities where the specified property is strictly less than
+     * {@code value}.
+     *
+     * @param <T>          The entity type being queried.
+     * @param <C>          The comparable type of the property.
+     * @param propertyPath Dot-delimited property path to compare.
+     * @param value        Value to compare against.
+     * @see PropertyPath#from(String)
+     */
     public static <T, C extends Comparable<? super C>> Specification<T> lessThan(String propertyPath, C value) {
         return lessThan(PropertyPath.from(propertyPath), value);
     }
 
+    /**
+     * Creates a specification that matches entities where the specified property is strictly less than
+     * {@code value}.
+     *
+     * @param <T>          The entity type being queried.
+     * @param <C>          The comparable type of the property.
+     * @param propertyPath Resolved property path to compare.
+     * @param value        Value to compare against.
+     */
     public static <T, C extends Comparable<? super C>> Specification<T> lessThan(PropertyPath propertyPath, C value) {
         return (root, query, cb) -> {
             Path<C> path = propertyPath.asPath(root);
@@ -549,10 +587,29 @@ public class JPASpecifications {
         };
     }
 
+    /**
+     * Creates a specification that matches entities where the specified property is strictly greater
+     * than {@code value}.
+     *
+     * @param <T>          The entity type being queried.
+     * @param <C>          The comparable type of the property.
+     * @param propertyPath Dot-delimited property path to compare.
+     * @param value        Value to compare against.
+     * @see PropertyPath#from(String)
+     */
     public static <T, C extends Comparable<? super C>> Specification<T> greaterThan(String propertyPath, C value) {
         return greaterThan(PropertyPath.from(propertyPath), value);
     }
 
+    /**
+     * Creates a specification that matches entities where the specified property is strictly greater
+     * than {@code value}.
+     *
+     * @param <T>          The entity type being queried.
+     * @param <C>          The comparable type of the property.
+     * @param propertyPath Resolved property path to compare.
+     * @param value        Value to compare against.
+     */
     public static <T, C extends Comparable<? super C>> Specification<T> greaterThan(PropertyPath propertyPath, C value) {
         return (root, query, cb) -> {
             Path<C> path = propertyPath.asPath(root);
@@ -560,10 +617,29 @@ public class JPASpecifications {
         };
     }
 
+    /**
+     * Creates a specification that matches entities where the specified property is greater than or
+     * equal to {@code value}.
+     *
+     * @param <T>          The entity type being queried.
+     * @param <C>          The comparable type of the property.
+     * @param propertyPath Dot-delimited property path to compare.
+     * @param value        Value to compare against.
+     * @see PropertyPath#from(String)
+     */
     public static <T, C extends Comparable<? super C>> Specification<T> atLeast(String propertyPath, C value) {
     	return atLeast(PropertyPath.from(propertyPath), value);
     }
 
+    /**
+     * Creates a specification that matches entities where the specified property is greater than or
+     * equal to {@code value}.
+     *
+     * @param <T>          The entity type being queried.
+     * @param <C>          The comparable type of the property.
+     * @param propertyPath Resolved property path to compare.
+     * @param value        Value to compare against.
+     */
     public static <T, C extends Comparable<? super C>> Specification<T> atLeast(PropertyPath propertyPath, C value) {
         return (root, query, cb) -> {
             Path<C> path = propertyPath.asPath(root);
@@ -571,10 +647,31 @@ public class JPASpecifications {
         };
     }
 
+    /**
+     * Creates a specification that matches entities where the specified property is greater than or
+     * equal to {@code startInclusive} and strictly less than {@code endExclusive}.
+     *
+     * @param <T>            The entity type being queried.
+     * @param <C>            The comparable type of the property.
+     * @param propertyPath   Dot-delimited property path to compare.
+     * @param startInclusive The inclusive lower bound.
+     * @param endExclusive   The exclusive upper bound.
+     * @see PropertyPath#from(String)
+     */
     public static <T, C extends Comparable<? super C>> Specification<T> between(String propertyPath, C startInclusive, C endExclusive) {
     	return between(PropertyPath.from(propertyPath), startInclusive, endExclusive);
     }
 
+    /**
+     * Creates a specification that matches entities where the specified property is greater than or
+     * equal to {@code startInclusive} and strictly less than {@code endExclusive}.
+     *
+     * @param <T>            The entity type being queried.
+     * @param <C>            The comparable type of the property.
+     * @param propertyPath   Resolved property path to compare.
+     * @param startInclusive The inclusive lower bound.
+     * @param endExclusive   The exclusive upper bound.
+     */
     public static <T, C extends Comparable<? super C>> Specification<T> between(PropertyPath propertyPath, C startInclusive, C endExclusive) {
         Specification<T> afterStart = atLeast(propertyPath, startInclusive);
         Specification<T> beforeEnd = lessThan(propertyPath, endExclusive);
