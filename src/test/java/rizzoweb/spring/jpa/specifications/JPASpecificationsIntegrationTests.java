@@ -1,6 +1,8 @@
 package rizzoweb.spring.jpa.specifications;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static rizzoweb.spring.jpa.specifications.JPASpecifications.atLeast;
+import static rizzoweb.spring.jpa.specifications.JPASpecifications.smartDistinct;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -92,6 +94,30 @@ public class JPASpecificationsIntegrationTests {
 			List<Customer> results = repo.findAll(spec);
 
 			assertThat(results).containsExactly(coyote);
+		}
+
+		@Test
+		void doesNotContain_NestedProperty() {
+		    Customer coyote = Customer.builder()
+                		            .name("Wile E. Coyote")
+                		            .address(Address.builder().city("Albuquerque").build())
+                		            .build();
+		    entityManager.persistAndFlush(coyote.getAddress());
+		    coyote = entityManager.persistAndFlush(coyote);
+
+		    final Customer bugs = Customer.builder()
+                		            .name("Bugs Bunny")
+                		            .address(Address.builder().city("Atlanta").build())
+                		            .build();
+		    entityManager.persistAndFlush(bugs.getAddress());
+		    entityManager.persistAndFlush(bugs);
+
+		    var path = Customer.Fields.address + '.' + Address.Fields.city;
+		    Specification<Customer> spec = JPASpecifications.doesNotContain(path, "que");
+
+		    List<Customer> results = repo.findAll(spec);
+
+		    assertThat(results).containsExactly(bugs);
 		}
 
 		@Test
@@ -222,6 +248,52 @@ public class JPASpecificationsIntegrationTests {
 
 			assertThat(results).containsExactly(customer);
 		}
+
+		@Test
+		void isNot() {
+            final String wileE = "Wile E. Coyote";
+            Customer coyote = Customer.builder()
+                                        .name(wileE)
+                                        .build();
+            coyote = entityManager.persistAndFlush(coyote);
+
+            Customer roadRunner = Customer.builder().name("Road Runner").build();
+            roadRunner = entityManager.persistAndFlush(roadRunner);
+
+            Specification<Customer> spec = JPASpecifications.isNot(Customer.Fields.name, wileE);
+
+            List<Customer> results = repo.findAll(spec);
+
+            assertThat(results).containsExactly(roadRunner);
+		}
+
+        @Test
+        void isNot_NestedProperty() {
+            final String zipCode = "33602";
+            Customer customer1 = Customer.builder()
+                                    .address(Address.builder()
+                                            .zipCode(zipCode)
+                                            .build())
+                                    .build();
+            entityManager.persistAndFlush(customer1.getAddress());
+            customer1 = entityManager.persistAndFlush(customer1);
+
+            Customer customer2 = Customer.builder()
+                                    .address(Address.builder()
+                                            .zipCode("12345")
+                                            .build())
+                                    .build();
+            entityManager.persistAndFlush(customer2.getAddress());
+            customer2 = entityManager.persistAndFlush(customer2);
+
+            var path = PropertyPath.of(Customer.Fields.address, Address.Fields.zipCode);
+            Specification<Customer> spec = JPASpecifications.isNot(path, zipCode);
+
+            List<Customer> results = repo.findAll(spec);
+
+            assertThat(results).containsExactly(customer2);
+        }
+
 	}
 
 
@@ -324,7 +396,7 @@ public class JPASpecificationsIntegrationTests {
 			entityManager.persist(poBoxUser.getAddress());
 			poBoxUser = entityManager.persistAndFlush(poBoxUser);
 
-			PropertyPath path = PropertyPath.from("address.isPOBox");
+			String path = "address.isPOBox";
 			Specification<Customer> spec = JPASpecifications.isTrue(path);
 
 			List<Customer> results = repo.findAll(spec);
@@ -428,12 +500,43 @@ public class JPASpecificationsIntegrationTests {
 								.build());
 			staleUser = entityManager.persistAndFlush(staleUser);
 
-			var spec = CustomerSpecifications.hasRecentOrder();
+		    final var path = Customer.Fields.orders + '.' + Order.Fields.datePlaced;
+		    Specification<Customer> spec = atLeast(path, LocalDate.now().minusDays(30));
+		    spec = smartDistinct(spec);
+
 			List<Customer> results = repo.findAll(spec);
 
 			assertThat(results).containsExactly(newbie);
 		}
 	}
+
+    @Test
+    void areEqual() {
+        Customer customer1 = Customer.builder()
+                                .name("Somewhere")  // Not realistic but useful for testing
+                                .address(Address.builder()
+                                        .city("Somewhere")
+                                        .build())
+                                .build();
+        entityManager.persistAndFlush(customer1.getAddress());
+        customer1 = entityManager.persistAndFlush(customer1);
+
+        Customer customer2 = Customer.builder()
+                                .name("Daffy Duck")
+                                .address(Address.builder()
+                                        .city("Spitsville")
+                                        .build())
+                                .build();
+        entityManager.persistAndFlush(customer2.getAddress());
+        customer2 = entityManager.persistAndFlush(customer2);
+
+        // Find entities where name is equal to city
+        Specification<Customer> spec = JPASpecifications.areEqual("name", "address.city");
+
+        List<Customer> results = repo.findAll(spec);
+
+        assertThat(results).containsExactly(customer1);
+    }
 
 
 	@Test

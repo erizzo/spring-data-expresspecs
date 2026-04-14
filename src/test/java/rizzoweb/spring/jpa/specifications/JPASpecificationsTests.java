@@ -87,6 +87,14 @@ class JPASpecificationsTests {
     @ParameterizedTest
     @NullSource
     @EmptySource
+    void isNot_EmptySearchValue(String emptySearchValue) {
+        Specification<Object> result = JPASpecifications.isNot("foo", emptySearchValue);
+        assertThat(result).isNull();
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @EmptySource
     void is_NestedPath_EmptySearchValue(String emptySearchValue) {
       PropertyPath propertyPath = PropertyPath.of("foo", "bar");
 	  Specification<Object> result = JPASpecifications.is(propertyPath, emptySearchValue);

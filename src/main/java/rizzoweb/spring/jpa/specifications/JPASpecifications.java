@@ -61,8 +61,8 @@ public class JPASpecifications {
         };
     }
 
-    public static <T> Specification<T> isTrue(String property) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.isTrue(root.get(property));
+    public static <T> Specification<T> isTrue(String propertyPath) {
+        return isTrue(PropertyPath.from(propertyPath));
     }
 
     public static <T> Specification<T> isTrue(PropertyPath propertyPath) {
@@ -72,8 +72,8 @@ public class JPASpecifications {
         };
     }
 
-    public static <T> Specification<T> isFalse(String property) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.isFalse(root.get(property));
+    public static <T> Specification<T> isFalse(String propertyPath) {
+        return isFalse(PropertyPath.from(propertyPath));
     }
 
     public static <T> Specification<T> isFalse(PropertyPath propertyPath) {
