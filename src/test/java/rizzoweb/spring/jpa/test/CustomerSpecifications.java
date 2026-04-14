@@ -1,15 +1,15 @@
 package rizzoweb.spring.jpa.test;
 
 
-import static rizzoweb.spring.jpa.JPASpecifications.atLeast;
-import static rizzoweb.spring.jpa.JPASpecifications.smartDistinct;
+import static rizzoweb.spring.jpa.specifications.JPASpecifications.atLeast;
+import static rizzoweb.spring.jpa.specifications.JPASpecifications.smartDistinct;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import org.springframework.data.jpa.domain.Specification;
 
-import rizzoweb.spring.jpa.JPASpecifications;
-import rizzoweb.spring.jpa.PropertyPath;
+import rizzoweb.spring.jpa.specifications.JPASpecifications;
+import rizzoweb.spring.jpa.specifications.PropertyPath;
 
 public interface CustomerSpecifications {
 

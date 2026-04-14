@@ -1,6 +1,6 @@
-package rizzoweb.spring.jpa;
+package rizzoweb.spring.jpa.specifications;
 
-import static rizzoweb.spring.jpa.SpecificationExtensions.safeOr;
+import static rizzoweb.spring.jpa.specifications.SpecificationExtensions.safeOr;
 import static rizzoweb.utils.SQLUtils.escapeLike;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isEmpty;

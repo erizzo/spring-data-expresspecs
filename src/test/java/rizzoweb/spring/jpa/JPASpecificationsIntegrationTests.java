@@ -13,6 +13,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ContextConfiguration;
+
+import rizzoweb.spring.jpa.specifications.JPASpecifications;
+import rizzoweb.spring.jpa.specifications.PropertyPath;
 import rizzoweb.spring.jpa.test.Address;
 import rizzoweb.spring.jpa.test.Customer;
 import rizzoweb.spring.jpa.test.CustomerRepository;
