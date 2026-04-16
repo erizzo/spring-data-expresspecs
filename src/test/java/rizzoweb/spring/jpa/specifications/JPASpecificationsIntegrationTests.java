@@ -11,9 +11,10 @@ import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.data.jpa.domain.Specification;
+import org.jspecify.annotations.NonNull;
 import org.springframework.test.context.ContextConfiguration;
 
 import rizzoweb.spring.jpa.specifications.test.Address;
@@ -34,16 +35,39 @@ public class JPASpecificationsIntegrationTests {
 	private TestEntityManager entityManager;
 
 
+	private @NonNull Customer customer(String name) {
+	    return Customer.builder()
+                .name(name)
+                .build();
+	}
+
+	private @NonNull Customer customer(String name, Address address) {
+	    return Customer.builder()
+	            .name(name)
+	            .address(address)
+	            .build();
+	}
+
+	private @NonNull Address city(String city) {
+	    return Address.builder()
+	            .city(city)
+	            .build();
+	}
+
+	private @NonNull Address zipCode(String zipCode) {
+	    return Address.builder()
+	            .zipCode(zipCode)
+	            .build();
+	}
+
 	@Nested
 	class ContainsVariants {
 		@Test
 		void contains() {
-			Customer coyote = Customer.builder()
-								.name("Wile E. Coyote")
-								.build();
+			Customer coyote = customer("Wile E. Coyote");
 			coyote = entityManager.persistAndFlush(coyote);
 
-			entityManager.persistAndFlush(Customer.builder().name("Road Runner").build());
+			entityManager.persistAndFlush(customer("Road Runner"));
 
 			Specification<Customer> spec = JPASpecifications.contains(Customer.Fields.name, "Coy");
 			// Equaivalent using the CustomerSpecifications domain-specific helper
@@ -56,12 +80,10 @@ public class JPASpecificationsIntegrationTests {
 
 		@Test
 		void contains_WithSpace() {
-			Customer coyote = Customer.builder()
-								.name("Wile E. Coyote")
-								.build();
+			Customer coyote = customer("Wile E. Coyote");
 			coyote = entityManager.persistAndFlush(coyote);
 
-			entityManager.persistAndFlush(Customer.builder().name("Unknown").build());
+			entityManager.persistAndFlush(customer("Unknown"));
 
 			Specification<Customer> spec = JPASpecifications.contains(Customer.Fields.name, " ");
 			// Equaivalent using the CustomerSpecifications domain-specific helper
@@ -72,19 +94,14 @@ public class JPASpecificationsIntegrationTests {
 			assertThat(results).containsExactly(coyote);
 		}
 
-		@Test
+        @Test
+        @SuppressWarnings("null")
 		void contains_NestedProperty() {
-			Customer coyote = Customer.builder()
-								.name("Wile E. Coyote")
-								.address(Address.builder().city("Albuquerque").build())
-								.build();
+			Customer coyote = customer("Wile E. Coyote", city("Albuquerque"));
 			entityManager.persistAndFlush(coyote.getAddress());
 			coyote = entityManager.persistAndFlush(coyote);
 
-			final Customer rabbit = Customer.builder()
-									.name("Bugs Bunny")
-									.address(Address.builder().city("Atlanta").build())
-									.build();
+			final Customer rabbit = customer("Bugs Bunny", city("Atlanta"));
 			entityManager.persistAndFlush(rabbit.getAddress());
 			entityManager.persistAndFlush(rabbit);
 
@@ -97,18 +114,13 @@ public class JPASpecificationsIntegrationTests {
 		}
 
 		@Test
+		@SuppressWarnings("null")
 		void containsIgnoreCase_NestedProperty() {
-			Customer coyote = Customer.builder()
-								.name("Wile E. Coyote")
-								.address(Address.builder().city("Albuquerque").build())
-								.build();
+			Customer coyote = customer("Wile E. Coyote", city("Albuquerque"));
 			entityManager.persistAndFlush(coyote.getAddress());
 			coyote = entityManager.persistAndFlush(coyote);
 
-			final Customer rabbit = Customer.builder()
-									.name("Bugs Bunny")
-									.address(Address.builder().city("Atlanta").build())
-									.build();
+			final Customer rabbit = customer("Bugs Bunny", city("Atlanta"));
 			entityManager.persistAndFlush(rabbit.getAddress());
 			entityManager.persistAndFlush(rabbit);
 
@@ -122,18 +134,13 @@ public class JPASpecificationsIntegrationTests {
 		}
 
 		@Test
+		@SuppressWarnings("null")
 		void doesNotContain_NestedProperty() {
-		    Customer coyote = Customer.builder()
-                		            .name("Wile E. Coyote")
-                		            .address(Address.builder().city("Albuquerque").build())
-                		            .build();
+		    Customer coyote = customer("Wile E. Coyote", city("Albuquerque"));
 		    entityManager.persistAndFlush(coyote.getAddress());
 		    coyote = entityManager.persistAndFlush(coyote);
 
-		    final Customer rabbit = Customer.builder()
-                		            .name("Bugs Bunny")
-                		            .address(Address.builder().city("Atlanta").build())
-                		            .build();
+		    final Customer rabbit = customer("Bugs Bunny", city("Atlanta"));
 		    entityManager.persistAndFlush(rabbit.getAddress());
 		    entityManager.persistAndFlush(rabbit);
 
@@ -146,18 +153,13 @@ public class JPASpecificationsIntegrationTests {
 		}
 
 		@Test
+		@SuppressWarnings("null")
 		void doesNotContainIgnoreCase_NestedProperty() {
-		    Customer coyote = Customer.builder()
-                		            .name("Wile E. Coyote")
-                		            .address(Address.builder().city("Albuquerque").build())
-                		            .build();
+		    Customer coyote = customer("Wile E. Coyote", city("Albuquerque"));
 		    entityManager.persistAndFlush(coyote.getAddress());
 		    coyote = entityManager.persistAndFlush(coyote);
 
-		    final Customer rabbit = Customer.builder()
-                		            .name("Bugs Bunny")
-                		            .address(Address.builder().city("Atlanta").build())
-                		            .build();
+		    final Customer rabbit = customer("Bugs Bunny", city("Atlanta"));
 		    entityManager.persistAndFlush(rabbit.getAddress());
 		    entityManager.persistAndFlush(rabbit);
 
@@ -171,12 +173,10 @@ public class JPASpecificationsIntegrationTests {
 
 		@Test
 		void containsAny() {
-			Customer coyote = Customer.builder()
-								.name("Wile E. Coyote")
-								.build();
+			Customer coyote = customer("Wile E. Coyote");
 			coyote = entityManager.persistAndFlush(coyote);
 
-			entityManager.persistAndFlush(Customer.builder().name("Road Runner").build());
+			entityManager.persistAndFlush(customer("Road Runner"));
 
 			List<String> searchTerms = List.of("Fudd", "Wile", "Bugs");
 			Specification<Customer> spec = JPASpecifications.containsAny(Customer.Fields.name, searchTerms);
@@ -188,12 +188,10 @@ public class JPASpecificationsIntegrationTests {
 
 		@Test
 		void containsAnyIgnoreCase() {
-			Customer coyote = Customer.builder()
-								.name("Wile E. Coyote")
-								.build();
+			Customer coyote = customer("Wile E. Coyote");
 			coyote = entityManager.persistAndFlush(coyote);
 
-			entityManager.persistAndFlush(Customer.builder().name("Road Runner").build());
+			entityManager.persistAndFlush(customer("Road Runner"));
 
 			List<String> searchTerms = List.of("FUDD", "WILE", "BUGS");
 			Specification<Customer> spec = JPASpecifications.containsAnyIgnoreCase(
@@ -204,19 +202,14 @@ public class JPASpecificationsIntegrationTests {
 			assertThat(results).containsExactly(coyote);
 		}
 
-		@Test
+        @Test
+        @SuppressWarnings("null")
 		void containsAny_NestedProperty() {
-			Customer coyote = Customer.builder()
-								.name("Wile E. Coyote")
-								.address(Address.builder().city("Albuquerque").build())
-								.build();
+			Customer coyote = customer("Wile E. Coyote", city("Albuquerque"));
 			entityManager.persistAndFlush(coyote.getAddress());
 			coyote = entityManager.persistAndFlush(coyote);
 
-			final Customer rabbit = Customer.builder()
-									.name("Bugs Bunny")
-									.address(Address.builder().city("Atlanta").build())
-									.build();
+			final Customer rabbit = customer("Bugs Bunny", city("Atlanta"));
 			entityManager.persistAndFlush(rabbit.getAddress());
 			entityManager.persistAndFlush(rabbit);
 
@@ -228,19 +221,14 @@ public class JPASpecificationsIntegrationTests {
 			assertThat(results).containsExactly(coyote);
 		}
 
-		@Test
+        @Test
+        @SuppressWarnings("null")
 		void containsAnyIgnoreCase_NestedProperty() {
-			Customer coyote = Customer.builder()
-								.name("Wile E. Coyote")
-								.address(Address.builder().city("Albuquerque").build())
-								.build();
+			Customer coyote = customer("Wile E. Coyote", city("Albuquerque"));
 			entityManager.persistAndFlush(coyote.getAddress());
 			coyote = entityManager.persistAndFlush(coyote);
 
-			final Customer rabbit = Customer.builder()
-									.name("Bugs Bunny")
-									.address(Address.builder().city("Atlanta").build())
-									.build();
+			final Customer rabbit = customer("Bugs Bunny", city("Atlanta"));
 			entityManager.persistAndFlush(rabbit.getAddress());
 			entityManager.persistAndFlush(rabbit);
 
@@ -260,12 +248,10 @@ public class JPASpecificationsIntegrationTests {
 		@Test
 		void is() {
 			final String wileE = "Wile E. Coyote";
-			Customer coyote = Customer.builder()
-								.name(wileE)
-								.build();
+			Customer coyote = customer(wileE);
 			coyote = entityManager.persistAndFlush(coyote);
 
-			entityManager.persistAndFlush(Customer.builder().name("Road Runner").build());
+			entityManager.persistAndFlush(customer("Road Runner"));
 
 			Specification<Customer> spec = JPASpecifications.is(Customer.Fields.name, wileE);
 			// Equaivalent using the CustomerSpecifications domain-specific helper
@@ -278,12 +264,9 @@ public class JPASpecificationsIntegrationTests {
 
 		@Test
 	    void is_NestedProperty_NoMatches() {
-			Customer customer = Customer.builder()
-	                            	.address(Address.builder()
-											.zipCode("33602")
-											.build())
-	                            .build();
-			entityManager.persistAndFlush(customer.getAddress());
+			Address address = zipCode("33602");
+            Customer customer = customer("c1", address);
+			entityManager.persistAndFlush(address);
 			entityManager.persistAndFlush(customer);
 
 			var path = PropertyPath.of(Customer.Fields.address, Address.Fields.zipCode);
@@ -300,12 +283,9 @@ public class JPASpecificationsIntegrationTests {
 		@Test
 		void is_NestedProperty() {
 			final String zipCode = "33602";
-			Customer customer = Customer.builder()
-									.address(Address.builder()
-											.zipCode(zipCode)
-											.build())
-									.build();
-			entityManager.persistAndFlush(customer.getAddress());
+			Address address = zipCode(zipCode);
+			Customer customer = customer("c1", address);
+			entityManager.persistAndFlush(address);
 			customer = entityManager.persistAndFlush(customer);
 
 			var path = PropertyPath.of(Customer.Fields.address, Address.Fields.zipCode);
@@ -344,12 +324,10 @@ public class JPASpecificationsIntegrationTests {
 		@Test
 		void isNot() {
             final String wileE = "Wile E. Coyote";
-            Customer coyote = Customer.builder()
-                                        .name(wileE)
-                                        .build();
+            Customer coyote = customer(wileE);
             coyote = entityManager.persistAndFlush(coyote);
 
-            Customer roadRunner = Customer.builder().name("Road Runner").build();
+            Customer roadRunner = customer("Road Runner");
             roadRunner = entityManager.persistAndFlush(roadRunner);
 
             Specification<Customer> spec = JPASpecifications.isNot(Customer.Fields.name, wileE);
@@ -360,21 +338,14 @@ public class JPASpecificationsIntegrationTests {
 		}
 
         @Test
+        @SuppressWarnings("null")
         void isNot_NestedProperty() {
             final String zipCode = "33602";
-            Customer customer1 = Customer.builder()
-                                    .address(Address.builder()
-                                            .zipCode(zipCode)
-                                            .build())
-                                    .build();
+            Customer customer1 = customer("c1", zipCode(zipCode));
             entityManager.persistAndFlush(customer1.getAddress());
             customer1 = entityManager.persistAndFlush(customer1);
 
-            Customer customer2 = Customer.builder()
-                                    .address(Address.builder()
-                                            .zipCode("12345")
-                                            .build())
-                                    .build();
+            Customer customer2 = customer("c2", zipCode("12345"));
             entityManager.persistAndFlush(customer2.getAddress());
             customer2 = entityManager.persistAndFlush(customer2);
 
@@ -394,12 +365,10 @@ public class JPASpecificationsIntegrationTests {
 		@Test
 		void isAny() {
 			final String wileE = "Wile E. Coyote";
-			Customer coyote = Customer.builder()
-					.name(wileE)
-					.build();
+			Customer coyote = customer(wileE);
 			coyote = entityManager.persistAndFlush(coyote);
 
-			entityManager.persistAndFlush(Customer.builder().name("Road Runner").build());
+			entityManager.persistAndFlush(customer("Road Runner"));
 
 			List<String> searchValues = List.of("Bugs Bunny", wileE, "Elmer Fudd");
 
@@ -413,14 +382,11 @@ public class JPASpecificationsIntegrationTests {
 			assertThat(results).containsExactly(coyote);
 		}
 
-		@Test
+        @Test
+        @SuppressWarnings("null")
 		void isAny_NestedProperty() {
 			final String zipCode = "33602";
-			Customer customer = Customer.builder()
-								.address(Address.builder()
-										.zipCode(zipCode)
-										.build())
-								.build();
+			Customer customer = customer("c1", zipCode(zipCode));
 			entityManager.persistAndFlush(customer.getAddress());
 			customer = entityManager.persistAndFlush(customer);
 
@@ -439,16 +405,12 @@ public class JPASpecificationsIntegrationTests {
 	class IsTrueIsFalse {
 		@Test
 		void isTrue_isFalse() {
-			Customer coyote = Customer.builder()
-								.name("Wile E. Coyote")
-								.isActive(true)
-								.build();
+			Customer coyote = customer("Wile E. Coyote");
+			coyote.setActive(true);
 			coyote = entityManager.persistAndFlush(coyote);
 
-			Customer inactive = Customer.builder()
-								.name("Unknown")
-								.isActive(false)
-								.build();
+			Customer inactive = customer("c2");
+			inactive.setActive(false);
 			inactive = entityManager.persistAndFlush(inactive);
 
 			Specification<Customer> spec = JPASpecifications.isTrue(Customer.Fields.isActive);
@@ -468,7 +430,8 @@ public class JPASpecificationsIntegrationTests {
 		}
 
 
-		@Test
+        @Test
+        @SuppressWarnings("null")
 		void isTrue_isFalse_NestedProperty() {
 			Customer coyote = Customer.builder()
 								.name("Wile E. Coyote")
@@ -506,15 +469,10 @@ public class JPASpecificationsIntegrationTests {
 
 	@Test
 	void isNull_notNull() {
-		Customer coyote = Customer.builder()
-							.name("Wile E. Coyote")
-							.isActive(true)
-							.build();
+		Customer coyote = customer("Wile E. Coyote");
 		coyote = entityManager.persistAndFlush(coyote);
 
-		Customer unnamed = Customer.builder()
-							// no name is set
-							.build();
+		Customer unnamed = customer(null);    // No name
 		unnamed = entityManager.persistAndFlush(unnamed);
 
 		// Test isNull()
@@ -579,14 +537,14 @@ public class JPASpecificationsIntegrationTests {
 
 		@Test
 		void atLeast_NestedProperty() {
-			var newbie = Customer.builder().build();
+			var newbie = customer("newb");
 
 			newbie.addOrder(Order.builder()
 								.datePlaced(LocalDate.now().minusDays(1))
 								.build());
 			newbie = entityManager.persistAndFlush(newbie);
 
-			var staleUser = Customer.builder().build();
+			var staleUser = customer("stale");
 			staleUser.addOrder(Order.builder()
 								.datePlaced(LocalDate.now().minusYears(1))
 								.build());
@@ -603,22 +561,13 @@ public class JPASpecificationsIntegrationTests {
 	}
 
     @Test
+    @SuppressWarnings("null")
     void areEqual() {
-        Customer customer1 = Customer.builder()
-                                .name("Somewhere")  // Not realistic but useful for testing
-                                .address(Address.builder()
-                                        .city("Somewhere")
-                                        .build())
-                                .build();
+        Customer customer1 = customer("Somewhere", city("Somewhere"));   // Not realistic but useful for testing
         entityManager.persistAndFlush(customer1.getAddress());
         customer1 = entityManager.persistAndFlush(customer1);
 
-        Customer customer2 = Customer.builder()
-                                .name("Daffy Duck")
-                                .address(Address.builder()
-                                        .city("Spitsville")
-                                        .build())
-                                .build();
+        Customer customer2 = customer("Daffy Duck", city("Spitsville"));
         entityManager.persistAndFlush(customer2.getAddress());
         customer2 = entityManager.persistAndFlush(customer2);
 
