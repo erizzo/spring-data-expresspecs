@@ -20,6 +20,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write  ## Needed for the dependency graph upload step below
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [sb4, sb3]
 
     steps:
     - uses: actions/checkout@v4
@@ -29,11 +33,13 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    - name: Build with Maven
-      run: ./mvnw -B --no-transfer-progress package
+
+    - name: Build with Maven (${{ matrix.profile }})
+      run: ./mvnw -B --no-transfer-progress package -P${{ matrix.profile }}
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
+      if: matrix.profile == 'sb4'
       uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
       with:
-        maven-args: -B --no-transfer-progress
+        maven-args: -B --no-transfer-progress -Psb4
