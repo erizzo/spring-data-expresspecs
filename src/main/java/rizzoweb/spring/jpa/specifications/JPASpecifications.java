@@ -458,7 +458,7 @@ public class JPASpecifications {
      * @return A specification, or {@code null} when {@code searchTerms} is null/empty.
      * @see PropertyPath#from(String)
      */
-    public static <T> @NonNull Specification<T> containsAnyIgnoreCase(String propertyPath, List<String> searchTerms) {
+    public static <T> @NonNull Specification<T> containsAnyIgnoreCase(String propertyPath, Collection<String> searchTerms) {
         return containsAnyIgnoreCase(PropertyPath.from(propertyPath), searchTerms);
     }
 
@@ -471,7 +471,7 @@ public class JPASpecifications {
      * @param searchTerms Candidate substrings for case-insensitive matching.
      * @return A specification, or {@code null} when {@code searchTerms} is null/empty.
      */
-    public static <T> @NonNull Specification<T> containsAnyIgnoreCase(PropertyPath propertyPath, List<String> searchTerms) {
+    public static <T> @NonNull Specification<T> containsAnyIgnoreCase(PropertyPath propertyPath, Collection<String> searchTerms) {
         if (isEmpty(searchTerms)) { return unrestricted(); }
 
         List<String> escapedTerms = searchTerms.stream()
@@ -501,7 +501,7 @@ public class JPASpecifications {
      * @return A specification, or {@code null} when {@code searchTerms} is null/empty.
      * @see PropertyPath#from(String)
      */
-    public static <T> @NonNull Specification<T> containsAny(String propertyPath, List<String> searchTerms) {
+    public static <T> @NonNull Specification<T> containsAny(String propertyPath, Collection<String> searchTerms) {
         return containsAny(PropertyPath.from(propertyPath), searchTerms);
     }
 
@@ -514,7 +514,7 @@ public class JPASpecifications {
      * @param searchTerms Candidate substrings for case-sensitive matching.
      * @return A specification, or {@code null} when {@code searchTerms} is null/empty.
      */
-    public static <T> @NonNull Specification<T> containsAny(PropertyPath propertyPath, List<String> searchTerms) {
+    public static <T> @NonNull Specification<T> containsAny(PropertyPath propertyPath, Collection<String> searchTerms) {
         if (isEmpty(searchTerms)) { return unrestricted(); }
 
         List<String> escapedTerms = searchTerms.stream()
