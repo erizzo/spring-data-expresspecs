@@ -5,6 +5,6 @@ import org.springframework.test.context.ContextConfiguration;
 
 
 @DataJpaTest
-@ContextConfiguration(classes = rizzoweb.spring.jpa.specifications.TestJpaConfig.class)
-public class CustomerServiceIntegrationTests extends BaseCustomerServiceIntegrationTests {
+@ContextConfiguration(classes = rizzoweb.spring.jpa.specifications.SB3JpaTestConfig.class)
+public class SB3CustomerServiceIntegrationTests extends BaseCustomerServiceIntegrationTests {
 }

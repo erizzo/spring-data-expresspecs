@@ -15,7 +15,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan(basePackageClasses = rizzoweb.spring.jpa.specifications.test.ComponentScanMarker.class)
 @EntityScan(basePackageClasses = rizzoweb.spring.jpa.specifications.test.ComponentScanMarker.class)
 @EnableJpaRepositories(basePackageClasses = rizzoweb.spring.jpa.specifications.test.ComponentScanMarker.class)
-public class TestJpaConfig {
+public class SB4JPATestConfig {
 
     @Bean
     EntityManagerWrapper entityManager(TestEntityManager entityManager) {
