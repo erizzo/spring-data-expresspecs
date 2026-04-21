@@ -27,6 +27,10 @@ public interface CustomerSpecifications {
 		return JPASpecifications.contains(Customer.Fields.name, partialName);
 	}
 
+	public static @NonNull Specification<Customer> nameContainsIgnoreCase(String partialName) {
+		return JPASpecifications.containsIgnoreCase(Customer.Fields.name, partialName);
+	}
+
 	public static @NonNull Specification<Customer> isActive() {
 		return JPASpecifications.isTrue(Customer.Fields.isActive);
 	}

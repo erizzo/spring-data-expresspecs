@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 
+import rizzoweb.spring.jpa.BaseJPAIntegrationTest;
 import rizzoweb.spring.jpa.specifications.test.Address;
 import rizzoweb.spring.jpa.specifications.test.Customer;
 import rizzoweb.spring.jpa.specifications.test.CustomerRepository;
@@ -22,13 +23,11 @@ import rizzoweb.spring.jpa.specifications.test.Order;
 import rizzoweb.spring.jpa.specifications.test.PhoneNumber;
 
 @Transactional
-abstract class BaseJPASpecificationsIntegrationTests {
+public abstract class BaseJPASpecificationsIntegrationTests extends BaseJPAIntegrationTest {
 
 	@Autowired
 	protected CustomerRepository repo;
 
-	protected abstract <T> @NonNull T persistAndFlush(T entity);
-	protected abstract void clear();
 
 	private @NonNull Customer customer(String name) {
 	    return Customer.builder()
@@ -99,6 +98,20 @@ abstract class BaseJPASpecificationsIntegrationTests {
 
 		var path = PropertyPath.of(Customer.Fields.address, Address.Fields.city);
 		Specification<Customer> spec = JPASpecifications.contains(path, "que");
+
+		List<Customer> results = repo.findAll(spec);
+
+		assertThat(results).containsExactly(coyote);
+	}
+
+	@Test
+	void nameContainsIgnoreCase() {
+		Customer coyote = customer("Wile E. Coyote");
+		coyote = persistAndFlush(coyote);
+
+		persistAndFlush(customer("Road Runner"));
+
+		Specification<Customer> spec = CustomerSpecifications.nameContainsIgnoreCase("COYOTE");
 
 		List<Customer> results = repo.findAll(spec);
 
@@ -571,7 +584,7 @@ abstract class BaseJPASpecificationsIntegrationTests {
 							.datePlaced(LocalDate.now().minusDays(2))
 							.build());
 		customer = persistAndFlush(customer);
-		clear();
+		entityManager.clear();
 
 		var spec = CustomerSpecifications.hasRecentOrder();
 		List<Customer> results = repo.findAll(spec);
