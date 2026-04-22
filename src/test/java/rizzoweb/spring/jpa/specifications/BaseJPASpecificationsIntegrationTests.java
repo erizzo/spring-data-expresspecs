@@ -15,12 +15,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 
 import rizzoweb.spring.jpa.BaseJPAIntegrationTest;
-import rizzoweb.spring.jpa.specifications.test.Address;
-import rizzoweb.spring.jpa.specifications.test.Customer;
-import rizzoweb.spring.jpa.specifications.test.CustomerRepository;
-import rizzoweb.spring.jpa.specifications.test.CustomerSpecifications;
-import rizzoweb.spring.jpa.specifications.test.Order;
-import rizzoweb.spring.jpa.specifications.test.PhoneNumber;
+import rizzoweb.spring.jpa.specifications.example.Address;
+import rizzoweb.spring.jpa.specifications.example.Customer;
+import rizzoweb.spring.jpa.specifications.example.CustomerRepository;
+import rizzoweb.spring.jpa.specifications.example.CustomerSpecifications;
+import rizzoweb.spring.jpa.specifications.example.Order;
+import rizzoweb.spring.jpa.specifications.example.PhoneNumber;
 
 @Transactional
 public abstract class BaseJPASpecificationsIntegrationTests extends BaseJPAIntegrationTest {

@@ -9,12 +9,14 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import rizzoweb.spring.jpa.EntityManagerWrapper;
+
 
 @Configuration
 @EnableAutoConfiguration
-@ComponentScan(basePackageClasses = rizzoweb.spring.jpa.specifications.test.ComponentScanMarker.class)
-@EntityScan(basePackageClasses = rizzoweb.spring.jpa.specifications.test.ComponentScanMarker.class)
-@EnableJpaRepositories(basePackageClasses = rizzoweb.spring.jpa.specifications.test.ComponentScanMarker.class)
+@ComponentScan(basePackageClasses = rizzoweb.spring.jpa.specifications.example.ComponentScanMarker.class)
+@EntityScan(basePackageClasses = rizzoweb.spring.jpa.specifications.example.ComponentScanMarker.class)
+@EnableJpaRepositories(basePackageClasses = rizzoweb.spring.jpa.specifications.example.ComponentScanMarker.class)
 public class SB3JpaTestConfig {
 
     @Bean

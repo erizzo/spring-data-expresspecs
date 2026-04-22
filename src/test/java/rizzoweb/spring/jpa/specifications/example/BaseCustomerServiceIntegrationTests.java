@@ -1,4 +1,4 @@
-package rizzoweb.spring.jpa.specifications.test;
+package rizzoweb.spring.jpa.specifications.example;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

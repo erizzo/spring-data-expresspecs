@@ -2,8 +2,6 @@ package rizzoweb.spring.jpa;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import rizzoweb.spring.jpa.specifications.EntityManagerWrapper;
-
 public class BaseJPAIntegrationTest {
 
     @Autowired

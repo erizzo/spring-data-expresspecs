@@ -1,10 +1,11 @@
-package rizzoweb.spring.jpa.specifications;
+package rizzoweb.spring.jpa;
 
 import org.jspecify.annotations.NonNull;
 
 public interface EntityManagerWrapper {
 
     <T> @NonNull T persistAndFlush(T entity);
+
     void clear();
 
 }

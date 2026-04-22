@@ -1,7 +1,7 @@
-package rizzoweb.spring.jpa.specifications.test;
+package rizzoweb.spring.jpa.specifications.example;
 
-import static rizzoweb.spring.jpa.specifications.test.CustomerSpecifications.isActive;
-import static rizzoweb.spring.jpa.specifications.test.CustomerSpecifications.nameContainsIgnoreCase;
+import static rizzoweb.spring.jpa.specifications.example.CustomerSpecifications.isActive;
+import static rizzoweb.spring.jpa.specifications.example.CustomerSpecifications.nameContainsIgnoreCase;
 
 import java.util.List;
 

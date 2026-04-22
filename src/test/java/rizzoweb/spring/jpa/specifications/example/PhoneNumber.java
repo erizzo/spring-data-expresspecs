@@ -1,4 +1,4 @@
-package rizzoweb.spring.jpa.specifications.test;
+package rizzoweb.spring.jpa.specifications.example;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
