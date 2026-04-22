@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import org.apache.commons.lang3.ObjectUtils;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Path;
@@ -47,11 +48,11 @@ public class JPASpecifications {
      * @param spec The underlying specification to execute.
      * @return A new Specification that conditionally applies {@code DISTINCT}.
      */
-    public static <T> Specification<T> smartDistinct(Specification<T> spec) {
+    public static <T> @NonNull Specification<T> smartDistinct(Specification<T> spec) {
         return (root, query, cb) -> {
             Predicate predicate = spec.toPredicate(root, query, cb);
 
-            if (query != null && !root.getJoins().isEmpty()) {
+            if (!root.getJoins().isEmpty()) {
                 Class<?> resultType = query.getResultType();
                 if (resultType != Long.class && resultType != long.class) {
                     query.distinct(true);
@@ -59,6 +60,18 @@ public class JPASpecifications {
             }
             return predicate;
         };
+    }
+
+    /**
+     * Returns an unrestricted specification that acts as a safe, backward-compatible replacement for
+     * returning {@code null} out of specification factories, which Spring Boot 4's {@code findAll()}
+     * no longer accepts.
+     *
+     * @param <T> The entity type being queried.
+     * @return An unrestricted specification.
+     */
+    public static <T> @NonNull Specification<T> unrestricted() {
+        return (root, query, cb) -> null;
     }
 
     /**
@@ -70,7 +83,7 @@ public class JPASpecifications {
      * @return A specification that evaluates to {@code true} when the target property is true.
      * @see PropertyPath#from(String)
      */
-    public static <T> Specification<T> isTrue(String propertyPath) {
+    public static <T> @NonNull Specification<T> isTrue(String propertyPath) {
         return isTrue(PropertyPath.from(propertyPath));
     }
 
@@ -82,7 +95,7 @@ public class JPASpecifications {
      * @param propertyPath Resolved property path to a boolean attribute.
      * @return A specification that evaluates to {@code true} when the target property is true.
      */
-    public static <T> Specification<T> isTrue(PropertyPath propertyPath) {
+    public static <T> @NonNull Specification<T> isTrue(PropertyPath propertyPath) {
         return (root, query, cb) -> {
             Path<Boolean> path = propertyPath.asPath(root);
 			return cb.isTrue(path);
@@ -98,7 +111,7 @@ public class JPASpecifications {
      * @return A specification that evaluates to {@code true} when the target property is false.
      * @see PropertyPath#from(String)
      */
-    public static <T> Specification<T> isFalse(String propertyPath) {
+    public static <T> @NonNull Specification<T> isFalse(String propertyPath) {
         return isFalse(PropertyPath.from(propertyPath));
     }
 
@@ -110,7 +123,7 @@ public class JPASpecifications {
      * @param propertyPath Resolved property path to a boolean attribute.
      * @return A specification that evaluates to {@code true} when the target property is false.
      */
-    public static <T> Specification<T> isFalse(PropertyPath propertyPath) {
+    public static <T> @NonNull Specification<T> isFalse(PropertyPath propertyPath) {
         return (root, query, cb) -> {
             Path<Boolean> path = propertyPath.asPath(root);
 			return cb.isFalse(path);
@@ -125,7 +138,7 @@ public class JPASpecifications {
      * @return A specification that evaluates to {@code true} when the target property is null.
      * @see PropertyPath#from(String)
      */
-    public static <T> Specification<T> isNull(String propertyPath) {
+    public static <T> @NonNull Specification<T> isNull(String propertyPath) {
         return isNull(PropertyPath.from(propertyPath));
     }
 
@@ -136,7 +149,7 @@ public class JPASpecifications {
      * @param propertyPath Resolved property path to test for null.
      * @return A specification that evaluates to {@code true} when the target property is null.
      */
-    public static <T> Specification<T> isNull(PropertyPath propertyPath) {
+    public static <T> @NonNull Specification<T> isNull(PropertyPath propertyPath) {
         return (root, query, cb) -> {
             Path<Boolean> path = propertyPath.asPath(root);
 			return cb.isNull(path);
@@ -152,7 +165,7 @@ public class JPASpecifications {
      * @return A specification that evaluates to {@code true} when the target property is not null.
      * @see PropertyPath#from(String)
      */
-    public static <T> Specification<T> notNull(String propertyPath) {
+    public static <T> @NonNull Specification<T> notNull(String propertyPath) {
         return notNull(PropertyPath.from(propertyPath));
     }
 
@@ -164,7 +177,7 @@ public class JPASpecifications {
      * @param propertyPath Resolved property path to test for non-null.
      * @return A specification that evaluates to {@code true} when the target property is not null.
      */
-    public static <T> Specification<T> notNull(PropertyPath propertyPath) {
+    public static <T> @NonNull Specification<T> notNull(PropertyPath propertyPath) {
         return (root, query, cb) -> {
             Path<Boolean> path = propertyPath.asPath(root);
 			return cb.isNotNull(path);
@@ -182,7 +195,7 @@ public class JPASpecifications {
      * @return A specification, or {@code null} when {@code value} is null/empty.
      * @see PropertyPath#from(String)
      */
-    public static <T, V> Specification<T> is(String propertyPath, V value) {
+    public static <T, V> @NonNull Specification<T> is(String propertyPath, V value) {
         return is(PropertyPath.from(propertyPath), value);
     }
 
@@ -196,8 +209,8 @@ public class JPASpecifications {
      * @param value Value to compare against.
      * @return A specification, or {@code null} when {@code value} is null/empty.
      */
-    public static <T, V> Specification<T> is(PropertyPath propertyPath, V value) {
-        if (ObjectUtils.isEmpty(value)) { return null; }
+    public static <T, V> @NonNull Specification<T> is(PropertyPath propertyPath, V value) {
+        if (ObjectUtils.isEmpty(value)) { return unrestricted(); }
 
         return (root, query, cb) -> {
             Path<?> path = propertyPath.asPath(root);
@@ -216,7 +229,7 @@ public class JPASpecifications {
      * @return A specification, or {@code null} when {@code aValue} is null/empty.
      * @see PropertyPath#from(String)
      */
-    public static <T, V> Specification<T> isNot(String propertyPath, V aValue) {
+    public static <T, V> @NonNull Specification<T> isNot(String propertyPath, V aValue) {
     	return isNot(PropertyPath.from(propertyPath), aValue);
     }
 
@@ -230,8 +243,8 @@ public class JPASpecifications {
      * @param aValue Value to compare against.
      * @return A specification, or {@code null} when {@code aValue} is null/empty.
      */
-    public static <T, V> Specification<T> isNot(PropertyPath propertyPath, V aValue) {
-    	if (ObjectUtils.isEmpty(aValue)) { return null; }
+    public static <T, V> @NonNull Specification<T> isNot(PropertyPath propertyPath, V aValue) {
+    	if (ObjectUtils.isEmpty(aValue)) { return unrestricted(); }
 
     	return (root, query, cb) -> {
     		Path<?> path = propertyPath.asPath(root);
@@ -248,7 +261,7 @@ public class JPASpecifications {
      * @return A specification that evaluates to {@code true} when both properties have
      *         equal values.
      */
-    public static <T> Specification<T> areEqual(PropertyPath path1, PropertyPath path2) {
+    public static <T> @NonNull Specification<T> areEqual(PropertyPath path1, PropertyPath path2) {
         return (root, query, cb) ->  cb.equal(path1.asPath(root), path2.asPath(root));
     }
 
@@ -261,7 +274,7 @@ public class JPASpecifications {
      * @return A specification that evaluates to {@code true} when both properties have
      *         equal values.
      */
-    public static <T> Specification<T> areEqual(String property1, String property2) {
+    public static <T> @NonNull Specification<T> areEqual(String property1, String property2) {
     	return areEqual(PropertyPath.from(property1), PropertyPath.from(property2));
     }
 
@@ -277,7 +290,7 @@ public class JPASpecifications {
      * @return A specification, or {@code null} when {@code searchValues} is null/empty.
      * @see PropertyPath#from(String)
      */
-    public static <T, V> Specification<T> isAny(String propertyPath, Collection<V> searchValues) {
+    public static <T, V> @NonNull Specification<T> isAny(String propertyPath, Collection<V> searchValues) {
     	return isAny(PropertyPath.from(propertyPath), searchValues);
     }
 
@@ -292,8 +305,8 @@ public class JPASpecifications {
      * @param searchValues Candidate values for an {@code IN (...)} predicate.
      * @return A specification, or {@code null} when {@code searchValues} is null/empty.
      */
-    public static <T, V> Specification<T> isAny(PropertyPath propertyPath, Collection<V> searchValues) {
-        if (isEmpty(searchValues)) { return null; }
+    public static <T, V> @NonNull Specification<T> isAny(PropertyPath propertyPath, Collection<V> searchValues) {
+        if (isEmpty(searchValues)) { return unrestricted(); }
 
         return (root, query, cb) -> {
             Path<Object> path = propertyPath.asPath(root);
@@ -312,7 +325,7 @@ public class JPASpecifications {
      * @return A specification, or {@code null} when {@code value} is null/empty.
      * @see PropertyPath#from(String)
      */
-    public static <T> Specification<T> contains(String propertyPath, String value) {
+    public static <T> @NonNull Specification<T> contains(String propertyPath, String value) {
         return contains(PropertyPath.from(propertyPath), value);
     }
 
@@ -325,8 +338,8 @@ public class JPASpecifications {
      * @param value Substring to match within the property value.
      * @return A specification, or {@code null} when {@code value} is null/empty.
      */
-    public static <T> Specification<T> contains(PropertyPath propertyPath, String value) {
-    	if (isEmpty(value)) { return null; }
+    public static <T> @NonNull Specification<T> contains(PropertyPath propertyPath, String value) {
+    	if (isEmpty(value)) { return unrestricted(); }
 
     	String escapedValue = escapeLike(value, ESCAPE_CHAR);
         return (root, query, cb) -> {
@@ -345,7 +358,7 @@ public class JPASpecifications {
      * @return A specification, or {@code null} when {@code value} is null/empty.
      * @see PropertyPath#from(String)
      */
-    public static <T> Specification<T> containsIgnoreCase(String propertyPath, String value) {
+    public static <T> @NonNull Specification<T> containsIgnoreCase(String propertyPath, String value) {
         return containsIgnoreCase(PropertyPath.from(propertyPath), value);
     }
 
@@ -358,8 +371,8 @@ public class JPASpecifications {
      * @param value Substring to match within the property value.
      * @return A specification, or {@code null} when {@code value} is null/empty.
      */
-    public static <T> Specification<T> containsIgnoreCase(PropertyPath propertyPath, String value) {
-        if (isEmpty(value)) { return null; }
+    public static <T> @NonNull Specification<T> containsIgnoreCase(PropertyPath propertyPath, String value) {
+        if (isEmpty(value)) { return unrestricted(); }
 
         String escapedValue = escapeLike(value.toLowerCase(Locale.ROOT), ESCAPE_CHAR);
         return (root, query, cb) -> {
@@ -378,7 +391,7 @@ public class JPASpecifications {
      * @return A specification, or {@code null} when {@code value} is null/empty.
      * @see PropertyPath#from(String)
      */
-    public static <T> Specification<T> doesNotContain(String propertyPath, String value) {
+    public static <T> @NonNull Specification<T> doesNotContain(String propertyPath, String value) {
         return doesNotContain(PropertyPath.from(propertyPath), value);
     }
 
@@ -391,8 +404,8 @@ public class JPASpecifications {
      * @param value Substring to exclude from the property value.
      * @return A specification, or {@code null} when {@code value} is null/empty.
      */
-    public static <T> Specification<T> doesNotContain(PropertyPath propertyPath, String value) {
-    	if (isEmpty(value)) { return null; }
+    public static <T> @NonNull Specification<T> doesNotContain(PropertyPath propertyPath, String value) {
+    	if (isEmpty(value)) { return unrestricted(); }
 
     	String escapedValue = escapeLike(value, ESCAPE_CHAR);
     	return (root, query, cb) -> {
@@ -411,7 +424,7 @@ public class JPASpecifications {
      * @return A specification, or {@code null} when {@code value} is null/empty.
      * @see PropertyPath#from(String)
      */
-    public static <T> Specification<T> doesNotContainIgnoreCase(String propertyPath, String value) {
+    public static <T> @NonNull Specification<T> doesNotContainIgnoreCase(String propertyPath, String value) {
         return doesNotContainIgnoreCase(PropertyPath.from(propertyPath), value);
     }
 
@@ -424,8 +437,8 @@ public class JPASpecifications {
      * @param value Substring to exclude from the property value.
      * @return A specification, or {@code null} when {@code value} is null/empty.
      */
-    public static <T> Specification<T> doesNotContainIgnoreCase(PropertyPath propertyPath, String value) {
-        if (isEmpty(value)) { return null; }
+    public static <T> @NonNull Specification<T> doesNotContainIgnoreCase(PropertyPath propertyPath, String value) {
+        if (isEmpty(value)) { return unrestricted(); }
 
         String escapedValue = escapeLike(value.toLowerCase(Locale.ROOT), ESCAPE_CHAR);
         return (root, query, cb) -> {
@@ -445,7 +458,7 @@ public class JPASpecifications {
      * @return A specification, or {@code null} when {@code searchTerms} is null/empty.
      * @see PropertyPath#from(String)
      */
-    public static <T> Specification<T> containsAnyIgnoreCase(String propertyPath, List<String> searchTerms) {
+    public static <T> @NonNull Specification<T> containsAnyIgnoreCase(String propertyPath, Collection<String> searchTerms) {
         return containsAnyIgnoreCase(PropertyPath.from(propertyPath), searchTerms);
     }
 
@@ -458,8 +471,8 @@ public class JPASpecifications {
      * @param searchTerms Candidate substrings for case-insensitive matching.
      * @return A specification, or {@code null} when {@code searchTerms} is null/empty.
      */
-    public static <T> Specification<T> containsAnyIgnoreCase(PropertyPath propertyPath, List<String> searchTerms) {
-        if (isEmpty(searchTerms)) { return null; }
+    public static <T> @NonNull Specification<T> containsAnyIgnoreCase(PropertyPath propertyPath, Collection<String> searchTerms) {
+        if (isEmpty(searchTerms)) { return unrestricted(); }
 
         List<String> escapedTerms = searchTerms.stream()
                 .filter(term -> !isEmpty(term))
@@ -467,7 +480,7 @@ public class JPASpecifications {
                 .toList();
 
         // Special case: all terms are empty so nothing to match against
-        if (escapedTerms.isEmpty()) { return null; }
+        if (escapedTerms.isEmpty()) { return unrestricted(); }
 
         return (root, query, cb) -> {
             Path<String> path = propertyPath.asPath(root);
@@ -488,7 +501,7 @@ public class JPASpecifications {
      * @return A specification, or {@code null} when {@code searchTerms} is null/empty.
      * @see PropertyPath#from(String)
      */
-    public static <T> Specification<T> containsAny(String propertyPath, List<String> searchTerms) {
+    public static <T> @NonNull Specification<T> containsAny(String propertyPath, Collection<String> searchTerms) {
         return containsAny(PropertyPath.from(propertyPath), searchTerms);
     }
 
@@ -501,8 +514,8 @@ public class JPASpecifications {
      * @param searchTerms Candidate substrings for case-sensitive matching.
      * @return A specification, or {@code null} when {@code searchTerms} is null/empty.
      */
-    public static <T> Specification<T> containsAny(PropertyPath propertyPath, List<String> searchTerms) {
-        if (isEmpty(searchTerms)) { return null; }
+    public static <T> @NonNull Specification<T> containsAny(PropertyPath propertyPath, Collection<String> searchTerms) {
+        if (isEmpty(searchTerms)) { return unrestricted(); }
 
         List<String> escapedTerms = searchTerms.stream()
                 .filter(term -> !isEmpty(term))
@@ -510,7 +523,7 @@ public class JPASpecifications {
                 .toList();
 
         // Special case: all terms are empty so nothing to match against
-        if (escapedTerms.isEmpty()) { return null; }
+        if (escapedTerms.isEmpty()) { return unrestricted(); }
 
         return (root, query, cb) -> {
             Path<String> path = propertyPath.asPath(root);
@@ -531,7 +544,7 @@ public class JPASpecifications {
      * @param targetDate   The date to match.
      * @see PropertyPath#from(String)
      */
-    public static <T> Specification<T> onDate(String propertyPath, LocalDate targetDate) {
+    public static <T> @NonNull Specification<T> onDate(String propertyPath, LocalDate targetDate) {
     	return onDate(PropertyPath.from(propertyPath), targetDate);
     }
 
@@ -544,8 +557,8 @@ public class JPASpecifications {
      * @param propertyPath Resolved property path to compare.
      * @param targetDate   The date to match.
      */
-    public static <T> Specification<T> onDate(PropertyPath propertyPath, LocalDate targetDate) {
-        if (targetDate == null) { return null; }
+    public static <T> @NonNull Specification<T> onDate(PropertyPath propertyPath, LocalDate targetDate) {
+        if (targetDate == null) { return unrestricted(); }
 
         LocalDateTime start = targetDate.atStartOfDay();
         LocalDateTime end = targetDate.plusDays(1).atStartOfDay();
@@ -567,7 +580,7 @@ public class JPASpecifications {
      * @param value        Value to compare against.
      * @see PropertyPath#from(String)
      */
-    public static <T, C extends Comparable<? super C>> Specification<T> lessThan(String propertyPath, C value) {
+    public static <T, C extends Comparable<? super C>> @NonNull Specification<T> lessThan(String propertyPath, C value) {
         return lessThan(PropertyPath.from(propertyPath), value);
     }
 
@@ -580,7 +593,7 @@ public class JPASpecifications {
      * @param propertyPath Resolved property path to compare.
      * @param value        Value to compare against.
      */
-    public static <T, C extends Comparable<? super C>> Specification<T> lessThan(PropertyPath propertyPath, C value) {
+    public static <T, C extends Comparable<? super C>> @NonNull Specification<T> lessThan(PropertyPath propertyPath, C value) {
         return (root, query, cb) -> {
             Path<C> path = propertyPath.asPath(root);
             return cb.lessThan(path, value);
@@ -597,7 +610,7 @@ public class JPASpecifications {
      * @param value        Value to compare against.
      * @see PropertyPath#from(String)
      */
-    public static <T, C extends Comparable<? super C>> Specification<T> greaterThan(String propertyPath, C value) {
+    public static <T, C extends Comparable<? super C>> @NonNull Specification<T> greaterThan(String propertyPath, C value) {
         return greaterThan(PropertyPath.from(propertyPath), value);
     }
 
@@ -610,7 +623,7 @@ public class JPASpecifications {
      * @param propertyPath Resolved property path to compare.
      * @param value        Value to compare against.
      */
-    public static <T, C extends Comparable<? super C>> Specification<T> greaterThan(PropertyPath propertyPath, C value) {
+    public static <T, C extends Comparable<? super C>> @NonNull Specification<T> greaterThan(PropertyPath propertyPath, C value) {
         return (root, query, cb) -> {
             Path<C> path = propertyPath.asPath(root);
             return cb.greaterThan(path, value);
@@ -627,7 +640,7 @@ public class JPASpecifications {
      * @param value        Value to compare against.
      * @see PropertyPath#from(String)
      */
-    public static <T, C extends Comparable<? super C>> Specification<T> atLeast(String propertyPath, C value) {
+    public static <T, C extends Comparable<? super C>> @NonNull Specification<T> atLeast(String propertyPath, C value) {
     	return atLeast(PropertyPath.from(propertyPath), value);
     }
 
@@ -640,7 +653,7 @@ public class JPASpecifications {
      * @param propertyPath Resolved property path to compare.
      * @param value        Value to compare against.
      */
-    public static <T, C extends Comparable<? super C>> Specification<T> atLeast(PropertyPath propertyPath, C value) {
+    public static <T, C extends Comparable<? super C>> @NonNull Specification<T> atLeast(PropertyPath propertyPath, C value) {
         return (root, query, cb) -> {
             Path<C> path = propertyPath.asPath(root);
             return cb.greaterThanOrEqualTo(path, value);
@@ -658,7 +671,7 @@ public class JPASpecifications {
      * @param endExclusive   The exclusive upper bound.
      * @see PropertyPath#from(String)
      */
-    public static <T, C extends Comparable<? super C>> Specification<T> between(String propertyPath, C startInclusive, C endExclusive) {
+    public static <T, C extends Comparable<? super C>> @NonNull Specification<T> between(String propertyPath, C startInclusive, C endExclusive) {
     	return between(PropertyPath.from(propertyPath), startInclusive, endExclusive);
     }
 
@@ -672,7 +685,7 @@ public class JPASpecifications {
      * @param startInclusive The inclusive lower bound.
      * @param endExclusive   The exclusive upper bound.
      */
-    public static <T, C extends Comparable<? super C>> Specification<T> between(PropertyPath propertyPath, C startInclusive, C endExclusive) {
+    public static <T, C extends Comparable<? super C>> @NonNull Specification<T> between(PropertyPath propertyPath, C startInclusive, C endExclusive) {
         Specification<T> afterStart = atLeast(propertyPath, startInclusive);
         Specification<T> beforeEnd = lessThan(propertyPath, endExclusive);
 

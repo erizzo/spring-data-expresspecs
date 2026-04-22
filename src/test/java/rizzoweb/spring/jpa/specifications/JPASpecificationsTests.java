@@ -2,6 +2,7 @@ package rizzoweb.spring.jpa.specifications;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static rizzoweb.spring.jpa.specifications.SpecificationAssert.assertThat;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 
+@SuppressWarnings("null")
 @ExtendWith(MockitoExtension.class)
 class JPASpecificationsTests {
 
@@ -35,7 +37,7 @@ class JPASpecificationsTests {
     @EmptySource
     void contains_EmptySearchValue(String emptySearchValue) {
         Specification<Object> result = JPASpecifications.contains("foo", emptySearchValue);
-        assertThat(result).isNull();
+        assertThat(result).isUnrestricted();
     }
 
     @ParameterizedTest
@@ -44,19 +46,19 @@ class JPASpecificationsTests {
     void contains_NestedProperty_EmptySearchValue(String emptySearchValue) {
         var path = PropertyPath.of("foo", "bar");
 		Specification<Object> result = JPASpecifications.contains(path , emptySearchValue);
-        assertThat(result).isNull();
+        assertThat(result).isUnrestricted();
     }
 
     @Test
     void containsAny_NullList() {
         Specification<Object> result = JPASpecifications.containsAny("foo", null);
-        assertThat(result).isNull();
+        assertThat(result).isUnrestricted();
     }
 
     @Test
     void containsAny_EmptyList() {
         Specification<Object> result = JPASpecifications.containsAny("foo", emptyList());
-        assertThat(result).isNull();
+        assertThat(result).isUnrestricted();
     }
 
     @Test
@@ -66,7 +68,7 @@ class JPASpecificationsTests {
 	        terms.add(null);
 
         Specification<Object> result = JPASpecifications.containsAny("foo", terms);
-        assertThat(result).isNull();
+        assertThat(result).isUnrestricted();
     }
 
     @Test
@@ -81,7 +83,7 @@ class JPASpecificationsTests {
     @EmptySource
     void is_EmptySearchValue(String emptySearchValue) {
         Specification<Object> result = JPASpecifications.is("foo", emptySearchValue);
-        assertThat(result).isNull();
+        assertThat(result).isUnrestricted();
     }
 
     @ParameterizedTest
@@ -89,7 +91,7 @@ class JPASpecificationsTests {
     @EmptySource
     void isNot_EmptySearchValue(String emptySearchValue) {
         Specification<Object> result = JPASpecifications.isNot("foo", emptySearchValue);
-        assertThat(result).isNull();
+        assertThat(result).isUnrestricted();
     }
 
     @ParameterizedTest
@@ -98,14 +100,14 @@ class JPASpecificationsTests {
     void is_NestedPath_EmptySearchValue(String emptySearchValue) {
       PropertyPath propertyPath = PropertyPath.of("foo", "bar");
 	  Specification<Object> result = JPASpecifications.is(propertyPath, emptySearchValue);
-      assertThat(result).isNull();
+      assertThat(result).isUnrestricted();
     }
 
     @Test
     void isAny_EmptySearchValues() {
     	List<String> searchValues = emptyList();
     	Specification<Object> result = JPASpecifications.isAny("foo", searchValues);
-    	assertThat(result).isNull();
+    	assertThat(result).isUnrestricted();
     }
 
     @Test
@@ -113,7 +115,7 @@ class JPASpecificationsTests {
     	List<String> searchValues = emptyList();
     	var path = PropertyPath.of("foo", "bar");
 		Specification<Object> result = JPASpecifications.isAny(path , searchValues);
-    	assertThat(result).isNull();
+    	assertThat(result).isUnrestricted();
     }
 
     @Test
