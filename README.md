@@ -222,3 +222,59 @@ public Page<Customer> findSpecialCustomers(boolean isActive, Set<String> zipCode
 	return repo.findAll(spec, pageable);
 }
 ```
+
+## Implementation Notes
+
+### Spring Boot 3 and 4 Compatibility
+
+This library supports both **Spring Boot 3.5** and **Spring Boot 4.0** from a single codebase.
+
+#### Why
+
+The library's production code (`JPASpecifications`, `SpecificationExtensions`, `PropertyPath`) depends only on the JPA Criteria API and Spring Data JPA's `Specification` interface—APIs that are identical across both Spring Boot versions. No version-specific code is needed at runtime.
+
+The challenge is in the **test infrastructure**. Spring Boot 4 relocated several key test classes to new packages:
+
+| Class | Spring Boot 3 package | Spring Boot 4 package |
+|-------|----------------------|----------------------|
+| `@DataJpaTest` | `o.s.boot.test.autoconfigure.orm.jpa` | `o.s.boot.data.jpa.test.autoconfigure` |
+| `TestEntityManager` | `o.s.boot.test.autoconfigure.orm.jpa` | `o.s.boot.jpa.test.autoconfigure` |
+| `@EntityScan` | `o.s.boot.autoconfigure.domain` | `o.s.boot.persistence.autoconfigure` |
+
+Since the test configuration classes must import these types directly, it is not possible for a single test class to compile against both versions.
+
+#### How
+
+The project uses **Maven profiles** (`sb3` and `sb4`) with **separate test source trees** that share common base classes:
+
+```
+src/
+├── main/java/                  # Production code — version-independent
+├── test/java/                  # Common test code (base classes, entities, unit tests)
+├── test-springboot3/java/      # SB3-specific: thin subclasses + config
+└── test-springboot4/java/      # SB4-specific: thin subclasses + config
+```
+
+Each profile activates its corresponding test source tree via `build-helper-maven-plugin` and sets the appropriate `spring-boot.version` property:
+
+- **`sb4`** (default) — uses Spring Boot 4.0, adds `src/test-springboot4/java`
+- **`sb3`** — uses Spring Boot 3.5, adds `src/test-springboot3/java`
+
+**Common test code** (`src/test/java`) contains:
+- All test entities, repositories, and domain-specific specifications (in the `example` subpackage)
+- Abstract base test classes (e.g., `BaseJPASpecificationsIntegrationTests`) that hold the actual `@Test` methods
+- An `EntityManagerWrapper` interface that abstracts away the `TestEntityManager` API differences
+- Pure unit tests that don't require Spring context (e.g., `JPASpecificationsTests`, `SpecificationExtensionsTests`)
+
+**Version-specific test code** (e.g., `src/test-springboot4/java`) contains only:
+- A `@Configuration` class that imports the correct `@EntityScan`, `TestEntityManager`, etc. and provides the `EntityManagerWrapper` bean
+- Thin, empty subclasses of the base test classes annotated with the correct version of `@DataJpaTest` and `@ContextConfiguration`
+
+This keeps version-specific code to a minimum—typically just a config class and a one-line test subclass per test suite—while the actual test logic is written and maintained only once.
+
+#### Running the tests
+
+```bash
+./mvnw test -Psb4   # Spring Boot 4 (default)
+./mvnw test -Psb3   # Spring Boot 3.5
+```
