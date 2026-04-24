@@ -30,28 +30,28 @@ public abstract class BaseJPASpecificationsIntegrationTests extends BaseJPAInteg
 
 
 	private @NonNull Customer customer(String name) {
-	    return Customer.builder()
-                .name(name)
-                .build();
+		return Customer.builder()
+				.name(name)
+				.build();
 	}
 
 	private @NonNull Customer customer(String name, Address address) {
-	    return Customer.builder()
-	            .name(name)
-	            .address(address)
-	            .build();
+		return Customer.builder()
+				.name(name)
+				.address(address)
+				.build();
 	}
 
 	private @NonNull Address city(String city) {
-	    return Address.builder()
-	            .city(city)
-	            .build();
+		return Address.builder()
+				.city(city)
+				.build();
 	}
 
 	private @NonNull Address zipCode(String zipCode) {
-	    return Address.builder()
-	            .zipCode(zipCode)
-	            .build();
+		return Address.builder()
+				.zipCode(zipCode)
+				.build();
 	}
 
 	@Test
@@ -139,38 +139,38 @@ public abstract class BaseJPASpecificationsIntegrationTests extends BaseJPAInteg
 
 	@Test
 	void doesNotContain_NestedProperty() {
-	    Customer coyote = customer("Wile E. Coyote", city("Albuquerque"));
-	    persistAndFlush(coyote.getAddress());
-	    coyote = persistAndFlush(coyote);
+		Customer coyote = customer("Wile E. Coyote", city("Albuquerque"));
+		persistAndFlush(coyote.getAddress());
+		coyote = persistAndFlush(coyote);
 
-	    final Customer rabbit = customer("Bugs Bunny", city("Atlanta"));
-	    persistAndFlush(rabbit.getAddress());
-	    persistAndFlush(rabbit);
+		final Customer rabbit = customer("Bugs Bunny", city("Atlanta"));
+		persistAndFlush(rabbit.getAddress());
+		persistAndFlush(rabbit);
 
-	    var path = Customer.Fields.address + '.' + Address.Fields.city;
-	    Specification<Customer> spec = JPASpecifications.doesNotContain(path, "que");
+		var path = Customer.Fields.address + '.' + Address.Fields.city;
+		Specification<Customer> spec = JPASpecifications.doesNotContain(path, "que");
 
-	    List<Customer> results = repo.findAll(spec);
+		List<Customer> results = repo.findAll(spec);
 
-	    assertThat(results).containsExactly(rabbit);
+		assertThat(results).containsExactly(rabbit);
 	}
 
 	@Test
 	void doesNotContainIgnoreCase_NestedProperty() {
-	    Customer coyote = customer("Wile E. Coyote", city("Albuquerque"));
-	    persistAndFlush(coyote.getAddress());
-	    coyote = persistAndFlush(coyote);
+		Customer coyote = customer("Wile E. Coyote", city("Albuquerque"));
+		persistAndFlush(coyote.getAddress());
+		coyote = persistAndFlush(coyote);
 
-	    final Customer rabbit = customer("Bugs Bunny", city("Atlanta"));
-	    persistAndFlush(rabbit.getAddress());
-	    persistAndFlush(rabbit);
+		final Customer rabbit = customer("Bugs Bunny", city("Atlanta"));
+		persistAndFlush(rabbit.getAddress());
+		persistAndFlush(rabbit);
 
-	    var path = Customer.Fields.address + '.' + Address.Fields.city;
-	    Specification<Customer> spec = JPASpecifications.doesNotContainIgnoreCase(path, "QUE");
+		var path = Customer.Fields.address + '.' + Address.Fields.city;
+		Specification<Customer> spec = JPASpecifications.doesNotContainIgnoreCase(path, "QUE");
 
-	    List<Customer> results = repo.findAll(spec);
+		List<Customer> results = repo.findAll(spec);
 
-	    assertThat(results).containsExactly(rabbit);
+		assertThat(results).containsExactly(rabbit);
 	}
 
 	@Test
@@ -319,37 +319,37 @@ public abstract class BaseJPASpecificationsIntegrationTests extends BaseJPAInteg
 
 	@Test
 	void isNot() {
-        final String wileE = "Wile E. Coyote";
-        Customer coyote = customer(wileE);
-        coyote = persistAndFlush(coyote);
+		final String wileE = "Wile E. Coyote";
+		Customer coyote = customer(wileE);
+		coyote = persistAndFlush(coyote);
 
-        Customer roadRunner = customer("Road Runner");
-        roadRunner = persistAndFlush(roadRunner);
+		Customer roadRunner = customer("Road Runner");
+		roadRunner = persistAndFlush(roadRunner);
 
-        Specification<Customer> spec = JPASpecifications.isNot(Customer.Fields.name, wileE);
+		Specification<Customer> spec = JPASpecifications.isNot(Customer.Fields.name, wileE);
 
-        List<Customer> results = repo.findAll(spec);
+		List<Customer> results = repo.findAll(spec);
 
-        assertThat(results).containsExactly(roadRunner);
+		assertThat(results).containsExactly(roadRunner);
 	}
 
 	@Test
 	void isNot_NestedProperty() {
-        final String zipCode = "33602";
-        Customer customer1 = customer("c1", zipCode(zipCode));
-        persistAndFlush(customer1.getAddress());
-        customer1 = persistAndFlush(customer1);
+		final String zipCode = "33602";
+		Customer customer1 = customer("c1", zipCode(zipCode));
+		persistAndFlush(customer1.getAddress());
+		customer1 = persistAndFlush(customer1);
 
-        Customer customer2 = customer("c2", zipCode("12345"));
-        persistAndFlush(customer2.getAddress());
-        customer2 = persistAndFlush(customer2);
+		Customer customer2 = customer("c2", zipCode("12345"));
+		persistAndFlush(customer2.getAddress());
+		customer2 = persistAndFlush(customer2);
 
-        var path = PropertyPath.of(Customer.Fields.address, Address.Fields.zipCode);
-        Specification<Customer> spec = JPASpecifications.isNot(path, zipCode);
+		var path = PropertyPath.of(Customer.Fields.address, Address.Fields.zipCode);
+		Specification<Customer> spec = JPASpecifications.isNot(path, zipCode);
 
-        List<Customer> results = repo.findAll(spec);
+		List<Customer> results = repo.findAll(spec);
 
-        assertThat(results).containsExactly(customer2);
+		assertThat(results).containsExactly(customer2);
 	}
 
 	@Test
@@ -489,7 +489,7 @@ public abstract class BaseJPASpecificationsIntegrationTests extends BaseJPAInteg
 		Customer coyote = customer("Wile E. Coyote");
 		coyote = persistAndFlush(coyote);
 
-		Customer unnamed = customer(null);    // No name
+		Customer unnamed = customer(null);		// No name
 		unnamed = persistAndFlush(unnamed);
 
 		// Test isNull()
@@ -564,9 +564,9 @@ public abstract class BaseJPASpecificationsIntegrationTests extends BaseJPAInteg
 							.build());
 		staleUser = persistAndFlush(staleUser);
 
-	    final var path = Customer.Fields.orders + '.' + Order.Fields.datePlaced;
-	    Specification<Customer> spec = atLeast(path, LocalDate.now().minusDays(30));
-	    spec = smartDistinct(spec);
+		final var path = Customer.Fields.orders + '.' + Order.Fields.datePlaced;
+		Specification<Customer> spec = atLeast(path, LocalDate.now().minusDays(30));
+		spec = smartDistinct(spec);
 
 		List<Customer> results = repo.findAll(spec);
 
@@ -575,20 +575,20 @@ public abstract class BaseJPASpecificationsIntegrationTests extends BaseJPAInteg
 
 	@Test
 	void areEqual() {
-        Customer customer1 = customer("Somewhere", city("Somewhere"));   // Not realistic but useful for testing
-        persistAndFlush(customer1.getAddress());
-        customer1 = persistAndFlush(customer1);
+		Customer customer1 = customer("Somewhere", city("Somewhere"));	 // Not realistic but useful for testing
+		persistAndFlush(customer1.getAddress());
+		customer1 = persistAndFlush(customer1);
 
-        Customer customer2 = customer("Daffy Duck", city("Spitsville"));
-        persistAndFlush(customer2.getAddress());
-        customer2 = persistAndFlush(customer2);
+		Customer customer2 = customer("Daffy Duck", city("Spitsville"));
+		persistAndFlush(customer2.getAddress());
+		customer2 = persistAndFlush(customer2);
 
-        // Find entities where name is equal to city
-        Specification<Customer> spec = JPASpecifications.areEqual("name", "address.city");
+		// Find entities where name is equal to city
+		Specification<Customer> spec = JPASpecifications.areEqual("name", "address.city");
 
-        List<Customer> results = repo.findAll(spec);
+		List<Customer> results = repo.findAll(spec);
 
-        assertThat(results).containsExactly(customer1);
+		assertThat(results).containsExactly(customer1);
 	}
 
 	@Test

@@ -23,7 +23,7 @@ import lombok.experimental.FieldNameConstants;
 @Table(name = "orders")
 @Getter
 @Setter
-@ToString(exclude = "customer")	// to avoid circular reference in toString()
+@ToString(exclude = "customer") // to avoid circular reference in toString()
 @FieldNameConstants
 @Builder(toBuilder = true)
 @NoArgsConstructor
@@ -31,15 +31,15 @@ import lombok.experimental.FieldNameConstants;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Order {
 
-    @Id @GeneratedValue
-    private Long id;
+	@Id @GeneratedValue
+	private Long id;
 
-    @EqualsAndHashCode.Include
-    private final UUID orderID = UUID.randomUUID();
+	@EqualsAndHashCode.Include
+	private final UUID orderID = UUID.randomUUID();
 
-    private LocalDate datePlaced;
+	private LocalDate datePlaced;
 
-    @ManyToOne
-    @Setter(PACKAGE)
-    private Customer customer;
+	@ManyToOne
+	@Setter(PACKAGE)
+	private Customer customer;
 }

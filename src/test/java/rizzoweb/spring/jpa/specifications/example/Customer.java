@@ -35,40 +35,40 @@ import lombok.experimental.FieldNameConstants;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Customer {
 
-    @Id @GeneratedValue
-    @EqualsAndHashCode.Include
-    private Long id;
+	@Id @GeneratedValue
+	@EqualsAndHashCode.Include
+	private Long id;
 
-    private String name;
+	private String name;
 
-    @Builder.Default
-    private boolean isActive = true;
+	@Builder.Default
+	private boolean isActive = true;
 
-    @Builder.Default
-    private Integer creditLimit = 100;
+	@Builder.Default
+	private Integer creditLimit = 100;
 
-    private OffsetDateTime createdTimestamp;
+	private OffsetDateTime createdTimestamp;
 
-    @OneToOne
-    private Address address;
+	@OneToOne
+	private Address address;
 
-    @Embedded
-    private PhoneNumber phoneNumber;
+	@Embedded
+	private PhoneNumber phoneNumber;
 
-    @OneToMany(mappedBy = Order.Fields.customer, cascade = CascadeType.ALL, orphanRemoval = true)
-    @Setter(NONE)
-    @Builder.Default
-    private Set<Order> orders = new HashSet<>();
+	@OneToMany(mappedBy = Order.Fields.customer, cascade = CascadeType.ALL, orphanRemoval = true)
+	@Setter(NONE)
+	@Builder.Default
+	private Set<Order> orders = new HashSet<>();
 
 
-    public void addOrder(Order order) {
-        orders.add(order);
-        order.setCustomer(this);
-    }
+	public void addOrder(Order order) {
+		orders.add(order);
+		order.setCustomer(this);
+	}
 
-    public void removeOrder(Order order) {
-        if (orders.remove(order)) {
-            order.setCustomer(null);
-        }
-    }
+	public void removeOrder(Order order) {
+		if (orders.remove(order)) {
+			order.setCustomer(null);
+		}
+	}
 }
