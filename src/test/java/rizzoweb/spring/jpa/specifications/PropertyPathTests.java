@@ -97,5 +97,31 @@ class PropertyPathTests {
             assertThat(result).isSameAs(expectedPath);
             verify(root).get("id");
         }
+
+        @Test
+        @DisplayName("Should resolve 3-level nested path via chained get() calls")
+        @SuppressWarnings("unchecked")
+        void shouldResolveThreeLevelNestedPath() {
+            // Arrange
+            Root<Object> root = mock(Root.class);
+            Path<Object> level1 = mock(Path.class, "level1");
+            Path<Object> level2 = mock(Path.class, "level2");
+            Path<Object> leaf = mock(Path.class, "leaf");
+
+            when(root.get("customer")).thenReturn(level1);
+            when(level1.get("address")).thenReturn(level2);
+            when(level2.get("city")).thenReturn(leaf);
+
+            PropertyPath propertyPath = PropertyPath.of("customer", "address", "city");
+
+            // Act
+            Path<String> result = propertyPath.asPath(root);
+
+            // Assert
+            assertThat(result).isSameAs(leaf);
+            verify(root).get("customer");
+            verify(level1).get("address");
+            verify(level2).get("city");
+        }
     }
 }

@@ -1,8 +1,8 @@
 package rizzoweb.spring.jpa.specifications;
 
 import static rizzoweb.utils.SQLUtils.escapeLike;
-import static org.apache.commons.collections4.CollectionUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,6 +13,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.domain.Specification;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import lombok.experimental.ExtensionMethod;
@@ -151,7 +152,7 @@ public class JPASpecifications {
      */
     public static <T> @NonNull Specification<T> isNull(PropertyPath propertyPath) {
         return (root, query, cb) -> {
-            Path<Boolean> path = propertyPath.asPath(root);
+            Path<?> path = propertyPath.asPath(root);
 			return cb.isNull(path);
         };
     }
@@ -179,7 +180,7 @@ public class JPASpecifications {
      */
     public static <T> @NonNull Specification<T> notNull(PropertyPath propertyPath) {
         return (root, query, cb) -> {
-            Path<Boolean> path = propertyPath.asPath(root);
+            Path<?> path = propertyPath.asPath(root);
 			return cb.isNotNull(path);
         };
     }
@@ -306,12 +307,55 @@ public class JPASpecifications {
      * @return A specification, or {@code null} when {@code searchValues} is null/empty.
      */
     public static <T, V> @NonNull Specification<T> isAny(PropertyPath propertyPath, Collection<V> searchValues) {
-        if (isEmpty(searchValues)) { return unrestricted(); }
+        if (CollectionUtils.isEmpty(searchValues)) { return unrestricted(); }
 
         return (root, query, cb) -> {
-            Path<Object> path = propertyPath.asPath(root);
-            return cb.in(path).value(searchValues);
+            Path<V> path = propertyPath.asPath(root);
+            CriteriaBuilder.In<V> in = cb.in(path);
+            for (V v : searchValues) {
+                in.value(v);
+            }
+            return in;
         };
+    }
+
+
+    /**
+     * Creates a specification that matches entities where the specified property does not
+     * equal any value in {@code searchValues}.
+     *
+     * @param <T>          The entity type being queried.
+     * @param <V>          The property value type.
+     * @param propertyPath Dot-delimited property path to compare.
+     * @param searchValues Candidate values for a {@code NOT IN (...)} predicate.
+     * @return A specification, or {@code null} when {@code searchValues} is null/empty.
+     * @see PropertyPath#from(String)
+     */
+    public static <T, V> @NonNull Specification<T> isNotAny(String propertyPath, Collection<V> searchValues) {
+    	return isNotAny(PropertyPath.from(propertyPath), searchValues);
+    }
+
+    /**
+     * Creates a specification that matches entities where the specified property does not
+     * equal any value in {@code searchValues}.
+     *
+     * @param <T> The entity type being queried.
+     * @param <V> The property value type.
+     * @param propertyPath Resolved property path to compare.
+     * @param searchValues Candidate values for a {@code NOT IN (...)} predicate.
+     * @return A specification, or {@code null} when {@code searchValues} is null/empty.
+     */
+    public static <T, V> @NonNull Specification<T> isNotAny(PropertyPath propertyPath, Collection<V> searchValues) {
+    	if (CollectionUtils.isEmpty(searchValues)) { return unrestricted(); }
+
+    	return (root, query, cb) -> {
+    		Path<V> path = propertyPath.asPath(root);
+    		CriteriaBuilder.In<V> in = cb.in(path);
+    		for (V v : searchValues) {
+    			in.value(v);
+    		}
+    		return cb.not(in);
+    	};
     }
 
 
@@ -339,7 +383,7 @@ public class JPASpecifications {
      * @return A specification, or {@code null} when {@code value} is null/empty.
      */
     public static <T> @NonNull Specification<T> contains(PropertyPath propertyPath, String value) {
-    	if (isEmpty(value)) { return unrestricted(); }
+    	if (StringUtils.isEmpty(value)) { return unrestricted(); }
 
     	String escapedValue = escapeLike(value, ESCAPE_CHAR);
         return (root, query, cb) -> {
@@ -372,7 +416,7 @@ public class JPASpecifications {
      * @return A specification, or {@code null} when {@code value} is null/empty.
      */
     public static <T> @NonNull Specification<T> containsIgnoreCase(PropertyPath propertyPath, String value) {
-        if (isEmpty(value)) { return unrestricted(); }
+        if (StringUtils.isEmpty(value)) { return unrestricted(); }
 
         String escapedValue = escapeLike(value.toLowerCase(Locale.ROOT), ESCAPE_CHAR);
         return (root, query, cb) -> {
@@ -405,7 +449,7 @@ public class JPASpecifications {
      * @return A specification, or {@code null} when {@code value} is null/empty.
      */
     public static <T> @NonNull Specification<T> doesNotContain(PropertyPath propertyPath, String value) {
-    	if (isEmpty(value)) { return unrestricted(); }
+    	if (StringUtils.isEmpty(value)) { return unrestricted(); }
 
     	String escapedValue = escapeLike(value, ESCAPE_CHAR);
     	return (root, query, cb) -> {
@@ -438,7 +482,7 @@ public class JPASpecifications {
      * @return A specification, or {@code null} when {@code value} is null/empty.
      */
     public static <T> @NonNull Specification<T> doesNotContainIgnoreCase(PropertyPath propertyPath, String value) {
-        if (isEmpty(value)) { return unrestricted(); }
+        if (StringUtils.isEmpty(value)) { return unrestricted(); }
 
         String escapedValue = escapeLike(value.toLowerCase(Locale.ROOT), ESCAPE_CHAR);
         return (root, query, cb) -> {
@@ -472,10 +516,10 @@ public class JPASpecifications {
      * @return A specification, or {@code null} when {@code searchTerms} is null/empty.
      */
     public static <T> @NonNull Specification<T> containsAnyIgnoreCase(PropertyPath propertyPath, Collection<String> searchTerms) {
-        if (isEmpty(searchTerms)) { return unrestricted(); }
+        if (CollectionUtils.isEmpty(searchTerms)) { return unrestricted(); }
 
         List<String> escapedTerms = searchTerms.stream()
-                .filter(term -> !isEmpty(term))
+                .filter(term -> !StringUtils.isEmpty(term))
                 .map(term -> escapeLike(term.toLowerCase(Locale.ROOT), ESCAPE_CHAR))
                 .toList();
 
@@ -515,10 +559,10 @@ public class JPASpecifications {
      * @return A specification, or {@code null} when {@code searchTerms} is null/empty.
      */
     public static <T> @NonNull Specification<T> containsAny(PropertyPath propertyPath, Collection<String> searchTerms) {
-        if (isEmpty(searchTerms)) { return unrestricted(); }
+        if (CollectionUtils.isEmpty(searchTerms)) { return unrestricted(); }
 
         List<String> escapedTerms = searchTerms.stream()
-                .filter(term -> !isEmpty(term))
+                .filter(term -> !StringUtils.isEmpty(term))
                 .map(term -> escapeLike(term, ESCAPE_CHAR))
                 .toList();
 
@@ -691,4 +735,85 @@ public class JPASpecifications {
 
         return afterStart.and(beforeEnd);
     }
+
+    /**
+     * Creates a specification that matches entities where the specified collection property
+     * is not empty (has at least one element).
+     *
+     * @param <T>          The entity type being queried.
+     * @param propertyPath Dot-delimited property path to a collection attribute.
+     * @see PropertyPath#from(String)
+     */
+    public static <T> @NonNull Specification<T> isNotEmpty(String propertyPath) {
+        return isNotEmpty(PropertyPath.from(propertyPath));
+    }
+
+    /**
+     * Creates a specification that matches entities where the specified collection property
+     * is not empty (has at least one element).
+     *
+     * @param <T>          The entity type being queried.
+     * @param propertyPath Resolved property path to a collection attribute.
+     */
+    public static <T> @NonNull Specification<T> isNotEmpty(PropertyPath propertyPath) {
+        return (root, query, cb) -> {
+            Path<Collection<?>> path = propertyPath.asPath(root);
+            return cb.isNotEmpty(path);
+        };
+    }
+
+    /**
+     * Creates a specification that matches entities where the specified collection property
+     * is empty (has no elements).
+     *
+     * @param <T>          The entity type being queried.
+     * @param propertyPath Dot-delimited property path to a collection attribute.
+     * @see PropertyPath#from(String)
+     */
+    public static <T> @NonNull Specification<T> isEmpty(String propertyPath) {
+        return isEmpty(PropertyPath.from(propertyPath));
+    }
+
+    /**
+     * Creates a specification that matches entities where the specified collection property
+     * is empty (has no elements).
+     *
+     * @param <T>          The entity type being queried.
+     * @param propertyPath Resolved property path to a collection attribute.
+     */
+    public static <T> @NonNull Specification<T> isEmpty(PropertyPath propertyPath) {
+        return (root, query, cb) -> {
+            Path<Collection<?>> path = propertyPath.asPath(root);
+            return cb.isEmpty(path);
+        };
+    }
+
+    /**
+     * Creates a specification that matches entities where the specified collection property
+     * has at least {@code minSize} elements.
+     *
+     * @param <T>          The entity type being queried.
+     * @param propertyPath Dot-delimited property path to a collection attribute.
+     * @param minSize      The minimum number of elements required.
+     * @see PropertyPath#from(String)
+     */
+    public static <T> @NonNull Specification<T> sizeAtLeast(String propertyPath, int minSize) {
+        return sizeAtLeast(PropertyPath.from(propertyPath), minSize);
+    }
+
+    /**
+     * Creates a specification that matches entities where the specified collection property
+     * has at least {@code minSize} elements.
+     *
+     * @param <T>          The entity type being queried.
+     * @param propertyPath Resolved property path to a collection attribute.
+     * @param minSize      The minimum number of elements required.
+     */
+    public static <T> @NonNull Specification<T> sizeAtLeast(PropertyPath propertyPath, int minSize) {
+        return (root, query, cb) -> {
+            Path<Collection<?>> path = propertyPath.asPath(root);
+            return cb.greaterThanOrEqualTo(cb.size(path), minSize);
+        };
+    }
 }
+

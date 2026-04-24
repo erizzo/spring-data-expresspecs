@@ -195,6 +195,7 @@ public interface CustomerSpecifications {
 
 Using these kinds of factory methods (along with some static imports) makes the calling code even more expressive
 and intentional:
+
 ```java
 var zipCodes = Set.of("99762", "48169");
 List<Customer> results = repo.findAll(
