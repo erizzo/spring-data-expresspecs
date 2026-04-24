@@ -13,6 +13,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.domain.Specification;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import lombok.experimental.ExtensionMethod;
@@ -309,9 +310,52 @@ public class JPASpecifications {
         if (CollectionUtils.isEmpty(searchValues)) { return unrestricted(); }
 
         return (root, query, cb) -> {
-            Path<Collection<V>> path = propertyPath.asPath(root);
-            return cb.in(path).value(searchValues);
+            Path<V> path = propertyPath.asPath(root);
+            CriteriaBuilder.In<V> in = cb.in(path);
+            for (V v : searchValues) {
+                in.value(v);
+            }
+            return in;
         };
+    }
+
+
+    /**
+     * Creates a specification that matches entities where the specified property does not
+     * equal any value in {@code searchValues}.
+     *
+     * @param <T>          The entity type being queried.
+     * @param <V>          The property value type.
+     * @param propertyPath Dot-delimited property path to compare.
+     * @param searchValues Candidate values for a {@code NOT IN (...)} predicate.
+     * @return A specification, or {@code null} when {@code searchValues} is null/empty.
+     * @see PropertyPath#from(String)
+     */
+    public static <T, V> @NonNull Specification<T> isNotAny(String propertyPath, Collection<V> searchValues) {
+    	return isNotAny(PropertyPath.from(propertyPath), searchValues);
+    }
+
+    /**
+     * Creates a specification that matches entities where the specified property does not
+     * equal any value in {@code searchValues}.
+     *
+     * @param <T> The entity type being queried.
+     * @param <V> The property value type.
+     * @param propertyPath Resolved property path to compare.
+     * @param searchValues Candidate values for a {@code NOT IN (...)} predicate.
+     * @return A specification, or {@code null} when {@code searchValues} is null/empty.
+     */
+    public static <T, V> @NonNull Specification<T> isNotAny(PropertyPath propertyPath, Collection<V> searchValues) {
+    	if (CollectionUtils.isEmpty(searchValues)) { return unrestricted(); }
+
+    	return (root, query, cb) -> {
+    		Path<V> path = propertyPath.asPath(root);
+    		CriteriaBuilder.In<V> in = cb.in(path);
+    		for (V v : searchValues) {
+    			in.value(v);
+    		}
+    		return cb.not(in);
+    	};
     }
 
 

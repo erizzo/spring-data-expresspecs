@@ -373,6 +373,22 @@ public abstract class BaseJPASpecificationsIntegrationTests extends BaseJPAInteg
 	}
 
 	@Test
+	void isNotAny() {
+		final String wileE = "Wile E. Coyote";
+		final String roadRunner = "Road Runner";
+		persistAndFlush(customer(wileE));
+		Customer runner = persistAndFlush(customer(roadRunner));
+
+		List<String> excludedValues = List.of("Bugs Bunny", wileE, "Elmer Fudd");
+
+		Specification<Customer> spec = JPASpecifications.isNotAny(Customer.Fields.name, excludedValues);
+
+		List<Customer> results = repo.findAll(spec);
+
+		assertThat(results).containsExactly(runner);
+	}
+
+	@Test
 	void isAny_NestedProperty() {
 		final String zipCode = "33602";
 		Customer customer = customer("c1", zipCode(zipCode));
@@ -386,6 +402,26 @@ public abstract class BaseJPASpecificationsIntegrationTests extends BaseJPAInteg
 		List<Customer> results = repo.findAll(spec);
 
 		assertThat(results).containsExactly(customer);
+	}
+
+	@Test
+	void isNotAny_NestedProperty() {
+		final String zipCode = "33602";
+		Customer customer = customer("c1", zipCode(zipCode));
+		persistAndFlush(customer.getAddress());
+		persistAndFlush(customer);
+
+		Customer other = customer("c2", zipCode("90210"));
+		persistAndFlush(other.getAddress());
+		persistAndFlush(other);
+
+		List<String> zipCodes = List.of("12345", zipCode);
+		var path = PropertyPath.of(Customer.Fields.address, Address.Fields.zipCode);
+		Specification<Customer> spec = JPASpecifications.isNotAny(path, zipCodes);
+
+		List<Customer> results = repo.findAll(spec);
+
+		assertThat(results).containsExactly(other);
 	}
 
 	@Test

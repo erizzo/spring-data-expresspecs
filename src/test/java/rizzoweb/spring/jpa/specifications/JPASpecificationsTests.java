@@ -21,6 +21,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
 @SuppressWarnings("null")
@@ -186,6 +187,52 @@ class JPASpecificationsTests {
         verify(root).get(field);
         verify(cb).size(collectionPath);
         verify(cb).greaterThanOrEqualTo(sizeExpr, minSize);
+    }
+
+    @Test
+    void isNotAny_EmptySearchValues() {
+        List<String> searchValues = emptyList();
+        Specification<Object> result = JPASpecifications.isNotAny("foo", searchValues);
+        assertThat(result).isUnrestricted();
+    }
+
+    @Test
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    void isAny_ShouldConstructInPredicate() {
+        String field = "status";
+        List<String> values = List.of("ACTIVE", "PENDING");
+        CriteriaBuilder.In inMock = mock(CriteriaBuilder.In.class);
+
+        when(root.get(field)).thenReturn(fieldPath);
+        when(cb.in(fieldPath)).thenReturn(inMock);
+
+        Specification<Object> spec = JPASpecifications.isAny(field, values);
+        spec.toPredicate(root, query, cb);
+
+        verify(cb).in(fieldPath);
+        verify(inMock).value("ACTIVE");
+        verify(inMock).value("PENDING");
+    }
+
+    @Test
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    void isNotAny_ShouldConstructNotInPredicate() {
+        String field = "status";
+        List<String> values = List.of("EXPIRED", "CANCELLED");
+        CriteriaBuilder.In inMock = mock(CriteriaBuilder.In.class);
+        Predicate notInPredicate = mock(Predicate.class);
+
+        when(root.get(field)).thenReturn(fieldPath);
+        when(cb.in(fieldPath)).thenReturn(inMock);
+        when(cb.not(inMock)).thenReturn(notInPredicate);
+
+        Specification<Object> spec = JPASpecifications.isNotAny(field, values);
+        spec.toPredicate(root, query, cb);
+
+        verify(cb).in(fieldPath);
+        verify(inMock).value("EXPIRED");
+        verify(inMock).value("CANCELLED");
+        verify(cb).not(inMock);
     }
 
 }
