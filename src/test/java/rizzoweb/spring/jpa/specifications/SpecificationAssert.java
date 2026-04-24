@@ -13,28 +13,28 @@ import jakarta.persistence.criteria.Root;
  */
 public class SpecificationAssert<T> extends AbstractAssert<SpecificationAssert<T>, Specification<T>> {
 
-    protected SpecificationAssert(Specification<T> actual) {
-        super(actual, SpecificationAssert.class);
-    }
+	protected SpecificationAssert(Specification<T> actual) {
+		super(actual, SpecificationAssert.class);
+	}
 
-    public static <T> SpecificationAssert<T> assertThat(Specification<T> actual) {
-        return new SpecificationAssert<>(actual);
-    }
+	public static <T> SpecificationAssert<T> assertThat(Specification<T> actual) {
+		return new SpecificationAssert<>(actual);
+	}
 
-    /**
-     * Verifies that the specification evaluates to a null predicate (is unrestricted).
-     */
-    @SuppressWarnings({ "unchecked", "null" })
-    public SpecificationAssert<T> isUnrestricted() {
-        isNotNull();
+	/**
+	 * Verifies that the specification evaluates to a null predicate (is unrestricted).
+	 */
+	@SuppressWarnings({ "unchecked", "null" })
+	public SpecificationAssert<T> isUnrestricted() {
+		isNotNull();
 
-        Root<T> root = mock(Root.class);
-        CriteriaQuery<?> query = mock(CriteriaQuery.class);
-        CriteriaBuilder cb = mock(CriteriaBuilder.class);
+		Root<T> root = mock(Root.class);
+		CriteriaQuery<?> query = mock(CriteriaQuery.class);
+		CriteriaBuilder cb = mock(CriteriaBuilder.class);
 
-        if (actual.toPredicate(root, query, cb) != null) {
-            failWithMessage("Expected specification to be unrestricted (null predicate) but it was not.");
-        }
-        return this;
-    }
+		if (actual.toPredicate(root, query, cb) != null) {
+			failWithMessage("Expected specification to be unrestricted (null predicate) but it was not.");
+		}
+		return this;
+	}
 }

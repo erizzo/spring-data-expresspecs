@@ -4,8 +4,8 @@ import org.jspecify.annotations.NonNull;
 
 public interface EntityManagerWrapper {
 
-    <T> @NonNull T persistAndFlush(T entity);
+	<T> @NonNull T persistAndFlush(T entity);
 
-    void clear();
+	void clear();
 
 }

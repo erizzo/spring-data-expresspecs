@@ -28,66 +28,66 @@ import jakarta.persistence.metamodel.ManagedType;
  */
 public record PropertyPath(List<String> properties) {
 
-    /**
-     * Factory method to create a path from one or more segments.
-     */
-    public static PropertyPath of(String... properties) {
-        if (isEmpty(properties)) {
-            throw new IllegalArgumentException("PropertyPath must contain at least one property");
-        }
+	/**
+	 * Factory method to create a path from one or more segments.
+	 */
+	public static PropertyPath of(String... properties) {
+		if (isEmpty(properties)) {
+			throw new IllegalArgumentException("PropertyPath must contain at least one property");
+		}
 
-        return new PropertyPath(List.of(properties));
-    }
-
-    /**
-     * Factory method to construct a path from a dot-separated string.
-     * Example: PropertyPath.fromDotSeparated("address.city")
-     */
-    public static PropertyPath from(String path) {
-        if (isBlank(path)) {
-            throw new IllegalArgumentException("Path string must not be blank");
-        }
-
-        final String[] properties = path.split("\\.");
 		return new PropertyPath(List.of(properties));
-    }
+	}
+
+	/**
+	 * Factory method to construct a path from a dot-separated string.
+	 * Example: PropertyPath.fromDotSeparated("address.city")
+	 */
+	public static PropertyPath from(String path) {
+		if (isBlank(path)) {
+			throw new IllegalArgumentException("Path string must not be blank");
+		}
+
+		final String[] properties = path.split("\\.");
+		return new PropertyPath(List.of(properties));
+	}
 
 
-    @SuppressWarnings("unchecked")
-    public <V> Path<V> asPath(Root<?> root) {
-        List<String> intermediates = properties.subList(0, properties.size() - 1);
-        String leaf = properties.get(properties.size() - 1);
+	@SuppressWarnings("unchecked")
+	public <V> Path<V> asPath(Root<?> root) {
+		List<String> intermediates = properties.subList(0, properties.size() - 1);
+		String leaf = properties.get(properties.size() - 1);
 
-        // Navigate through intermediate segments (associations join, embeddables get)
-        Path<?> current = root;
-        for (String segment : intermediates) {
-            if (isAssociation(current, segment)) {
-                current = findOrCreateJoin((From<?, ?>) current, segment);
-            } else {
-                current = current.get(segment);
-            }
-        }
+		// Navigate through intermediate segments (associations join, embeddables get)
+		Path<?> current = root;
+		for (String segment : intermediates) {
+			if (isAssociation(current, segment)) {
+				current = findOrCreateJoin((From<?, ?>) current, segment);
+			} else {
+				current = current.get(segment);
+			}
+		}
 
-        // Resolve the leaf segment
-        return (Path<V>) current.get(leaf);
-    }
+		// Resolve the leaf segment
+		return (Path<V>) current.get(leaf);
+	}
 
-    private boolean isAssociation(Path<?> path, String segment) {
-        var model = path.getModel();
+	private boolean isAssociation(Path<?> path, String segment) {
+		var model = path.getModel();
 
-        if (model instanceof ManagedType<?> managedType) {
-            return managedType.getAttribute(segment).isAssociation();
-        }
+		if (model instanceof ManagedType<?> managedType) {
+			return managedType.getAttribute(segment).isAssociation();
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    private From<?, ?> findOrCreateJoin(From<?, ?> from, String segment) {
-        return from.getJoins().stream()
-                .filter(j -> j.getAttribute().getName().equals(segment))
-                .findFirst()
-                .map(j -> (From<?, ?>) j)
-                .orElseGet(() -> from.join(segment, JoinType.LEFT));
-    }
+	private From<?, ?> findOrCreateJoin(From<?, ?> from, String segment) {
+		return from.getJoins().stream()
+				.filter(j -> j.getAttribute().getName().equals(segment))
+				.findFirst()
+				.map(j -> (From<?, ?>) j)
+				.orElseGet(() -> from.join(segment, JoinType.LEFT));
+	}
 
 }

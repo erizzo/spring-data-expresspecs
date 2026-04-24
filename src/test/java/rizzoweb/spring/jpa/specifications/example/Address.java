@@ -25,13 +25,13 @@ import lombok.experimental.FieldNameConstants;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Address {
 
-    @Id @GeneratedValue
-    @EqualsAndHashCode.Include
-    private Long id;
+	@Id @GeneratedValue
+	@EqualsAndHashCode.Include
+	private Long id;
 
-    private String street;
-    private String city;
-    private String state;
-    private String zipCode;
-    private boolean isPOBox;
+	private String street;
+	private String city;
+	private String state;
+	private String zipCode;
+	private boolean isPOBox;
 }

@@ -4,12 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class BaseJPAIntegrationTest {
 
-    @Autowired
-    protected EntityManagerWrapper entityManager;
+	@Autowired
+	protected EntityManagerWrapper entityManager;
 
 
-    protected <T> T persistAndFlush(T entity) {
-        return entityManager.persistAndFlush(entity);
-    }
+	protected <T> T persistAndFlush(T entity) {
+		return entityManager.persistAndFlush(entity);
+	}
 
 }
