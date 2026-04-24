@@ -3,7 +3,7 @@ package rizzoweb.spring.jpa.specifications;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import java.util.Iterator;
+
 import java.util.List;
 
 import jakarta.persistence.criteria.From;
@@ -12,6 +12,20 @@ import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.metamodel.ManagedType;
 
+/**
+ * Represents a dot-separated property path for use in JPA Criteria queries.
+ *
+ * <p>A {@code PropertyPath} models a chain of property names (e.g., {@code "address.city"})
+ * and can resolve itself into a JPA {@link Path} via {@link #asPath(Root)}.
+ *
+ * <p>During resolution, intermediate segments that are entity associations ({@code @ManyToOne},
+ * {@code @OneToOne}, etc.) are traversed using LEFT JOINs, while embeddable or simple
+ * intermediate segments use standard path navigation. The final (leaf) segment is always
+ * resolved with {@code get()} — it is assumed to be the property being used in a predicate,
+ * not a relationship being navigated through. This means the leaf should be a simple property,
+ * an embeddable, or an association compared by its foreign key (e.g., {@code cb.equal()} or
+ * {@code cb.isNull()}).
+ */
 public record PropertyPath(List<String> properties) {
 
     /**
@@ -41,28 +55,21 @@ public record PropertyPath(List<String> properties) {
 
     @SuppressWarnings("unchecked")
     public <V> Path<V> asPath(Root<?> root) {
+        List<String> intermediates = properties.subList(0, properties.size() - 1);
+        String leaf = properties.get(properties.size() - 1);
+
+        // Navigate through intermediate segments (associations join, embeddables get)
         Path<?> current = root;
-        Iterator<String> it = properties.iterator();
-
-        while (it.hasNext()) {
-            String segment = it.next();
-
-            // If this is the last segment, return the final Path (the leaf)
-            if (! it.hasNext()) {
-                return (Path<V>) current.get(segment);
-            }
-
-            // Otherwise, navigate deeper
+        for (String segment : intermediates) {
             if (isAssociation(current, segment)) {
-                // Confirmation: only Entities (From nodes) can have associations
                 current = findOrCreateJoin((From<?, ?>) current, segment);
             } else {
-                // Handle @Embeddables or nested components via navigation
                 current = current.get(segment);
             }
         }
 
-        return (Path<V>) current;
+        // Resolve the leaf segment
+        return (Path<V>) current.get(leaf);
     }
 
     private boolean isAssociation(Path<?> path, String segment) {

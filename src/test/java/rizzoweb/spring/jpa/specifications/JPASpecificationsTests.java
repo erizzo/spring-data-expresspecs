@@ -19,6 +19,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 
@@ -137,4 +138,55 @@ class JPASpecificationsTests {
         verify(cb).equal(fieldPath, value);
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Test
+    void isNotEmpty_ShouldCallCbIsNotEmpty() {
+        String field = "orders";
+        Path collectionPath = mock(Path.class);
+
+        when(root.get(field)).thenReturn(collectionPath);
+
+        Specification<Object> spec = JPASpecifications.isNotEmpty(field);
+        spec.toPredicate(root, query, cb);
+
+        verify(root).get(field);
+        verify(cb).isNotEmpty(collectionPath);
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Test
+    void isEmpty_ShouldCallCbIsEmpty() {
+        String field = "orders";
+        Path collectionPath = mock(Path.class);
+
+        when(root.get(field)).thenReturn(collectionPath);
+
+        Specification<Object> spec = JPASpecifications.isEmpty(field);
+        spec.toPredicate(root, query, cb);
+
+        verify(root).get(field);
+        verify(cb).isEmpty(collectionPath);
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Test
+    void sizeAtLeast_ShouldCallCbSizeAndGreaterThanOrEqualTo() {
+        String field = "orders";
+        int minSize = 3;
+
+        Path collectionPath = mock(Path.class);
+        Expression<Integer> sizeExpr = mock(Expression.class);
+        
+        when(root.get(field)).thenReturn(collectionPath);
+        when(cb.size(collectionPath)).thenReturn(sizeExpr);
+
+        Specification<Object> spec = JPASpecifications.sizeAtLeast(field, minSize);
+        spec.toPredicate(root, query, cb);
+
+        verify(root).get(field);
+        verify(cb).size(collectionPath);
+        verify(cb).greaterThanOrEqualTo(sizeExpr, minSize);
+    }
+
 }
+

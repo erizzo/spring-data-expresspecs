@@ -57,4 +57,12 @@ public interface CustomerSpecifications {
 		Specification<Customer> spec = atLeast(path, LocalDate.now().minusDays(30));
 		return smartDistinct(spec);
 	}
+
+	public static @NonNull Specification<Customer> hasAnyOrders() {
+		return JPASpecifications.isNotEmpty(Customer.Fields.orders);
+	}
+
+	public static @NonNull Specification<Customer> hasAtLeastOrders(int minOrders) {
+		return JPASpecifications.sizeAtLeast(Customer.Fields.orders, minOrders);
+	}
 }

@@ -592,4 +592,37 @@ public abstract class BaseJPASpecificationsIntegrationTests extends BaseJPAInteg
 		assertThat(results).containsExactly(customer);
 	}
 
+	@Test
+	void hasAnyOrders() {
+		var withOrders = customer("with");
+		withOrders.addOrder(Order.builder().datePlaced(LocalDate.now()).build());
+		withOrders = persistAndFlush(withOrders);
+
+		var withoutOrders = customer("without");
+		withoutOrders = persistAndFlush(withoutOrders);
+
+		Specification<Customer> spec = CustomerSpecifications.hasAnyOrders();
+		List<Customer> results = repo.findAll(spec);
+
+		assertThat(results).containsExactly(withOrders);
+	}
+
+	@Test
+	void hasAtLeastNOrders() {
+		var threeOrders = customer("three");
+		threeOrders.addOrder(Order.builder().datePlaced(LocalDate.now()).build());
+		threeOrders.addOrder(Order.builder().datePlaced(LocalDate.now()).build());
+		threeOrders.addOrder(Order.builder().datePlaced(LocalDate.now()).build());
+		threeOrders = persistAndFlush(threeOrders);
+
+		var oneOrder = customer("one");
+		oneOrder.addOrder(Order.builder().datePlaced(LocalDate.now()).build());
+		oneOrder = persistAndFlush(oneOrder);
+
+		Specification<Customer> spec = CustomerSpecifications.hasAtLeastOrders(2);
+		List<Customer> results = repo.findAll(spec);
+
+		assertThat(results).containsExactly(threeOrders);
+	}
+
 }
