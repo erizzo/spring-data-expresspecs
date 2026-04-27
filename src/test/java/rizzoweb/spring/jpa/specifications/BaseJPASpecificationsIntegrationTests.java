@@ -7,7 +7,6 @@ import static rizzoweb.spring.jpa.specifications.JPASpecifications.smartDistinct
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -366,6 +365,45 @@ public abstract class BaseJPASpecificationsIntegrationTests extends BaseJPAInteg
 
 		// Equaivalent using the CustomerSpecifications domain-specific helper
 		//Specification<Customer> spec = CustomerSpecifications.nameIsOneOf(searchValues);
+
+		List<Customer> results = repo.findAll(spec);
+
+		assertThat(results).containsExactly(coyote);
+	}
+
+	@Test
+	void equalsIgnoreCase() {
+		final String city = "Albuquerque";
+		Customer coyote = customer("Wile E. Coyote", city(city));
+		persistAndFlush(coyote.getAddress());
+		persistAndFlush(coyote);
+
+		Customer bunny = customer("Bugs Bunny", city("Atlanta"));
+		persistAndFlush(bunny.getAddress());
+		persistAndFlush(bunny);
+
+		// Match with different case
+		var path = PropertyPath.of(Customer.Fields.address, Address.Fields.city);
+		Specification<Customer> spec = JPASpecifications.equalsIgnoreCase(path, city.toLowerCase());
+
+		List<Customer> results = repo.findAll(spec);
+
+		assertThat(results).containsExactly(coyote);
+	}
+
+	@Test
+	void containsMember() {
+		Customer coyote = customer("Wile E. Coyote");
+		Order acmeOrder = Order.builder().datePlaced(LocalDate.now()).build();
+		coyote.addOrder(acmeOrder);
+		persistAndFlush(coyote);
+
+		Customer bunny = customer("Bugs Bunny");
+		Order carrotOrder = Order.builder().datePlaced(LocalDate.now()).build();
+		bunny.addOrder(carrotOrder);
+		persistAndFlush(bunny);
+
+		Specification<Customer> spec = JPASpecifications.containsMember(Customer.Fields.orders, acmeOrder);
 
 		List<Customer> results = repo.findAll(spec);
 
