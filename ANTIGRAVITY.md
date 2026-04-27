@@ -4,7 +4,8 @@ This file contains specific rules and preferences for the `erizzo-spring-utils` 
 
 ## 1. Indentation & Formatting
 - **Default Indentation**: Always use **Tabs** for indentation in all new or modified code.
-- **Strict Formatting Policy**: Never change the formatting of existing code (indentation, spacing, line breaks, etc.) unless explicitly instructed by the user.
+- **Strict Formatting Policy**: Never change the formatting of existing code (indentation, spacing, line breaks, etc.) unless explicitly instructed by the user. Terminology changes (e.g. updating documentation to reflect API changes) are permitted if they preserve the surrounding formatting.
+- **Project Configuration**: Always run `jdt maven update` after making changes to project files (e.g., `pom.xml`) to keep the Eclipse workspace in sync.
 - **Javadoc Integrity**: DO NOT change the line wrapping, indentation, or general structure of existing Javadoc comments. Terminology updates for technical accuracy are permitted, but they must be applied in-place without altering the surrounding formatting or line breaks.
 - **Line Length Guideline**: Prefer longer lines (up to 120 characters) over aggressive wrapping. Avoid wrapping that leaves only 1 or 2 words isolated on a new line.
 - **No Vertical Alignment**: Do not add extra spaces in Javadocs to vertically align text across multiple lines. Always use exactly one space after the `*` prefix (unless it's a deliberate structural indent like a nested list).
