@@ -235,5 +235,17 @@ class JPASpecificationsTests {
 		verify(cb).not(inMock);
 	}
 
+	@Test
+	@SuppressWarnings("unchecked")
+	void containsMember_ConstructsIsMemberPredicate() {
+		String field = "tags";
+		String value = "VIP";
+		when(root.get(field)).thenReturn(fieldPath);
+
+		Specification<Object> spec = JPASpecifications.containsMember(field, value);
+		spec.toPredicate(root, query, cb);
+
+		verify(cb).isMember(eq(value), any(Path.class));
+	}
 }
 

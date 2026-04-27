@@ -62,6 +62,8 @@ public record PropertyPath(List<String> properties) {
 		Path<?> current = root;
 		for (String segment : intermediates) {
 			if (isAssociation(current, segment)) {
+				// When encountering an association (relation to another entity), we will
+				// reuse an existing JOIN if one exists
 				current = findOrCreateJoin((From<?, ?>) current, segment);
 			} else {
 				current = current.get(segment);
@@ -82,6 +84,21 @@ public record PropertyPath(List<String> properties) {
 		return false;
 	}
 
+	/**
+	 * Resolves an association segment by either reusing an existing join or creating a new one.
+	 *
+	 * <p>This exists to prevent redundant JOINs in the generated SQL when multiple Specification
+	 * fragments navigate the same association path. Reusing joins ensures that criteria are
+	 * applied to the same related record rather than potentially different records of the
+	 * same type.</p>
+	 *
+	 * <p>It works by inspecting the existing joins on the {@code from} path. If a join for the
+	 * specified {@code segment} already exists, it is returned. Otherwise, a new LEFT JOIN is
+	 * initialized and added to the query.</p>
+	 *
+	 * @param from    The source path from which to join.
+	 * @param segment The name of the association attribute.
+	 */
 	private From<?, ?> findOrCreateJoin(From<?, ?> from, String segment) {
 		return from.getJoins().stream()
 				.filter(j -> j.getAttribute().getName().equals(segment))

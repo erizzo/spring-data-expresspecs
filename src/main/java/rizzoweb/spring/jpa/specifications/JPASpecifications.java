@@ -25,27 +25,36 @@ public class JPASpecifications {
 
 	static final char ESCAPE_CHAR = '\\';
 
+	// TODO: Add Date/Time Part Extractors (yearIs, monthIs, dayOfMonthIs)
+
+
 	/**
-	 * Wraps a {@link Specification} to ensure that results are distinct, but only when necessary.
-	 * <p>This decorator performs two critical checks before applying a {@code DISTINCT} keyword:
+	 * Wraps a {@link Specification} to ensure that results are distinct, but only
+	 * when necessary.
+	 * <p>
+	 * This decorator performs two critical checks before applying a {@code DISTINCT} keyword:
 	 * <ol>
-	 * <li><b>Join Detection:</b> It only applies distinct logic if the query has actually
-	 * performed a {@code JOIN}. This avoids the performance overhead of distinct sorting
-	 * on simple single-table queries.</li>
-	 * <li><b>Result Type Safety:</b> It ensures that {@code DISTINCT} is not applied to
-	 * count queries (where the result type is {@link Long}), preventing potential
-	 * JPA provider exceptions and incorrect metadata counts.</li>
+	 * <li><b>Join Detection:</b> It only applies distinct logic if the query has
+	 * actually performed a {@code JOIN}. This avoids the performance overhead of
+	 * distinct sorting on simple single-table queries.</li>
+	 * <li><b>Result Type Safety:</b> It ensures that {@code DISTINCT} is not
+	 * applied to count queries (where the result type is {@link Long}), preventing
+	 * potential JPA provider exceptions and incorrect metadata counts.</li>
 	 * </ol>
-	 * <p><b>When to use:</b> Use this when building user-facing search queries that navigate
-	 * {@code OneToMany} or {@code ManyToMany} relationships, where a single parent entity
-	 * would otherwise appear multiple times in the result list due to multiple matching
-	 * child records.</p>
+	 * <p>
+	 * <b>When to use:</b> Use this when building user-facing search queries that
+	 * navigate {@code OneToMany} or {@code ManyToMany} relationships, where a
+	 * single parent entity would otherwise appear multiple times in the result list due to
+	 * multiple matching child records.
+	 * </p>
 	 * <b>Example:</b>
-	 * <pre>{@code	Specification<Customer> spec = smartDistinct(hasRecentOrder().and(isPremium()));
+	 *
+	 * <pre>{@code
+	 * Specification<Customer> spec = smartDistinct(hasRecentOrder().and(isPremium()));
 	 * List<Customer> results = repository.findAll(spec);
 	 * }</pre>
 	 *
-	 * @param <T>  The type of the entity the specification is checking.
+	 * @param <T> The type of the entity the specification is checking.
 	 * @param spec The underlying specification to execute.
 	 * @return A new Specification that conditionally applies {@code DISTINCT}.
 	 */
@@ -64,24 +73,24 @@ public class JPASpecifications {
 	}
 
 	/**
-	 * Returns an unrestricted specification that acts as a safe, backward-compatible replacement for
-	 * returning {@code null} out of specification factories, which Spring Boot 4's {@code findAll()}
+	 * Returns an unrestricted specification that acts as a safe, backward-compatible replacement
+	 * for returning {@code null} out of specification factories, which Spring Boot 4's {@code findAll()}
 	 * no longer accepts.
+	 * <p>
+	 * This method exists for Spring Boot 3 support; Sprnig Boot 4 has it's own version of this
+	 * (see {@link Specification#unrestricted()}.
 	 *
 	 * @param <T> The entity type being queried.
-	 * @return An unrestricted specification.
 	 */
 	public static <T> @NonNull Specification<T> unrestricted() {
 		return (root, query, cb) -> null;
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property is
-	 * {@code true}.
+	 * Creates a specification that matches entities where the specified property is {@code true}.
 	 *
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Dot-delimited property path to a boolean attribute.
-	 * @return A specification that evaluates to {@code true} when the target property is true.
 	 * @see PropertyPath#from(String)
 	 */
 	public static <T> @NonNull Specification<T> isTrue(String propertyPath) {
@@ -89,12 +98,10 @@ public class JPASpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property is
-	 * {@code true}.
+	 * Creates a specification that matches entities where the specified property is {@code true}.
 	 *
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Resolved property path to a boolean attribute.
-	 * @return A specification that evaluates to {@code true} when the target property is true.
 	 */
 	public static <T> @NonNull Specification<T> isTrue(PropertyPath propertyPath) {
 		return (root, query, cb) -> {
@@ -104,12 +111,10 @@ public class JPASpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property is
-	 * {@code false}.
+	 * Creates a specification that matches entities where the specified property is {@code false}.
 	 *
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Dot-delimited property path to a boolean attribute.
-	 * @return A specification that evaluates to {@code true} when the target property is false.
 	 * @see PropertyPath#from(String)
 	 */
 	public static <T> @NonNull Specification<T> isFalse(String propertyPath) {
@@ -117,12 +122,10 @@ public class JPASpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property is
-	 * {@code false}.
+	 * Creates a specification that matches entities where the specified property is {@code false}.
 	 *
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Resolved property path to a boolean attribute.
-	 * @return A specification that evaluates to {@code true} when the target property is false.
 	 */
 	public static <T> @NonNull Specification<T> isFalse(PropertyPath propertyPath) {
 		return (root, query, cb) -> {
@@ -136,7 +139,6 @@ public class JPASpecifications {
 	 *
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Dot-delimited property path to test for null.
-	 * @return A specification that evaluates to {@code true} when the target property is null.
 	 * @see PropertyPath#from(String)
 	 */
 	public static <T> @NonNull Specification<T> isNull(String propertyPath) {
@@ -148,7 +150,6 @@ public class JPASpecifications {
 	 *
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Resolved property path to test for null.
-	 * @return A specification that evaluates to {@code true} when the target property is null.
 	 */
 	public static <T> @NonNull Specification<T> isNull(PropertyPath propertyPath) {
 		return (root, query, cb) -> {
@@ -158,12 +159,10 @@ public class JPASpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property is not
-	 * {@code null}.
+	 * Creates a specification that matches entities where the specified property is not {@code null}.
 	 *
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Dot-delimited property path to test for non-null.
-	 * @return A specification that evaluates to {@code true} when the target property is not null.
 	 * @see PropertyPath#from(String)
 	 */
 	public static <T> @NonNull Specification<T> notNull(String propertyPath) {
@@ -171,12 +170,10 @@ public class JPASpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property is not
-	 * {@code null}.
+	 * Creates a specification that matches entities where the specified property is not {@code null}.
 	 *
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Resolved property path to test for non-null.
-	 * @return A specification that evaluates to {@code true} when the target property is not null.
 	 */
 	public static <T> @NonNull Specification<T> notNull(PropertyPath propertyPath) {
 		return (root, query, cb) -> {
@@ -186,14 +183,12 @@ public class JPASpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property equals
-	 * {@code value}.
+	 * Creates a specification that matches entities where the specified property equals {@code value}.
 	 *
 	 * @param <T> The entity type being queried.
 	 * @param <V> The property value type.
 	 * @param propertyPath Dot-delimited property path to compare.
 	 * @param value Value to compare against.
-	 * @return A specification, or {@code null} when {@code value} is null/empty.
 	 * @see PropertyPath#from(String)
 	 */
 	public static <T, V> @NonNull Specification<T> is(String propertyPath, V value) {
@@ -201,17 +196,17 @@ public class JPASpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property equals
-	 * {@code value}.
+	 * Creates a specification that matches entities where the specified property equals {@code value}.
 	 *
 	 * @param <T> The entity type being queried.
 	 * @param <V> The property value type.
 	 * @param propertyPath Resolved property path to compare.
 	 * @param value Value to compare against.
-	 * @return A specification, or {@code null} when {@code value} is null/empty.
 	 */
 	public static <T, V> @NonNull Specification<T> is(PropertyPath propertyPath, V value) {
-		if (ObjectUtils.isEmpty(value)) { return unrestricted(); }
+		if (ObjectUtils.isEmpty(value)) {
+			return unrestricted();
+		}
 
 		return (root, query, cb) -> {
 			Path<?> path = propertyPath.asPath(root);
@@ -220,14 +215,12 @@ public class JPASpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property does not
-	 * equal {@code aValue}.
+	 * Creates a specification that matches entities where the specified property does not equal {@code aValue}.
 	 *
 	 * @param <T> The entity type being queried.
 	 * @param <V> The property value type.
 	 * @param propertyPath Dot-delimited property path to compare.
 	 * @param aValue Value to compare against.
-	 * @return A specification, or {@code null} when {@code aValue} is null/empty.
 	 * @see PropertyPath#from(String)
 	 */
 	public static <T, V> @NonNull Specification<T> isNot(String propertyPath, V aValue) {
@@ -235,21 +228,53 @@ public class JPASpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property does not
-	 * equal {@code aValue}.
+	 * Creates a specification that matches entities where the specified property does not equal {@code aValue}.
 	 *
 	 * @param <T> The entity type being queried.
 	 * @param <V> The property value type.
 	 * @param propertyPath Resolved property path to compare.
 	 * @param aValue Value to compare against.
-	 * @return A specification, or {@code null} when {@code aValue} is null/empty.
 	 */
 	public static <T, V> @NonNull Specification<T> isNot(PropertyPath propertyPath, V aValue) {
-		if (ObjectUtils.isEmpty(aValue)) { return unrestricted(); }
+		if (ObjectUtils.isEmpty(aValue)) {
+			return unrestricted();
+		}
 
 		return (root, query, cb) -> {
 			Path<?> path = propertyPath.asPath(root);
 			return cb.notEqual(path, aValue);
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property equals
+	 * {@code aValue}, ignoring case.
+	 *
+	 * @param <T> The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param aValue Value to compare against.
+	 * @see PropertyPath#from(String)
+	 */
+	public static <T> @NonNull Specification<T> equalsIgnoreCase(String propertyPath, String aValue) {
+		return equalsIgnoreCase(PropertyPath.from(propertyPath), aValue);
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property equals
+	 * {@code aValue}, ignoring case.
+	 *
+	 * @param <T> The entity type being queried.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param aValue Value to compare against.
+	 */
+	public static <T> @NonNull Specification<T> equalsIgnoreCase(PropertyPath propertyPath, String aValue) {
+		if (aValue == null) {
+			return unrestricted();
+		}
+
+		return (root, query, cb) -> {
+			Path<String> path = propertyPath.asPath(root);
+			return cb.equal(cb.lower(path), aValue.toLowerCase(Locale.ROOT));
 		};
 	}
 
@@ -259,26 +284,21 @@ public class JPASpecifications {
 	 * @param <T> The entity type being queried.
 	 * @param path1 First resolved property path in the comparison.
 	 * @param path2 Second resolved property path in the comparison.
-	 * @return A specification that evaluates to {@code true} when both properties have
-	 *		   equal values.
 	 */
 	public static <T> @NonNull Specification<T> areEqual(PropertyPath path1, PropertyPath path2) {
-		return (root, query, cb) ->	 cb.equal(path1.asPath(root), path2.asPath(root));
+		return (root, query, cb) -> cb.equal(path1.asPath(root), path2.asPath(root));
 	}
 
 	/**
 	 * Creates a specification that matches entities where two properties are equal.
 	 *
-	 * @param <T> The entity type being queried.
+	 * @param <T>   The entity type being queried.
 	 * @param property1 Dot-delimited path for the first property in the comparison.
 	 * @param property2 Dot-delimited path for the second property in the comparison.
-	 * @return A specification that evaluates to {@code true} when both properties have
-	 *		   equal values.
 	 */
 	public static <T> @NonNull Specification<T> areEqual(String property1, String property2) {
 		return areEqual(PropertyPath.from(property1), PropertyPath.from(property2));
 	}
-
 
 	/**
 	 * Creates a specification that matches entities where the specified property equals any
@@ -288,13 +308,11 @@ public class JPASpecifications {
 	 * @param <V> The property value type.
 	 * @param propertyPath Dot-delimited property path to compare.
 	 * @param searchValues Candidate values for an {@code IN (...)} predicate.
-	 * @return A specification, or {@code null} when {@code searchValues} is null/empty.
 	 * @see PropertyPath#from(String)
 	 */
 	public static <T, V> @NonNull Specification<T> isAny(String propertyPath, Collection<V> searchValues) {
 		return isAny(PropertyPath.from(propertyPath), searchValues);
 	}
-
 
 	/**
 	 * Creates a specification that matches entities where the specified property equals any
@@ -304,10 +322,11 @@ public class JPASpecifications {
 	 * @param <V> The property value type.
 	 * @param propertyPath Resolved property path to compare.
 	 * @param searchValues Candidate values for an {@code IN (...)} predicate.
-	 * @return A specification, or {@code null} when {@code searchValues} is null/empty.
 	 */
 	public static <T, V> @NonNull Specification<T> isAny(PropertyPath propertyPath, Collection<V> searchValues) {
-		if (CollectionUtils.isEmpty(searchValues)) { return unrestricted(); }
+		if (CollectionUtils.isEmpty(searchValues)) {
+			return unrestricted();
+		}
 
 		return (root, query, cb) -> {
 			Path<V> path = propertyPath.asPath(root);
@@ -319,16 +338,14 @@ public class JPASpecifications {
 		};
 	}
 
-
 	/**
 	 * Creates a specification that matches entities where the specified property does not
 	 * equal any value in {@code searchValues}.
 	 *
-	 * @param <T>		   The entity type being queried.
-	 * @param <V>		   The property value type.
+	 * @param <T> The entity type being queried.
+	 * @param <V> The property value type.
 	 * @param propertyPath Dot-delimited property path to compare.
 	 * @param searchValues Candidate values for a {@code NOT IN (...)} predicate.
-	 * @return A specification, or {@code null} when {@code searchValues} is null/empty.
 	 * @see PropertyPath#from(String)
 	 */
 	public static <T, V> @NonNull Specification<T> isNotAny(String propertyPath, Collection<V> searchValues) {
@@ -343,10 +360,11 @@ public class JPASpecifications {
 	 * @param <V> The property value type.
 	 * @param propertyPath Resolved property path to compare.
 	 * @param searchValues Candidate values for a {@code NOT IN (...)} predicate.
-	 * @return A specification, or {@code null} when {@code searchValues} is null/empty.
 	 */
 	public static <T, V> @NonNull Specification<T> isNotAny(PropertyPath propertyPath, Collection<V> searchValues) {
-		if (CollectionUtils.isEmpty(searchValues)) { return unrestricted(); }
+		if (CollectionUtils.isEmpty(searchValues)) {
+			return unrestricted();
+		}
 
 		return (root, query, cb) -> {
 			Path<V> path = propertyPath.asPath(root);
@@ -358,7 +376,6 @@ public class JPASpecifications {
 		};
 	}
 
-
 	/**
 	 * Creates a specification that matches entities where the specified property contains
 	 * {@code value}. Matching is case-sensitive.
@@ -366,7 +383,6 @@ public class JPASpecifications {
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Dot-delimited property path to compare.
 	 * @param value Substring to match within the property value.
-	 * @return A specification, or {@code null} when {@code value} is null/empty.
 	 * @see PropertyPath#from(String)
 	 */
 	public static <T> @NonNull Specification<T> contains(String propertyPath, String value) {
@@ -380,15 +396,16 @@ public class JPASpecifications {
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Resolved property path to compare.
 	 * @param value Substring to match within the property value.
-	 * @return A specification, or {@code null} when {@code value} is null/empty.
 	 */
 	public static <T> @NonNull Specification<T> contains(PropertyPath propertyPath, String value) {
-		if (StringUtils.isEmpty(value)) { return unrestricted(); }
+		if (StringUtils.isEmpty(value)) {
+			return unrestricted();
+		}
 
 		String escapedValue = escapeLike(value, ESCAPE_CHAR);
 		return (root, query, cb) -> {
 			Path<String> path = propertyPath.asPath(root);
-			return cb.like(path, "%"+escapedValue+"%", ESCAPE_CHAR);
+			return cb.like(path, "%" + escapedValue + "%", ESCAPE_CHAR);
 		};
 	}
 
@@ -399,7 +416,6 @@ public class JPASpecifications {
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Dot-delimited property path to compare.
 	 * @param value Substring to match within the property value.
-	 * @return A specification, or {@code null} when {@code value} is null/empty.
 	 * @see PropertyPath#from(String)
 	 */
 	public static <T> @NonNull Specification<T> containsIgnoreCase(String propertyPath, String value) {
@@ -413,10 +429,11 @@ public class JPASpecifications {
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Resolved property path to compare.
 	 * @param value Substring to match within the property value.
-	 * @return A specification, or {@code null} when {@code value} is null/empty.
 	 */
 	public static <T> @NonNull Specification<T> containsIgnoreCase(PropertyPath propertyPath, String value) {
-		if (StringUtils.isEmpty(value)) { return unrestricted(); }
+		if (StringUtils.isEmpty(value)) {
+			return unrestricted();
+		}
 
 		String escapedValue = escapeLike(value.toLowerCase(Locale.ROOT), ESCAPE_CHAR);
 		return (root, query, cb) -> {
@@ -432,7 +449,6 @@ public class JPASpecifications {
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Dot-delimited property path to compare.
 	 * @param value Substring to exclude from the property value.
-	 * @return A specification, or {@code null} when {@code value} is null/empty.
 	 * @see PropertyPath#from(String)
 	 */
 	public static <T> @NonNull Specification<T> doesNotContain(String propertyPath, String value) {
@@ -446,15 +462,16 @@ public class JPASpecifications {
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Resolved property path to compare.
 	 * @param value Substring to exclude from the property value.
-	 * @return A specification, or {@code null} when {@code value} is null/empty.
 	 */
 	public static <T> @NonNull Specification<T> doesNotContain(PropertyPath propertyPath, String value) {
-		if (StringUtils.isEmpty(value)) { return unrestricted(); }
+		if (StringUtils.isEmpty(value)) {
+			return unrestricted();
+		}
 
 		String escapedValue = escapeLike(value, ESCAPE_CHAR);
 		return (root, query, cb) -> {
 			Path<String> path = propertyPath.asPath(root);
-			return cb.notLike(path, "%"+escapedValue+"%", ESCAPE_CHAR);
+			return cb.notLike(path, "%" + escapedValue + "%", ESCAPE_CHAR);
 		};
 	}
 
@@ -465,7 +482,6 @@ public class JPASpecifications {
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Dot-delimited property path to compare.
 	 * @param value Substring to exclude from the property value.
-	 * @return A specification, or {@code null} when {@code value} is null/empty.
 	 * @see PropertyPath#from(String)
 	 */
 	public static <T> @NonNull Specification<T> doesNotContainIgnoreCase(String propertyPath, String value) {
@@ -479,10 +495,11 @@ public class JPASpecifications {
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Resolved property path to compare.
 	 * @param value Substring to exclude from the property value.
-	 * @return A specification, or {@code null} when {@code value} is null/empty.
 	 */
 	public static <T> @NonNull Specification<T> doesNotContainIgnoreCase(PropertyPath propertyPath, String value) {
-		if (StringUtils.isEmpty(value)) { return unrestricted(); }
+		if (StringUtils.isEmpty(value)) {
+			return unrestricted();
+		}
 
 		String escapedValue = escapeLike(value.toLowerCase(Locale.ROOT), ESCAPE_CHAR);
 		return (root, query, cb) -> {
@@ -491,32 +508,33 @@ public class JPASpecifications {
 		};
 	}
 
-
 	/**
-	 * Creates a specification that matches entities where the specified property contains at
-	 * least one of the values in {@code searchTerms}. Matching ignores case.
+	 * Creates a specification that matches entities where the specified property contains at least
+	 * one of the values in {@code searchTerms}. Matching ignores case.
 	 *
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Dot-delimited property path to compare.
 	 * @param searchTerms Candidate substrings for case-insensitive matching.
-	 * @return A specification, or {@code null} when {@code searchTerms} is null/empty.
 	 * @see PropertyPath#from(String)
 	 */
-	public static <T> @NonNull Specification<T> containsAnyIgnoreCase(String propertyPath, Collection<String> searchTerms) {
+	public static <T> @NonNull Specification<T> containsAnyIgnoreCase(String propertyPath,
+			Collection<String> searchTerms) {
 		return containsAnyIgnoreCase(PropertyPath.from(propertyPath), searchTerms);
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property contains at
-	 * least one of the values in {@code searchTerms}. Matching ignores case.
+	 * Creates a specification that matches entities where the specified property contains at least
+	 * one of the values in {@code searchTerms}. Matching ignores case.
 	 *
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Resolved property path to compare.
 	 * @param searchTerms Candidate substrings for case-insensitive matching.
-	 * @return A specification, or {@code null} when {@code searchTerms} is null/empty.
 	 */
-	public static <T> @NonNull Specification<T> containsAnyIgnoreCase(PropertyPath propertyPath, Collection<String> searchTerms) {
-		if (CollectionUtils.isEmpty(searchTerms)) { return unrestricted(); }
+	public static <T> @NonNull Specification<T> containsAnyIgnoreCase(PropertyPath propertyPath,
+			Collection<String> searchTerms) {
+		if (CollectionUtils.isEmpty(searchTerms)) {
+			return unrestricted();
+		}
 
 		List<String> escapedTerms = searchTerms.stream()
 				.filter(term -> !StringUtils.isEmpty(term))
@@ -524,25 +542,26 @@ public class JPASpecifications {
 				.toList();
 
 		// Special case: all terms are empty so nothing to match against
-		if (escapedTerms.isEmpty()) { return unrestricted(); }
+		if (escapedTerms.isEmpty()) {
+			return unrestricted();
+		}
 
 		return (root, query, cb) -> {
 			Path<String> path = propertyPath.asPath(root);
 			Predicate[] predicates = escapedTerms.stream()
-										.map(term -> cb.like(cb.lower(path), "%" + term + "%", ESCAPE_CHAR))
-										.toArray(Predicate[]::new);
+					.map(term -> cb.like(cb.lower(path), "%" + term + "%", ESCAPE_CHAR))
+					.toArray(Predicate[]::new);
 			return cb.or(predicates);
 		};
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property contains at
-	 * least one of the values in {@code searchTerms}. Matching is case-sensitive.
+	 * Creates a specification that matches entities where the specified property contains at least
+	 * one of the values in {@code searchTerms}. Matching is case-sensitive.
 	 *
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Dot-delimited property path to compare.
 	 * @param searchTerms Candidate substrings for case-sensitive matching.
-	 * @return A specification, or {@code null} when {@code searchTerms} is null/empty.
 	 * @see PropertyPath#from(String)
 	 */
 	public static <T> @NonNull Specification<T> containsAny(String propertyPath, Collection<String> searchTerms) {
@@ -550,16 +569,17 @@ public class JPASpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property contains at
-	 * least one of the values in {@code searchTerms}. Matching is case-sensitive.
+	 * Creates a specification that matches entities where the specified property contains at least
+	 * one of the values in {@code searchTerms}. Matching is case-sensitive.
 	 *
 	 * @param <T> The entity type being queried.
 	 * @param propertyPath Resolved property path to compare.
 	 * @param searchTerms Candidate substrings for case-sensitive matching.
-	 * @return A specification, or {@code null} when {@code searchTerms} is null/empty.
 	 */
 	public static <T> @NonNull Specification<T> containsAny(PropertyPath propertyPath, Collection<String> searchTerms) {
-		if (CollectionUtils.isEmpty(searchTerms)) { return unrestricted(); }
+		if (CollectionUtils.isEmpty(searchTerms)) {
+			return unrestricted();
+		}
 
 		List<String> escapedTerms = searchTerms.stream()
 				.filter(term -> !StringUtils.isEmpty(term))
@@ -567,13 +587,15 @@ public class JPASpecifications {
 				.toList();
 
 		// Special case: all terms are empty so nothing to match against
-		if (escapedTerms.isEmpty()) { return unrestricted(); }
+		if (escapedTerms.isEmpty()) {
+			return unrestricted();
+		}
 
 		return (root, query, cb) -> {
 			Path<String> path = propertyPath.asPath(root);
 			Predicate[] predicates = escapedTerms.stream()
-										.map(term -> cb.like(path, "%" + term + "%", ESCAPE_CHAR))
-										.toArray(Predicate[]::new);
+					.map(term -> cb.like(path, "%" + term + "%", ESCAPE_CHAR))
+					.toArray(Predicate[]::new);
 			return cb.or(predicates);
 		};
 	}
@@ -583,9 +605,9 @@ public class JPASpecifications {
 	 * given {@code targetDate} (inclusive of the start of the day and exclusive of the start of the
 	 * following day).
 	 *
-	 * @param <T>		   The entity type being queried.
+	 * @param <T> The entity type being queried.
 	 * @param propertyPath Dot-delimited property path to compare.
-	 * @param targetDate   The date to match.
+	 * @param targetDate The date to match.
 	 * @see PropertyPath#from(String)
 	 */
 	public static <T> @NonNull Specification<T> onDate(String propertyPath, LocalDate targetDate) {
@@ -597,12 +619,14 @@ public class JPASpecifications {
 	 * given {@code targetDate} (inclusive of the start of the day and exclusive of the start of the
 	 * following day).
 	 *
-	 * @param <T>		   The entity type being queried.
+	 * @param <T> The entity type being queried.
 	 * @param propertyPath Resolved property path to compare.
-	 * @param targetDate   The date to match.
+	 * @param targetDate The date to match.
 	 */
 	public static <T> @NonNull Specification<T> onDate(PropertyPath propertyPath, LocalDate targetDate) {
-		if (targetDate == null) { return unrestricted(); }
+		if (targetDate == null) {
+			return unrestricted();
+		}
 
 		LocalDateTime start = targetDate.atStartOfDay();
 		LocalDateTime end = targetDate.plusDays(1).atStartOfDay();
@@ -613,31 +637,34 @@ public class JPASpecifications {
 		return afterStart.and(beforeEnd);
 	}
 
-
 	/**
-	 * Creates a specification that matches entities where the specified property is strictly less than
+	 * Creates a specification that matches entities where the specified property is
+	 * strictly less than
 	 * {@code value}.
 	 *
-	 * @param <T>		   The entity type being queried.
-	 * @param <C>		   The comparable type of the property.
+	 * @param <T> The entity type being queried.
+	 * @param <C> The comparable type of the property.
 	 * @param propertyPath Dot-delimited property path to compare.
-	 * @param value		   Value to compare against.
+	 * @param value Value to compare against.
 	 * @see PropertyPath#from(String)
 	 */
-	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> lessThan(String propertyPath, C value) {
+	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> lessThan(String propertyPath,
+			C value) {
 		return lessThan(PropertyPath.from(propertyPath), value);
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property is strictly less than
+	 * Creates a specification that matches entities where the specified property is
+	 * strictly less than
 	 * {@code value}.
 	 *
-	 * @param <T>		   The entity type being queried.
-	 * @param <C>		   The comparable type of the property.
+	 * @param <T> The entity type being queried.
+	 * @param <C> The comparable type of the property.
 	 * @param propertyPath Resolved property path to compare.
-	 * @param value		   Value to compare against.
+	 * @param value Value to compare against.
 	 */
-	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> lessThan(PropertyPath propertyPath, C value) {
+	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> lessThan(PropertyPath propertyPath,
+			C value) {
 		return (root, query, cb) -> {
 			Path<C> path = propertyPath.asPath(root);
 			return cb.lessThan(path, value);
@@ -648,13 +675,14 @@ public class JPASpecifications {
 	 * Creates a specification that matches entities where the specified property is strictly greater
 	 * than {@code value}.
 	 *
-	 * @param <T>		   The entity type being queried.
-	 * @param <C>		   The comparable type of the property.
+	 * @param <T> The entity type being queried.
+	 * @param <C> The comparable type of the property.
 	 * @param propertyPath Dot-delimited property path to compare.
-	 * @param value		   Value to compare against.
+	 * @param value Value to compare against.
 	 * @see PropertyPath#from(String)
 	 */
-	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> greaterThan(String propertyPath, C value) {
+	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> greaterThan(String propertyPath,
+			C value) {
 		return greaterThan(PropertyPath.from(propertyPath), value);
 	}
 
@@ -662,12 +690,13 @@ public class JPASpecifications {
 	 * Creates a specification that matches entities where the specified property is strictly greater
 	 * than {@code value}.
 	 *
-	 * @param <T>		   The entity type being queried.
-	 * @param <C>		   The comparable type of the property.
+	 * @param <T> The entity type being queried.
+	 * @param <C> The comparable type of the property.
 	 * @param propertyPath Resolved property path to compare.
-	 * @param value		   Value to compare against.
+	 * @param value Value to compare against.
 	 */
-	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> greaterThan(PropertyPath propertyPath, C value) {
+	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> greaterThan(PropertyPath propertyPath,
+			C value) {
 		return (root, query, cb) -> {
 			Path<C> path = propertyPath.asPath(root);
 			return cb.greaterThan(path, value);
@@ -678,10 +707,8 @@ public class JPASpecifications {
 	 * Creates a specification that matches entities where the specified property is greater than or
 	 * equal to {@code value}.
 	 *
-	 * @param <T>		   The entity type being queried.
-	 * @param <C>		   The comparable type of the property.
-	 * @param propertyPath Dot-delimited property path to compare.
-	 * @param value		   Value to compare against.
+	 * @param <T> The entity type being queried.
+	 * @param <V> Value to compare against.
 	 * @see PropertyPath#from(String)
 	 */
 	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> atLeast(String propertyPath, C value) {
@@ -692,12 +719,13 @@ public class JPASpecifications {
 	 * Creates a specification that matches entities where the specified property is greater than or
 	 * equal to {@code value}.
 	 *
-	 * @param <T>		   The entity type being queried.
-	 * @param <C>		   The comparable type of the property.
+	 * @param <T> The entity type being queried.
+	 * @param <C> The comparable type of the property.
 	 * @param propertyPath Resolved property path to compare.
-	 * @param value		   Value to compare against.
+	 * @param value Value to compare against.
 	 */
-	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> atLeast(PropertyPath propertyPath, C value) {
+	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> atLeast(PropertyPath propertyPath,
+			C value) {
 		return (root, query, cb) -> {
 			Path<C> path = propertyPath.asPath(root);
 			return cb.greaterThanOrEqualTo(path, value);
@@ -708,14 +736,15 @@ public class JPASpecifications {
 	 * Creates a specification that matches entities where the specified property is greater than or
 	 * equal to {@code startInclusive} and strictly less than {@code endExclusive}.
 	 *
-	 * @param <T>			 The entity type being queried.
-	 * @param <C>			 The comparable type of the property.
-	 * @param propertyPath	 Dot-delimited property path to compare.
+	 * @param <T> The entity type being queried.
+	 * @param <C> The comparable type of the property.
+	 * @param propertyPath Dot-delimited property path to compare.
 	 * @param startInclusive The inclusive lower bound.
-	 * @param endExclusive	 The exclusive upper bound.
+	 * @param endExclusive The exclusive upper bound.
 	 * @see PropertyPath#from(String)
 	 */
-	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> between(String propertyPath, C startInclusive, C endExclusive) {
+	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> between(String propertyPath,
+			C startInclusive, C endExclusive) {
 		return between(PropertyPath.from(propertyPath), startInclusive, endExclusive);
 	}
 
@@ -723,13 +752,14 @@ public class JPASpecifications {
 	 * Creates a specification that matches entities where the specified property is greater than or
 	 * equal to {@code startInclusive} and strictly less than {@code endExclusive}.
 	 *
-	 * @param <T>			 The entity type being queried.
-	 * @param <C>			 The comparable type of the property.
-	 * @param propertyPath	 Resolved property path to compare.
+	 * @param <T> The entity type being queried.
+	 * @param <C> The comparable type of the property.
+	 * @param propertyPath Resolved property path to compare.
 	 * @param startInclusive The inclusive lower bound.
-	 * @param endExclusive	 The exclusive upper bound.
+	 * @param endExclusive The exclusive upper bound.
 	 */
-	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> between(PropertyPath propertyPath, C startInclusive, C endExclusive) {
+	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> between(PropertyPath propertyPath,
+			C startInclusive, C endExclusive) {
 		Specification<T> afterStart = atLeast(propertyPath, startInclusive);
 		Specification<T> beforeEnd = lessThan(propertyPath, endExclusive);
 
@@ -740,7 +770,7 @@ public class JPASpecifications {
 	 * Creates a specification that matches entities where the specified collection property
 	 * is not empty (has at least one element).
 	 *
-	 * @param <T>		   The entity type being queried.
+	 * @param <T> The entity type being queried.
 	 * @param propertyPath Dot-delimited property path to a collection attribute.
 	 * @see PropertyPath#from(String)
 	 */
@@ -752,7 +782,7 @@ public class JPASpecifications {
 	 * Creates a specification that matches entities where the specified collection property
 	 * is not empty (has at least one element).
 	 *
-	 * @param <T>		   The entity type being queried.
+	 * @param <T> The entity type being queried.
 	 * @param propertyPath Resolved property path to a collection attribute.
 	 */
 	public static <T> @NonNull Specification<T> isNotEmpty(PropertyPath propertyPath) {
@@ -766,7 +796,7 @@ public class JPASpecifications {
 	 * Creates a specification that matches entities where the specified collection property
 	 * is empty (has no elements).
 	 *
-	 * @param <T>		   The entity type being queried.
+	 * @param <T> The entity type being queried.
 	 * @param propertyPath Dot-delimited property path to a collection attribute.
 	 * @see PropertyPath#from(String)
 	 */
@@ -778,7 +808,7 @@ public class JPASpecifications {
 	 * Creates a specification that matches entities where the specified collection property
 	 * is empty (has no elements).
 	 *
-	 * @param <T>		   The entity type being queried.
+	 * @param <T> The entity type being queried.
 	 * @param propertyPath Resolved property path to a collection attribute.
 	 */
 	public static <T> @NonNull Specification<T> isEmpty(PropertyPath propertyPath) {
@@ -790,11 +820,46 @@ public class JPASpecifications {
 
 	/**
 	 * Creates a specification that matches entities where the specified collection property
+	 * contains {@code value}.
+	 *
+	 * @param <T> The entity type being queried.
+	 * @param <V> The element type in the collection.
+	 * @param propertyPath Dot-delimited property path to a collection attribute.
+	 * @param value The value to check for membership.
+	 * @see PropertyPath#from(String)
+	 */
+	public static <T, V> @NonNull Specification<T> containsMember(String propertyPath, V value) {
+		return containsMember(PropertyPath.from(propertyPath), value);
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified collection property
+	 * contains {@code value}.
+	 *
+	 * @param <T> The entity type being queried.
+	 * @param <V> The element type in the collection.
+	 * @param propertyPath Resolved property path to a collection attribute.
+	 * @param value The value to check for membership.
+	 */
+	public static <T, V> @NonNull Specification<T> containsMember(PropertyPath propertyPath, V value) {
+		if (value == null) {
+			return unrestricted();
+		}
+
+		return (root, query, cb) -> {
+			@SuppressWarnings("unchecked")
+			Path<Collection<V>> path = (Path<Collection<V>>) (Path<?>) propertyPath.asPath(root);
+			return cb.isMember(value, path);
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified collection property
 	 * has at least {@code minSize} elements.
 	 *
-	 * @param <T>		   The entity type being queried.
+	 * @param <T> The entity type being queried.
 	 * @param propertyPath Dot-delimited property path to a collection attribute.
-	 * @param minSize	   The minimum number of elements required.
+	 * @param minSize The minimum number of elements required.
 	 * @see PropertyPath#from(String)
 	 */
 	public static <T> @NonNull Specification<T> sizeAtLeast(String propertyPath, int minSize) {
@@ -805,9 +870,9 @@ public class JPASpecifications {
 	 * Creates a specification that matches entities where the specified collection property
 	 * has at least {@code minSize} elements.
 	 *
-	 * @param <T>		   The entity type being queried.
+	 * @param <T> The entity type being queried.
 	 * @param propertyPath Resolved property path to a collection attribute.
-	 * @param minSize	   The minimum number of elements required.
+	 * @param minSize The minimum number of elements required.
 	 */
 	public static <T> @NonNull Specification<T> sizeAtLeast(PropertyPath propertyPath, int minSize) {
 		return (root, query, cb) -> {
@@ -816,4 +881,3 @@ public class JPASpecifications {
 		};
 	}
 }
-
