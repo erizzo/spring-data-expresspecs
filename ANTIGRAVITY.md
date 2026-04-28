@@ -16,7 +16,10 @@ This file contains specific rules and preferences for the `erizzo-spring-utils` 
 - **Type Safety**: Avoid using raw JPA types. Always use generic parameters for `Path<?>`, `Specification<?>`, etc., to maintain type safety.
 - **Association Logic**: When building Specifications for collections, prefer iterative `.value()` calls on the `CriteriaBuilder.In` predicate over passing a whole collection as a single value.
 
-## 3. Testing
-- Always verify changes across both Spring Boot profiles:
+## 3. Testing and Infrastructure
+- **Infrastructure Sync**: Always run `jdt maven update` after making changes to project files (e.g., `pom.xml`) or changing the file structure (renames, moves, etc.) to keep the Eclipse workspace in sync.
+- **Mandatory Test Verification**: After every set of changes, you MUST run the full project test suite using `jdt test run --project spring-utils -f`.
+- **Count Validation**: Every single time you run the tests via `jdt`, you MUST also confirm that the number of tests reported by `jdt` exactly matches the number of tests reported by the Maven `sb4` profile (`./mvnw clean test -Psb4`).
+- Always verify changes across both Spring Boot profiles when final changes are made:
 	- `./mvnw clean test -Psb3`
 	- `./mvnw clean test -Psb4`

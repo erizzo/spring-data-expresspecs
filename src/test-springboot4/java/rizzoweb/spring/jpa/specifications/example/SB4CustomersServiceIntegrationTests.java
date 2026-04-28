@@ -1,9 +1,11 @@
-package rizzoweb.spring.jpa.specifications;
+package rizzoweb.spring.jpa.specifications.example;
 
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.test.context.ContextConfiguration;
 
+import rizzoweb.spring.jpa.specifications.SB4JPATestConfig;
+
 @DataJpaTest
 @ContextConfiguration(classes = SB4JPATestConfig.class)
-class SB4JPASpecificationsIntegrationTests extends BaseJPASpecificationsIntegrationTests {
+public class SB4CustomersServiceIntegrationTests extends CustomersServiceIntegrationTests {
 }

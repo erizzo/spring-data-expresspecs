@@ -11,13 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 import rizzoweb.spring.jpa.BaseJPAIntegrationTest;
 
 /**
- * Base class for {@link CustomerService} integration tests.
+ * Base class for {@link CustomersService} integration tests.
  */
 @Transactional
-public abstract class BaseCustomerServiceIntegrationTests extends BaseJPAIntegrationTest {
+public abstract class CustomersServiceIntegrationTests extends BaseJPAIntegrationTest {
 
 	@Autowired
-	protected CustomerService customerService;
+	protected CustomersService customersService;
 
 	@Autowired
 	protected CustomerRepository repository;
@@ -35,7 +35,7 @@ public abstract class BaseCustomerServiceIntegrationTests extends BaseJPAIntegra
 		persistAndFlush(charlie);
 		persistAndFlush(aliceInactive);
 
-		List<Customer> results = customerService.findActiveCustomersByName("ali");
+		List<Customer> results = customersService.findActiveCustomersByName("ali");
 
 		assertThat(results).containsExactly(alice);
 	}

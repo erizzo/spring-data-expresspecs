@@ -5,5 +5,5 @@ import org.springframework.test.context.ContextConfiguration;
 
 @DataJpaTest
 @ContextConfiguration(classes = SB3JpaTestConfig.class)
-class SB3JPASpecificationsIntegrationTests extends BaseJPASpecificationsIntegrationTests {
+class SB3SpecificationIntegrationTests extends SpecificationIntegrationTests {
 }

@@ -26,7 +26,7 @@ import jakarta.persistence.criteria.Root;
 
 @SuppressWarnings("null")
 @ExtendWith(MockitoExtension.class)
-class JPASpecificationsTests {
+class SpecificationTests {
 
 	@Mock private Root<Object> root;
 	@Mock private CriteriaQuery<?> query;
@@ -38,7 +38,7 @@ class JPASpecificationsTests {
 	@NullSource
 	@EmptySource
 	void contains_EmptySearchValue(String emptySearchValue) {
-		Specification<Object> result = JPASpecifications.contains("foo", emptySearchValue);
+		Specification<Object> result = StringSpecifications.contains("foo", emptySearchValue);
 		assertThat(result).isUnrestricted();
 	}
 
@@ -47,19 +47,19 @@ class JPASpecificationsTests {
 	@EmptySource
 	void contains_NestedProperty_EmptySearchValue(String emptySearchValue) {
 		var path = PropertyPath.of("foo", "bar");
-		Specification<Object> result = JPASpecifications.contains(path , emptySearchValue);
+		Specification<Object> result = StringSpecifications.contains(path , emptySearchValue);
 		assertThat(result).isUnrestricted();
 	}
 
 	@Test
 	void containsAny_NullList() {
-		Specification<Object> result = JPASpecifications.containsAny("foo", null);
+		Specification<Object> result = StringSpecifications.containsAny("foo", null);
 		assertThat(result).isUnrestricted();
 	}
 
 	@Test
 	void containsAny_EmptyList() {
-		Specification<Object> result = JPASpecifications.containsAny("foo", emptyList());
+		Specification<Object> result = StringSpecifications.containsAny("foo", emptyList());
 		assertThat(result).isUnrestricted();
 	}
 
@@ -69,14 +69,14 @@ class JPASpecificationsTests {
 			terms.add("");
 			terms.add(null);
 
-		Specification<Object> result = JPASpecifications.containsAny("foo", terms);
+		Specification<Object> result = StringSpecifications.containsAny("foo", terms);
 		assertThat(result).isUnrestricted();
 	}
 
 	@Test
 	void containsAny_AllBlankTerms() {
 		var terms = List.of("", "	", "\t");
-		Specification<Object> result = JPASpecifications.containsAny("foo", terms);
+		Specification<Object> result = StringSpecifications.containsAny("foo", terms);
 		assertThat(result).isNotNull();
 	}
 
@@ -84,7 +84,7 @@ class JPASpecificationsTests {
 	@NullSource
 	@EmptySource
 	void is_EmptySearchValue(String emptySearchValue) {
-		Specification<Object> result = JPASpecifications.is("foo", emptySearchValue);
+		Specification<Object> result = BasicSpecifications.is("foo", emptySearchValue);
 		assertThat(result).isUnrestricted();
 	}
 
@@ -92,7 +92,7 @@ class JPASpecificationsTests {
 	@NullSource
 	@EmptySource
 	void isNot_EmptySearchValue(String emptySearchValue) {
-		Specification<Object> result = JPASpecifications.isNot("foo", emptySearchValue);
+		Specification<Object> result = BasicSpecifications.isNot("foo", emptySearchValue);
 		assertThat(result).isUnrestricted();
 	}
 
@@ -101,14 +101,14 @@ class JPASpecificationsTests {
 	@EmptySource
 	void is_NestedPath_EmptySearchValue(String emptySearchValue) {
 		PropertyPath propertyPath = PropertyPath.of("foo", "bar");
-		Specification<Object> result = JPASpecifications.is(propertyPath, emptySearchValue);
+		Specification<Object> result = BasicSpecifications.is(propertyPath, emptySearchValue);
 		assertThat(result).isUnrestricted();
 	}
 
 	@Test
 	void isAny_EmptySearchValues() {
 		List<String> searchValues = emptyList();
-		Specification<Object> result = JPASpecifications.isAny("foo", searchValues);
+		Specification<Object> result = BasicSpecifications.isAny("foo", searchValues);
 		assertThat(result).isUnrestricted();
 	}
 
@@ -116,7 +116,7 @@ class JPASpecificationsTests {
 	void isAny_NestedPath_EmptySearchValues() {
 		List<String> searchValues = emptyList();
 		var path = PropertyPath.of("foo", "bar");
-		Specification<Object> result = JPASpecifications.isAny(path , searchValues);
+		Specification<Object> result = BasicSpecifications.isAny(path , searchValues);
 		assertThat(result).isUnrestricted();
 	}
 
@@ -128,7 +128,7 @@ class JPASpecificationsTests {
 		when(root.get(field)).thenReturn(fieldPath);
 
 		// Act
-		Specification<Object> spec = JPASpecifications.is(field, value);
+		Specification<Object> spec = BasicSpecifications.is(field, value);
 
 		// Execute the lambda
 		assertThat(spec).isNotNull();
@@ -147,7 +147,7 @@ class JPASpecificationsTests {
 
 		when(root.get(field)).thenReturn(collectionPath);
 
-		Specification<Object> spec = JPASpecifications.isNotEmpty(field);
+		Specification<Object> spec = CollectionSpecifications.isNotEmpty(field);
 		spec.toPredicate(root, query, cb);
 
 		verify(root).get(field);
@@ -162,7 +162,7 @@ class JPASpecificationsTests {
 
 		when(root.get(field)).thenReturn(collectionPath);
 
-		Specification<Object> spec = JPASpecifications.isEmpty(field);
+		Specification<Object> spec = CollectionSpecifications.isEmpty(field);
 		spec.toPredicate(root, query, cb);
 
 		verify(root).get(field);
@@ -181,7 +181,7 @@ class JPASpecificationsTests {
 		when(root.get(field)).thenReturn(collectionPath);
 		when(cb.size(collectionPath)).thenReturn(sizeExpr);
 
-		Specification<Object> spec = JPASpecifications.sizeAtLeast(field, minSize);
+		Specification<Object> spec = CollectionSpecifications.sizeAtLeast(field, minSize);
 		spec.toPredicate(root, query, cb);
 
 		verify(root).get(field);
@@ -192,7 +192,7 @@ class JPASpecificationsTests {
 	@Test
 	void isNotAny_EmptySearchValues() {
 		List<String> searchValues = emptyList();
-		Specification<Object> result = JPASpecifications.isNotAny("foo", searchValues);
+		Specification<Object> result = BasicSpecifications.isNotAny("foo", searchValues);
 		assertThat(result).isUnrestricted();
 	}
 
@@ -206,7 +206,7 @@ class JPASpecificationsTests {
 		when(root.get(field)).thenReturn(fieldPath);
 		when(cb.in(fieldPath)).thenReturn(inMock);
 
-		Specification<Object> spec = JPASpecifications.isAny(field, values);
+		Specification<Object> spec = BasicSpecifications.isAny(field, values);
 		spec.toPredicate(root, query, cb);
 
 		verify(cb).in(fieldPath);
@@ -226,7 +226,7 @@ class JPASpecificationsTests {
 		when(cb.in(fieldPath)).thenReturn(inMock);
 		when(cb.not(inMock)).thenReturn(notInPredicate);
 
-		Specification<Object> spec = JPASpecifications.isNotAny(field, values);
+		Specification<Object> spec = BasicSpecifications.isNotAny(field, values);
 		spec.toPredicate(root, query, cb);
 
 		verify(cb).in(fieldPath);
@@ -242,7 +242,7 @@ class JPASpecificationsTests {
 		String value = "VIP";
 		when(root.get(field)).thenReturn(fieldPath);
 
-		Specification<Object> spec = JPASpecifications.containsMember(field, value);
+		Specification<Object> spec = CollectionSpecifications.containsMember(field, value);
 		spec.toPredicate(root, query, cb);
 
 		verify(cb).isMember(eq(value), any(Path.class));
