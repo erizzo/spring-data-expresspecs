@@ -2,14 +2,12 @@ package rizzoweb.spring.jpa;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class BaseJPAIntegrationTest {
+import lombok.Getter;
+
+public abstract class BaseJPAIntegrationTest implements DataIntegrationTest {
 
 	@Autowired
+	@Getter
 	protected EntityManagerWrapper entityManager;
-
-
-	protected <T> T persistAndFlush(T entity) {
-		return entityManager.persistAndFlush(entity);
-	}
 
 }
