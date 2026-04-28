@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static rizzoweb.spring.jpa.specifications.SpecificationAssert.assertThat;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -19,66 +18,19 @@ import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
 @SuppressWarnings("null")
 @ExtendWith(MockitoExtension.class)
-class SpecificationTests {
+class BasicSpecificationsTests {
 
 	@Mock private Root<Object> root;
 	@Mock private CriteriaQuery<?> query;
 	@Mock private CriteriaBuilder cb;
 	@Mock private Path<Object> fieldPath;
 
-
-	@ParameterizedTest
-	@NullSource
-	@EmptySource
-	void contains_EmptySearchValue(String emptySearchValue) {
-		Specification<Object> result = StringSpecifications.contains("foo", emptySearchValue);
-		assertThat(result).isUnrestricted();
-	}
-
-	@ParameterizedTest
-	@NullSource
-	@EmptySource
-	void contains_NestedProperty_EmptySearchValue(String emptySearchValue) {
-		var path = PropertyPath.of("foo", "bar");
-		Specification<Object> result = StringSpecifications.contains(path , emptySearchValue);
-		assertThat(result).isUnrestricted();
-	}
-
-	@Test
-	void containsAny_NullList() {
-		Specification<Object> result = StringSpecifications.containsAny("foo", null);
-		assertThat(result).isUnrestricted();
-	}
-
-	@Test
-	void containsAny_EmptyList() {
-		Specification<Object> result = StringSpecifications.containsAny("foo", emptyList());
-		assertThat(result).isUnrestricted();
-	}
-
-	@Test
-	void containsAny_AllEmptyTerms() {
-		List<String> terms = new ArrayList<>();
-			terms.add("");
-			terms.add(null);
-
-		Specification<Object> result = StringSpecifications.containsAny("foo", terms);
-		assertThat(result).isUnrestricted();
-	}
-
-	@Test
-	void containsAny_AllBlankTerms() {
-		var terms = List.of("", "	", "\t");
-		Specification<Object> result = StringSpecifications.containsAny("foo", terms);
-		assertThat(result).isNotNull();
-	}
 
 	@ParameterizedTest
 	@NullSource
@@ -139,56 +91,6 @@ class SpecificationTests {
 		verify(cb).equal(fieldPath, value);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Test
-	void isNotEmpty_ShouldCallCbIsNotEmpty() {
-		String field = "orders";
-		Path collectionPath = mock(Path.class);
-
-		when(root.get(field)).thenReturn(collectionPath);
-
-		Specification<Object> spec = CollectionSpecifications.isNotEmpty(field);
-		spec.toPredicate(root, query, cb);
-
-		verify(root).get(field);
-		verify(cb).isNotEmpty(collectionPath);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Test
-	void isEmpty_ShouldCallCbIsEmpty() {
-		String field = "orders";
-		Path collectionPath = mock(Path.class);
-
-		when(root.get(field)).thenReturn(collectionPath);
-
-		Specification<Object> spec = CollectionSpecifications.isEmpty(field);
-		spec.toPredicate(root, query, cb);
-
-		verify(root).get(field);
-		verify(cb).isEmpty(collectionPath);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Test
-	void sizeAtLeast_ShouldCallCbSizeAndGreaterThanOrEqualTo() {
-		String field = "orders";
-		int minSize = 3;
-
-		Path collectionPath = mock(Path.class);
-		Expression<Integer> sizeExpr = mock(Expression.class);
-
-		when(root.get(field)).thenReturn(collectionPath);
-		when(cb.size(collectionPath)).thenReturn(sizeExpr);
-
-		Specification<Object> spec = CollectionSpecifications.sizeAtLeast(field, minSize);
-		spec.toPredicate(root, query, cb);
-
-		verify(root).get(field);
-		verify(cb).size(collectionPath);
-		verify(cb).greaterThanOrEqualTo(sizeExpr, minSize);
-	}
-
 	@Test
 	void isNotAny_EmptySearchValues() {
 		List<String> searchValues = emptyList();
@@ -234,18 +136,4 @@ class SpecificationTests {
 		verify(inMock).value("CANCELLED");
 		verify(cb).not(inMock);
 	}
-
-	@Test
-	@SuppressWarnings("unchecked")
-	void containsMember_ConstructsIsMemberPredicate() {
-		String field = "tags";
-		String value = "VIP";
-		when(root.get(field)).thenReturn(fieldPath);
-
-		Specification<Object> spec = CollectionSpecifications.containsMember(field, value);
-		spec.toPredicate(root, query, cb);
-
-		verify(cb).isMember(eq(value), any(Path.class));
-	}
 }
-
