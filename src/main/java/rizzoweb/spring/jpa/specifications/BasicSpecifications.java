@@ -1,7 +1,5 @@
 package rizzoweb.spring.jpa.specifications;
 
-import static rizzoweb.spring.jpa.specifications.JPASpecificationUtils.unrestricted;
-
 import java.util.Collection;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -18,6 +16,20 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 public class BasicSpecifications {
+
+	/**
+	 * Returns an unrestricted specification that acts as a safe, backward-compatible replacement
+	 * for returning {@code null} out of specification factories, which Spring Boot 4's {@code findAll()}
+	 * no longer accepts.
+	 * <p>
+	 * This method exists for Spring Boot 3 support; Sprnig Boot 4 has it's own version of this
+	 * (see {@link Specification#unrestricted()}.
+	 *
+	 * @param <T> The entity type being queried.
+	 */
+	public static <T> @NonNull Specification<T> unrestricted() {
+		return (root, query, cb) -> null;
+	}
 
 	/**
 	 * Creates a specification that matches entities where the specified property is {@code true}.

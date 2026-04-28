@@ -2,7 +2,7 @@ package rizzoweb.spring.jpa.specifications.example;
 
 
 import static rizzoweb.spring.jpa.specifications.RangeSpecifications.atLeast;
-import static rizzoweb.spring.jpa.specifications.JPASpecificationUtils.smartDistinct;
+import static rizzoweb.spring.jpa.specifications.SpecificationExtensions.smartDistinct;
 
 import java.time.LocalDate;
 import java.util.Collection;

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.Getter;
 import rizzoweb.spring.jpa.BaseJPAIntegrationTest;
 
 /**
@@ -20,7 +21,8 @@ public abstract class CustomersServiceIntegrationTests extends BaseJPAIntegratio
 	protected CustomersService customersService;
 
 	@Autowired
-	protected CustomerRepository repository;
+	@Getter
+	protected CustomerRepository repo;
 
 
 	@Test

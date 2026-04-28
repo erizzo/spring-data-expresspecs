@@ -6,12 +6,13 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.transaction.annotation.Transactional;
 
+import rizzoweb.spring.jpa.DataIntegrationTest;
 import rizzoweb.spring.jpa.specifications.example.Customer;
 import rizzoweb.spring.jpa.specifications.example.CustomerSpecifications;
 import rizzoweb.spring.jpa.specifications.example.Order;
 
 @Transactional
-public interface SpecificationUtilsIntegrationTests extends SpecificationsIntegrationTest {
+public interface SpecificationExtensionsIntegrationTests extends DataIntegrationTest {
 
 	@Test
 	default void resultsAreDistinct() {

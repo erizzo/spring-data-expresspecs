@@ -11,7 +11,7 @@ public abstract class SpecificationIntegrationTests extends BaseJPAIntegrationTe
 		RangeSpecificationIntegrationTests,
 		DateTimeSpecificationIntegrationTests,
 		CollectionSpecificationIntegrationTests,
-		SpecificationUtilsIntegrationTests {
+		SpecificationExtensionsIntegrationTests {
 
 	@Autowired
 	@Getter

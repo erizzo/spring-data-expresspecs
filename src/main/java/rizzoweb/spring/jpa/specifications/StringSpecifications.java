@@ -1,6 +1,6 @@
 package rizzoweb.spring.jpa.specifications;
 
-import static rizzoweb.spring.jpa.specifications.JPASpecificationUtils.unrestricted;
+import static rizzoweb.spring.jpa.specifications.BasicSpecifications.unrestricted;
 import static rizzoweb.utils.SQLUtils.escapeLike;
 
 import java.util.Collection;

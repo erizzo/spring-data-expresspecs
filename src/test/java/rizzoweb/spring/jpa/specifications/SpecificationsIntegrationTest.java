@@ -1,10 +1,7 @@
 package rizzoweb.spring.jpa.specifications;
 
-import rizzoweb.spring.jpa.EntityManagerWrapper;
-import rizzoweb.spring.jpa.specifications.example.CustomerRepository;
+import rizzoweb.spring.jpa.DataIntegrationTest;
 
-public interface SpecificationsIntegrationTest extends CustomerDataFactory {
-	CustomerRepository getRepo();
-	EntityManagerWrapper getEntityManager();
-	<T> T persistAndFlush(T entity);
+interface SpecificationsIntegrationTest extends CustomerDataFactory, DataIntegrationTest {
+
 }

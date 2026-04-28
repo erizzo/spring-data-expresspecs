@@ -136,4 +136,10 @@ class BasicSpecificationsTests {
 		verify(inMock).value("CANCELLED");
 		verify(cb).not(inMock);
 	}
+
+	@Test
+	void unrestricted_ReturnsUnrestrictedSpecification() {
+		Specification<Object> spec = BasicSpecifications.unrestricted();
+		assertThat(spec).isUnrestricted();
+	}
 }

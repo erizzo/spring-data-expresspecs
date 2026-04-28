@@ -8,10 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 
+import rizzoweb.spring.jpa.DataIntegrationTest;
 import rizzoweb.spring.jpa.specifications.example.Customer;
 
 @Transactional
-public interface DateTimeSpecificationIntegrationTests extends SpecificationsIntegrationTest {
+public interface DateTimeSpecificationIntegrationTests extends DataIntegrationTest {
 
 	@Test
 	default void onDate() {
