@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import rizzoweb.spring.jpa.specifications.example.Customer;
 
 @Transactional
-public interface DateTimeSpecificationIntegrationTests extends SpecificationTestHelpers {
+public interface DateTimeSpecificationIntegrationTests extends SpecificationsIntegrationTest {
 
 	@Test
 	default void onDate() {

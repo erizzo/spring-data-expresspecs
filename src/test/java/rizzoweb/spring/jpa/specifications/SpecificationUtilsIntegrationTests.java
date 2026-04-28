@@ -11,7 +11,7 @@ import rizzoweb.spring.jpa.specifications.example.CustomerSpecifications;
 import rizzoweb.spring.jpa.specifications.example.Order;
 
 @Transactional
-public interface SpecificationUtilsIntegrationTests extends SpecificationTestHelpers {
+public interface SpecificationUtilsIntegrationTests extends SpecificationsIntegrationTest {
 
 	@Test
 	default void resultsAreDistinct() {

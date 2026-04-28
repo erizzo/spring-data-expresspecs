@@ -12,7 +12,7 @@ import rizzoweb.spring.jpa.specifications.example.CustomerSpecifications;
 import rizzoweb.spring.jpa.specifications.example.Order;
 
 @Transactional
-public interface CollectionSpecificationIntegrationTests extends SpecificationTestHelpers {
+public interface CollectionSpecificationIntegrationTests extends SpecificationsIntegrationTest {
 
 	@Test
 	default void containsMember() {

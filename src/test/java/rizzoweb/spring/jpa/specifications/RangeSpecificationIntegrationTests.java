@@ -14,7 +14,7 @@ import rizzoweb.spring.jpa.specifications.example.Customer;
 import rizzoweb.spring.jpa.specifications.example.Order;
 
 @Transactional
-public interface RangeSpecificationIntegrationTests extends SpecificationTestHelpers {
+public interface RangeSpecificationIntegrationTests extends SpecificationsIntegrationTest {
 
 	@Test
 	default void greaterThan_lessThan() {

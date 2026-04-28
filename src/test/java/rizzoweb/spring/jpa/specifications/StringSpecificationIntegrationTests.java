@@ -11,7 +11,7 @@ import rizzoweb.spring.jpa.specifications.example.Customer;
 import rizzoweb.spring.jpa.specifications.example.CustomerSpecifications;
 
 @Transactional
-public interface StringSpecificationIntegrationTests extends SpecificationTestHelpers {
+public interface StringSpecificationIntegrationTests extends SpecificationsIntegrationTest {
 
 	@Test
 	default void contains() {
