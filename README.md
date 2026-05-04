@@ -192,10 +192,10 @@ public Page<Customer> findSpecialCustomers(Set<String> zipCodes, Integer minCred
 
 To see a complete, fully working example of how all these pieces fit together, check out the `example` package in our test suite. It contains the exact code that runs our integration tests:
 
-- **Domain Model:** [Customer.java](src/test/java/rizzoweb/spring/jpa/specifications/example/Customer.java) (and its related [Order.java](src/test/java/rizzoweb/spring/jpa/specifications/example/Order.java) / [Address.java](src/test/java/rizzoweb/spring/jpa/specifications/example/Address.java) entities)
-- **Repository:** [CustomerRepository.java](src/test/java/rizzoweb/spring/jpa/specifications/example/CustomerRepository.java)
-- **DSL Factory:** [CustomerSpecifications.java](src/test/java/rizzoweb/spring/jpa/specifications/example/CustomerSpecifications.java)
-- **Service Layer:** [CustomersService.java](src/test/java/rizzoweb/spring/jpa/specifications/example/CustomersService.java)
+- **Domain Model:** [Customer.java](src/test/java/expresspecs/example/Customer.java) (and its related [Order.java](src/test/java/expresspecs/example/Order.java) / [Address.java](src/test/java/expresspecs/example/Address.java) entities)
+- **Repository:** [CustomerRepository.java](src/test/java/expresspecs/example/CustomerRepository.java)
+- **DSL Factory:** [CustomerSpecifications.java](src/test/java/expresspecs/example/CustomerSpecifications.java)
+- **Service Layer:** [CustomersService.java](src/test/java/expresspecs/example/CustomersService.java)
 
 
 ## The Magic of `smartDistinct`

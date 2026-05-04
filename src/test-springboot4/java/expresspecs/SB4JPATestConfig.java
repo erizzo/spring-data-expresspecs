@@ -1,4 +1,4 @@
-package rizzoweb.spring.jpa.specifications;
+package expresspecs;
 
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
