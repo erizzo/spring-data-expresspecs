@@ -1,4 +1,8 @@
-# Spring Data Expressive Specs (Ex-specs)
+# Spring Data Expresspecs
+
+> The name is a mashup of *express* and *specs* — capturing two ideas at once: the specs are
+> *expressive* (readable, intent-revealing factory methods instead of raw `CriteriaBuilder` noise),
+> and they let you *express* queries quickly, without boilerplate.
 
 This library provides a set of highly expressive, composable factory methods that eliminate the boilerplate of Spring Data JPA Specifications and the underlying Criteria API.
 
@@ -50,7 +54,7 @@ import static rizzoweb.spring.jpa.specifications.StringSpecifications.contains;
 // Raw JPA
 Specification<Customer> spec = (root, query, cb) -> cb.like(root.get(Customer.Fields.name), "%Bugs%");
 
-// With Spring Data Expressive Specs
+// With Spring Data Expresspecs
 Specification<Customer> spec = contains(Customer.Fields.name, "Bugs");
 ```
 
