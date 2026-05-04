@@ -3,6 +3,7 @@ package rizzoweb.spring.jpa.specifications.example;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.test.context.ContextConfiguration;
 
+import expresspecs.example.CustomersServiceIntegrationTests;
 import rizzoweb.spring.jpa.specifications.SB4JPATestConfig;
 
 @DataJpaTest

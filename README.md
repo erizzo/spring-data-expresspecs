@@ -49,7 +49,7 @@ This library gives you clean, declarative factory methods categorized by type.
 ### Before vs. After
 
 ```java
-import static rizzoweb.spring.jpa.specifications.StringSpecifications.contains;
+import static expresspecs.StringSpecifications.contains;
 
 // Raw JPA
 Specification<Customer> spec = (root, query, cb) -> cb.like(root.get(Customer.Fields.name), "%Bugs%");
@@ -79,7 +79,7 @@ Let's use the following basic queries to demonstrate. Note how easy it is to tra
 For standard equality, null checks, and booleans.
 
 ```java
-import static rizzoweb.spring.jpa.specifications.BasicSpecifications.*;
+import static expresspecs.BasicSpecifications.*;
 
 // Simple equality
 Specification<Customer> spec = is(Customer.Fields.isActive, true);
@@ -96,7 +96,7 @@ Specification<Customer> spec = isAny(statePath, Set.of("FL", "MI", "TX"));
 For text-based searching (LIKE clauses, ignore case, etc.). *Note: All `StringSpecifications` methods automatically handle appending wildcard characters (`%`) and properly escaping SQL `LIKE` special characters (like `_` and `%`) in your search terms to prevent query errors or unintended wildcard matches.*
 
 ```java
-import static rizzoweb.spring.jpa.specifications.StringSpecifications.*;
+import static expresspecs.StringSpecifications.*;
 
 Specification<Customer> spec = containsIgnoreCase(Customer.Fields.name, "bugs");
 
@@ -108,8 +108,8 @@ Specification<Customer> spec = startsWith(cityPath, "New");
 For numbers, dates, and comparisons.
 
 ```java
-import static rizzoweb.spring.jpa.specifications.RangeSpecifications.*;
-import static rizzoweb.spring.jpa.specifications.DateTimeSpecifications.*;
+import static expresspecs.RangeSpecifications.*;
+import static expresspecs.DateTimeSpecifications.*;
 
 Specification<Customer> spec = greaterThan(Customer.Fields.creditLimit, 1000);
 
@@ -122,9 +122,9 @@ Specification<Customer> spec = onDate(datePath, LocalDate.now());
 While using the library's utility methods directly is great, the true expressiveness shines when you wrap them in domain-specific factory methods for your entities. This creates a clean, type-safe DSL (Domain Specific Language) for your application code.
 
 ```java
-import static rizzoweb.spring.jpa.specifications.BasicSpecifications.*;
-import static rizzoweb.spring.jpa.specifications.RangeSpecifications.*;
-import static rizzoweb.spring.jpa.specifications.SpecificationExtensions.smartDistinct;
+import static expresspecs.BasicSpecifications.*;
+import static expresspecs.RangeSpecifications.*;
+import static expresspecs.SpecificationExtensions.smartDistinct;
 
 public interface CustomerSpecifications {
 

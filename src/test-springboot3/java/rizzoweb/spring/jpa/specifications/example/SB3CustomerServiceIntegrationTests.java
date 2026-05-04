@@ -1,9 +1,9 @@
-package rizzoweb.spring.jpa.specifications.example;
+package expresspecs.example;
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ContextConfiguration;
 
-import rizzoweb.spring.jpa.specifications.SB3JpaTestConfig;
+import expresspecs.SB3JpaTestConfig;
 
 
 @DataJpaTest

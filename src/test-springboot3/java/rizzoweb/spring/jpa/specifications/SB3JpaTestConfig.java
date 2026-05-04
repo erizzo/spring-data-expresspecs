@@ -1,4 +1,4 @@
-package rizzoweb.spring.jpa.specifications;
+package expresspecs;
 
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -14,9 +14,9 @@ import rizzoweb.spring.jpa.EntityManagerWrapper;
 
 @Configuration
 @EnableAutoConfiguration
-@ComponentScan(basePackageClasses = rizzoweb.spring.jpa.specifications.example.ComponentScanMarker.class)
-@EntityScan(basePackageClasses = rizzoweb.spring.jpa.specifications.example.ComponentScanMarker.class)
-@EnableJpaRepositories(basePackageClasses = rizzoweb.spring.jpa.specifications.example.ComponentScanMarker.class)
+@ComponentScan(basePackageClasses = expresspecs.example.ComponentScanMarker.class)
+@EntityScan(basePackageClasses = expresspecs.example.ComponentScanMarker.class)
+@EnableJpaRepositories(basePackageClasses = expresspecs.example.ComponentScanMarker.class)
 public class SB3JpaTestConfig {
 
 	@Bean

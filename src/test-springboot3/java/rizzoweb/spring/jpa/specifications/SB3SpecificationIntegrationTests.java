@@ -1,4 +1,4 @@
-package rizzoweb.spring.jpa.specifications;
+package expresspecs;
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ContextConfiguration;
