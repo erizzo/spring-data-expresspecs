@@ -1,6 +1,7 @@
 package rizzoweb.spring.jpa.specifications;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static rizzoweb.spring.jpa.specifications.RangeSpecifications.atLeast;
 import static rizzoweb.spring.jpa.specifications.SpecificationExtensions.smartDistinct;
 
@@ -59,6 +60,14 @@ public interface RangeSpecificationIntegrationTests extends SpecificationsIntegr
 		spec = RangeSpecifications.between(Customer.Fields.creditLimit, 0, 100);
 		results = getRepo().findAll(spec);
 		assertThat(results).isEmpty();
+	}
+
+	@Test
+	default void between_NullBounds() {
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> RangeSpecifications.between(Customer.Fields.creditLimit, null, 1000));
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> RangeSpecifications.between(Customer.Fields.creditLimit, 0, null));
 	}
 
 	@Test
