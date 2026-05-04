@@ -12,3 +12,4 @@ target/
 *.rar
 
 hs_err_pid*
+/.claude/
