@@ -128,7 +128,11 @@ public class BasicSpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property equals {@code value}.
+	 * Creates a specification that matches entities where the specified property equals {@code value},
+	 * or an {@linkplain #unrestricted() unrestricted specification} if {@code value} is {@code null} or empty.
+	 *
+	 * <p>If the intent is to match entities where the property itself is {@code null}, use {@link #isNull} instead,
+	 * as passing {@code null} here will produce an unrestricted specification rather than a {@code IS NULL} predicate.
 	 *
 	 * @param <T>          The entity type being queried.
 	 * @param <V>          The property value type.
@@ -141,7 +145,11 @@ public class BasicSpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property equals {@code value}.
+	 * Creates a specification that matches entities where the specified property equals {@code value},
+	 * or an {@linkplain #unrestricted() unrestricted specification} if {@code value} is {@code null} or empty.
+	 *
+	 * <p>If the intent is to match entities where the property itself is {@code null}, use {@link #isNull} instead,
+	 * as passing {@code null} here will produce an unrestricted specification rather than a {@code IS NULL} predicate.
 	 *
 	 * @param <T>          The entity type being queried.
 	 * @param <V>          The property value type.
@@ -160,7 +168,12 @@ public class BasicSpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property does not equal {@code aValue}.
+	 * Creates a specification that matches entities where the specified property does not equal {@code aValue},
+	 * or an {@linkplain #unrestricted() unrestricted specification} if {@code aValue} is {@code null} or empty.
+	 *
+	 * <p>If the intent is to match entities where the property itself is not {@code null}, use {@link #notNull}
+	 * instead, as passing {@code null} here will produce an unrestricted specification rather than a
+	 * {@code IS NOT NULL} predicate.
 	 *
 	 * @param <T>          The entity type being queried.
 	 * @param <V>          The property value type.
@@ -173,7 +186,12 @@ public class BasicSpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property does not equal {@code aValue}.
+	 * Creates a specification that matches entities where the specified property does not equal {@code aValue},
+	 * or an {@linkplain #unrestricted() unrestricted specification} if {@code aValue} is {@code null} or empty.
+	 *
+	 * <p>If the intent is to match entities where the property itself is not {@code null}, use {@link #notNull}
+	 * instead, as passing {@code null} here will produce an unrestricted specification rather than a
+	 * {@code IS NOT NULL} predicate.
 	 *
 	 * @param <T>          The entity type being queried.
 	 * @param <V>          The property value type.
@@ -214,8 +232,9 @@ public class BasicSpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property equals any
-	 * value in {@code searchValues}.
+	 * Creates a specification that matches entities where the specified property equals any value in
+	 * {@code searchValues}, or an {@linkplain #unrestricted() unrestricted specification} if {@code searchValues}
+	 * is {@code null} or empty.
 	 *
 	 * @param <T>          The entity type being queried.
 	 * @param <V>          The property value type.
@@ -228,8 +247,9 @@ public class BasicSpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property equals any
-	 * value in {@code searchValues}.
+	 * Creates a specification that matches entities where the specified property equals any value in
+	 * {@code searchValues}, or an {@linkplain #unrestricted() unrestricted specification} if {@code searchValues}
+	 * is {@code null} or empty.
 	 *
 	 * @param <T>          The entity type being queried.
 	 * @param <V>          The property value type.
@@ -252,8 +272,9 @@ public class BasicSpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property does not
-	 * equal any value in {@code searchValues}.
+	 * Creates a specification that matches entities where the specified property does not equal any value in
+	 * {@code searchValues}, or an {@linkplain #unrestricted() unrestricted specification} if {@code searchValues}
+	 * is {@code null} or empty.
 	 *
 	 * @param <T>          The entity type being queried.
 	 * @param <V>          The property value type.
@@ -266,8 +287,9 @@ public class BasicSpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified property does not
-	 * equal any value in {@code searchValues}.
+	 * Creates a specification that matches entities where the specified property does not equal any value in
+	 * {@code searchValues}, or an {@linkplain #unrestricted() unrestricted specification} if {@code searchValues}
+	 * is {@code null} or empty.
 	 *
 	 * @param <T>          The entity type being queried.
 	 * @param <V>          The property value type.

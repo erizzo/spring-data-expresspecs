@@ -18,6 +18,10 @@ import lombok.experimental.UtilityClass;
 
 /**
  * Predicate factories for String-based JPA Specifications, including partial matches and case-insensitive equality.
+ *
+ * <p>All factories return an {@linkplain BasicSpecifications#unrestricted() unrestricted specification} when the
+ * filter value is {@code null}, blank, or an empty collection, making them safe to use directly from optional
+ * query parameters without null-checking at the call site.
  */
 @UtilityClass
 public class StringSpecifications {

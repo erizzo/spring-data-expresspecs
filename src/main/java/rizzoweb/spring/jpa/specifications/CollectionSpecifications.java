@@ -70,7 +70,8 @@ public class CollectionSpecifications {
 
 	/**
 	 * Creates a specification that matches entities where the specified collection property
-	 * contains {@code value}.
+	 * contains {@code value}, or an {@linkplain BasicSpecifications#unrestricted() unrestricted specification}
+	 * if {@code value} is {@code null}.
 	 *
 	 * @param <T>          The entity type being queried.
 	 * @param <V>          The element type in the collection.
@@ -84,7 +85,8 @@ public class CollectionSpecifications {
 
 	/**
 	 * Creates a specification that matches entities where the specified collection property
-	 * contains {@code value}.
+	 * contains {@code value}, or an {@linkplain BasicSpecifications#unrestricted() unrestricted specification}
+	 * if {@code value} is {@code null}.
 	 *
 	 * @param <T>          The entity type being queried.
 	 * @param <V>          The element type in the collection.

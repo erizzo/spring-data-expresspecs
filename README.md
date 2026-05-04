@@ -169,6 +169,9 @@ public Page<Customer> findSpecialCustomers(Set<String> zipCodes, Integer minCred
 
 One of the hidden superpowers of this library is that **it safely handles null and empty inputs automatically**. If you pass `null` or an empty collection into the factory methods, they safely return an "unrestricted" specification that acts as a no-op when chained. 
 
+> [!NOTE]
+> Most factory methods behave this way, though there are a few exceptions. Consult the Javadoc on each method for details.
+
 This means you can drop the `if` statements entirely and collapse your search APIs into a perfectly fluid chain:
 
 ```java
