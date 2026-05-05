@@ -11,7 +11,7 @@ import expresspecs.example.Customer;
 import expresspecs.example.CustomerSpecifications;
 
 @Transactional
-public interface StringSpecificationIntegrationTests extends SpecificationsIntegrationTest {
+public interface StringSpecificationIntegrationTests extends BaseIntegrationTest {
 
 	@Test
 	default void contains() {

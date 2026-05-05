@@ -15,7 +15,7 @@ import expresspecs.example.Customer;
 import expresspecs.example.Order;
 
 @Transactional
-public interface RangeSpecificationIntegrationTests extends SpecificationsIntegrationTest {
+public interface RangeSpecificationIntegrationTests extends BaseIntegrationTest {
 
 	@Test
 	default void greaterThan_lessThan() {

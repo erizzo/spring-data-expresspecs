@@ -12,7 +12,7 @@ import expresspecs.example.CustomerSpecifications;
 import expresspecs.example.Order;
 
 @Transactional
-public interface CollectionSpecificationIntegrationTests extends SpecificationsIntegrationTest {
+public interface CollectionSpecificationIntegrationTests extends BaseIntegrationTest {
 
 	@Test
 	default void containsMember() {
