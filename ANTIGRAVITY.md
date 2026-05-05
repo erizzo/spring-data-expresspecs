@@ -1,6 +1,6 @@
 # Antigravity Project Instructions
 
-This file contains specific rules and preferences for the `erizzo-spring-utils` project. These rules must be followed by Antigravity in all future sessions.
+This file contains specific rules and preferences for the `spring-data-expresspecs` project. These rules must be followed by Antigravity in all future sessions.
 
 ## 1. Indentation & Formatting
 - **Default Indentation**: Always use **Tabs** for indentation in all new or modified code.
@@ -18,7 +18,7 @@ This file contains specific rules and preferences for the `erizzo-spring-utils` 
 
 ## 3. Testing and Infrastructure
 - **Infrastructure Sync**: Always run `jdt maven update` after making changes to project files (e.g., `pom.xml`) or changing the file structure (renames, moves, etc.) to keep the Eclipse workspace in sync.
-- **Mandatory Test Verification**: After every set of changes, you MUST run the full project test suite using `jdt test run --project spring-utils -f`.
+- **Mandatory Test Verification**: After every set of changes, you MUST run the full project test suite using `jdt test run --project spring-data-expresspecs -f`.
 - **Count Validation**: Every single time you run the tests via `jdt`, you MUST also confirm that the number of tests reported by `jdt` exactly matches the number of tests reported by the Maven `sb4` profile (`./mvnw clean test -Psb4`).
 - Always verify changes across both Spring Boot profiles when final changes are made:
 	- `./mvnw clean test -Psb3`

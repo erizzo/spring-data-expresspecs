@@ -13,7 +13,7 @@ This project is developed in Eclipse with the `jdt` CLI bridge, which exposes th
 ```bash
 jdt problems                        # check compilation errors after edits
 jdt test run <FQN> -f -q            # run a single test class and stream results
-jdt build --project spring-utils    # trigger incremental build
+jdt build --project spring-data-expresspecs    # trigger incremental build
 jdt status -q                       # snapshot of open editors, errors, running tests
 ```
 
