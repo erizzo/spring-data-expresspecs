@@ -1,6 +1,6 @@
 package rizzoweb.spring.jpa;
 
-import rizzoweb.spring.jpa.specifications.example.CustomerRepository;
+import expresspecs.example.CustomerRepository;
 
 public interface DataIntegrationTest {
 

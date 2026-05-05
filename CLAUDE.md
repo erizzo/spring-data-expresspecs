@@ -41,7 +41,7 @@ jdt status -q                       # snapshot of open editors, errors, running 
 
 ## Architecture
 
-### Main source (`src/main/java/rizzoweb/spring/jpa/specifications/`)
+### Main source (`src/main/java/expresspecs/`)
 
 - **`PropertyPath`** — the core abstraction. A record representing a dot-notation JPA path (e.g., `"address.zipCode"`). It traverses associations via LEFT JOINs and embeddables via `.get()`, and reuses existing joins to prevent SQL duplicates. Most factory methods accept a `PropertyPath` (or a `String` shorthand for a single attribute).
 
@@ -66,9 +66,9 @@ All factory methods handle null or empty inputs by returning `BasicSpecification
 ### Testing
 
 - `src/test/java` — unit tests (mock-based) and Spring Boot 4 integration tests using H2.
-- `src/test/java-sb3` — Spring Boot 3-compatible versions of the integration tests (activated by the `sb3` Maven profile).
+- `src/test-springboot3/java` — Spring Boot 3-compatible versions of the integration tests (activated by the `sb3` Maven profile).
 - The `example` subpackage contains a worked example domain (Customer, Order, Address) with a `CustomerSpecifications` factory class demonstrating how to build a business-language DSL on top of this library.
 
 ### Dual Spring Boot support
 
-The `sb3` Maven profile switches the Spring Boot BOM version and activates the `src/test/java-sb3` test source tree. When adding new features, verify behaviour under both profiles.
+The `sb3` Maven profile switches the Spring Boot BOM version and activates the `src/test-springboot3/java` test source tree. When adding new features, verify behaviour under both profiles.
