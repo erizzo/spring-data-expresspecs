@@ -36,11 +36,3 @@ jobs:
 
     - name: Build with Maven (${{ matrix.profile }})
       run: ./mvnw -B --no-transfer-progress package -P${{ matrix.profile }}
-
-    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
-    - name: Update dependency graph
-      if: matrix.profile == 'sb4'
-      uses: advanced-security/maven-dependency-submission-action@v5
-      with:
-        directory: ${{ matrix.directory }}
-        correlator: ${{ github.job }}-${{ matrix.directory }}
