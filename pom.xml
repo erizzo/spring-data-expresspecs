@@ -7,6 +7,30 @@
     <version>0.1-SNAPSHOT</version>
 
     <name>Spring Data Expresspecs</name>
+    <description>Composable, type-safe factory methods for building Spring Data JPA Specification objects, eliminating CriteriaBuilder boilerplate with automatic join handling and null-safe chaining.</description>
+    <url>https://github.com/erizzo/spring-data-expresspecs</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Eric Rizzo</name>
+            <email>eric.rizzo@gmail.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/erizzo/spring-data-expresspecs</url>
+        <connection>scm:git:git://github.com/erizzo/spring-data-expresspecs.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/erizzo/spring-data-expresspecs.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
         <java.version>17</java.version>
