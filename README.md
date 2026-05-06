@@ -104,14 +104,14 @@ Specification<Customer> spec = contains(Customer.Fields.name, "Bugs");
 <dependency>
     <groupId>com.rizzoweb</groupId>
     <artifactId>spring-data-expresspecs</artifactId>
-    <version>0.1.0</version>
+    <version>0.1</version>
 </dependency>
 ```
 
 **Gradle:**
 
 ```groovy
-implementation 'com.rizzoweb:spring-data-expresspecs:0.1.0'
+implementation 'com.rizzoweb:spring-data-expresspecs:0.1'
 ```
 
 Snapshot builds are available from the Maven Central snapshot repository:
@@ -126,7 +126,7 @@ Snapshot builds are available from the Maven Central snapshot repository:
 </repositories>
 ```
 
-Then use version `0.1-SNAPSHOT`.
+Then use version `0.2-SNAPSHOT`.
 
 ### Your JPA Repository
 
