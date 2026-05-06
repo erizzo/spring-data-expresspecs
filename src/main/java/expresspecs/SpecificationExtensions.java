@@ -1,5 +1,7 @@
 package expresspecs;
 
+import static expresspecs.BasicSpecifications.unrestricted;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.jpa.domain.Specification;
@@ -9,9 +11,14 @@ import jakarta.persistence.criteria.Predicate;
 public class SpecificationExtensions {
 
 	/**
-	 * Null-safe or() for Specifications that tolerates null values for either argument
+	 * Null-safe or() for Specifications that tolerates null values for either argument. If both arguments
+	 * are null, {@link BasicSpecifications#unrestricted()} is returned.
 	 */
 	public static <T> Specification<T> safeOr(@Nullable Specification<T> existing, @Nullable Specification<T> additional) {
+		if (existing == null && additional == null) {
+			return unrestricted();
+		}
+
 		if (existing == null) {
 			return additional;
 		}
@@ -24,9 +31,14 @@ public class SpecificationExtensions {
 	}
 
 	/**
-	 * Null-safe and() for Specifications that tolerates null values for either argument
+	 * Null-safe and() for Specifications that tolerates null values for either argument. If both arguments
+	 * are null, {@link BasicSpecifications#unrestricted()} is returned.
 	 */
 	public static <T> Specification<T> safeAnd(@Nullable Specification<T> existing, @Nullable Specification<T> additional) {
+		if (existing == null && additional == null) {
+			return unrestricted();
+		}
+
 		if (existing == null) {
 			return additional;
 		}

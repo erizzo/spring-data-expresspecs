@@ -1,6 +1,7 @@
 package expresspecs;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static expresspecs.SpecificationAssert.assertThat;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.Nested;
@@ -27,9 +28,9 @@ class SpecificationExtensionsTests {
 	class SafeOr {
 
 		@Test
-		void bothNull_ReturnsNull() {
+		void bothNull() {
 			Specification<Object> result = SpecificationExtensions.safeOr(null, null);
-			assertThat(result).isNull();
+			assertThat(result).isUnrestricted();
 		}
 
 		@Test
@@ -69,9 +70,9 @@ class SpecificationExtensionsTests {
 	class SafeAnd {
 
 		@Test
-		void bothNull_ReturnsNull() {
+		void bothNull() {
 			Specification<Object> result = SpecificationExtensions.safeAnd(null, null);
-			assertThat(result).isNull();
+			assertThat(result).isUnrestricted();
 		}
 
 		@Test
