@@ -14,6 +14,89 @@ import org.springframework.data.jpa.domain.Specification;
 
 class StringSpecificationsTests {
 
+	@Test
+	void equalsIgnoreCase_NullValue_ReturnsUnrestricted() {
+		Specification<Object> result = StringSpecifications.equalsIgnoreCase("foo", null);
+		assertThat(result).isUnrestricted();
+	}
+
+	@Test
+	void equalsIgnoreCase_NestedProperty_NullValue_ReturnsUnrestricted() {
+		Specification<Object> result = StringSpecifications.equalsIgnoreCase(PropertyPath.of("foo", "bar"), null);
+		assertThat(result).isUnrestricted();
+	}
+
+	@ParameterizedTest
+	@NullSource
+	@EmptySource
+	void containsIgnoreCase_EmptySearchValue(String emptySearchValue) {
+		Specification<Object> result = StringSpecifications.containsIgnoreCase("foo", emptySearchValue);
+		assertThat(result).isUnrestricted();
+	}
+
+	@ParameterizedTest
+	@NullSource
+	@EmptySource
+	void containsIgnoreCase_NestedProperty_EmptySearchValue(String emptySearchValue) {
+		Specification<Object> result = StringSpecifications.containsIgnoreCase(PropertyPath.of("foo", "bar"), emptySearchValue);
+		assertThat(result).isUnrestricted();
+	}
+
+	@ParameterizedTest
+	@NullSource
+	@EmptySource
+	void doesNotContain_EmptySearchValue(String emptySearchValue) {
+		Specification<Object> result = StringSpecifications.doesNotContain("foo", emptySearchValue);
+		assertThat(result).isUnrestricted();
+	}
+
+	@ParameterizedTest
+	@NullSource
+	@EmptySource
+	void doesNotContain_NestedProperty_EmptySearchValue(String emptySearchValue) {
+		Specification<Object> result = StringSpecifications.doesNotContain(PropertyPath.of("foo", "bar"), emptySearchValue);
+		assertThat(result).isUnrestricted();
+	}
+
+	@ParameterizedTest
+	@NullSource
+	@EmptySource
+	void doesNotContainIgnoreCase_EmptySearchValue(String emptySearchValue) {
+		Specification<Object> result = StringSpecifications.doesNotContainIgnoreCase("foo", emptySearchValue);
+		assertThat(result).isUnrestricted();
+	}
+
+	@ParameterizedTest
+	@NullSource
+	@EmptySource
+	void doesNotContainIgnoreCase_NestedProperty_EmptySearchValue(String emptySearchValue) {
+		Specification<Object> result = StringSpecifications.doesNotContainIgnoreCase(PropertyPath.of("foo", "bar"), emptySearchValue);
+		assertThat(result).isUnrestricted();
+	}
+
+	@Test
+	void containsAnyIgnoreCase_NullList() {
+		Specification<Object> result = StringSpecifications.containsAnyIgnoreCase("foo", null);
+		assertThat(result).isUnrestricted();
+	}
+
+	@Test
+	void containsAnyIgnoreCase_EmptyList() {
+		Specification<Object> result = StringSpecifications.containsAnyIgnoreCase("foo", emptyList());
+		assertThat(result).isUnrestricted();
+	}
+
+	@Test
+	void containsAnyIgnoreCase_AllEmptyTerms() {
+		List<String> terms = new ArrayList<>();
+		terms.add("");
+		terms.add(null);
+
+		Specification<Object> result = StringSpecifications.containsAnyIgnoreCase("foo", terms);
+		assertThat(result).isUnrestricted();
+	}
+
+
 	@ParameterizedTest
 	@NullSource
 	@EmptySource
