@@ -210,22 +210,35 @@ public class BasicSpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where two properties are equal.
+	 * Creates a specification that matches entities where two of their own properties are equal
+	 * to each other (a column-to-column comparison, not a comparison against a fixed value).
+	 *
+	 * <p>Use this when the filter criterion is a relationship between two attributes on the same
+	 * entity row — for example, matching orders whose {@code promisedDate} has not passed its
+	 * {@code shippedDate}. For comparing a single property against a fixed value, use
+	 * {@link #is(PropertyPath, Object)} instead.
 	 *
 	 * @param <T>   The entity type being queried.
-	 * @param path1 First resolved property path in the comparison.
-	 * @param path2 Second resolved property path in the comparison.
+	 * @param path1 Path to the first property.
+	 * @param path2 Path to the second property.
 	 */
 	public static <T> @NonNull Specification<T> areEqual(PropertyPath path1, PropertyPath path2) {
 		return (root, query, cb) -> cb.equal(path1.asPath(root), path2.asPath(root));
 	}
 
 	/**
-	 * Creates a specification that matches entities where two properties are equal.
+	 * Creates a specification that matches entities where two of their own properties are equal
+	 * to each other (a column-to-column comparison, not a comparison against a fixed value).
+	 * Accepts dot-delimited path strings (e.g., {@code "address.city"}).
+	 *
+	 * <p>Use this when the filter criterion is a relationship between two attributes on the same
+	 * entity row — for example, matching orders whose {@code promisedDate} has not passed its
+	 * {@code shippedDate}. For comparing a single property against a fixed value, use
+	 * {@link #is(PropertyPath, Object)} instead.
 	 *
 	 * @param <T>       The entity type being queried.
-	 * @param property1 Dot-delimited path for the first property in the comparison.
-	 * @param property2 Dot-delimited path for the second property in the comparison.
+	 * @param property1 Dot-delimited path to the first property.
+	 * @param property2 Dot-delimited path to the second property.
 	 */
 	public static <T> @NonNull Specification<T> areEqual(String property1, String property2) {
 		return areEqual(PropertyPath.from(property1), PropertyPath.from(property2));
