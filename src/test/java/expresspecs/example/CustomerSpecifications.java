@@ -49,7 +49,7 @@ public interface CustomerSpecifications {
 	}
 
 	public static @NonNull Specification<Customer> hasZipCode(String zipCode) {
-		final var path = PropertyPath.of(Customer.Fields.address, Address.Fields.zipCode);
+		final var path = PropertyPath.of(Customer_.address, Address_.zipCode);
 		return is(path, zipCode);
 	}
 
@@ -58,7 +58,7 @@ public interface CustomerSpecifications {
 	}
 
 	public static @NonNull Specification<Customer> hasRecentOrder() {
-		final var path = PropertyPath.of(Customer.Fields.orders, Order.Fields.datePlaced);
+		final var path = PropertyPath.of(Customer_.orders, Order_.datePlaced);
 		Specification<Customer> spec = atLeast(path, LocalDate.now().minusDays(30));
 		return smartDistinct(spec);
 	}

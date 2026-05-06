@@ -58,7 +58,41 @@ Specification<Customer> spec = (root, query, cb) -> cb.like(root.get(Customer.Fi
 Specification<Customer> spec = contains(Customer.Fields.name, "Bugs");
 ```
 
-*(Note: Throughout these examples, we use static constants like `Customer.Fields.name`—easily generated via Lombok's [@FieldNameConstants](https://projectlombok.org/features/experimental/FieldNameConstants)—to ensure type-safety and avoid magic strings).*
+> [!NOTE]
+> Throughout these examples, we use static constants like `Customer.Fields.name`—easily generated via Lombok's [@FieldNameConstants](https://projectlombok.org/features/experimental/FieldNameConstants)—to ensure type-safety and avoid magic strings.
+>
+> **Alternative: JPA Static Metamodel**
+>
+> If your project already uses the [JPA static metamodel](https://hibernate.org/orm/tooling/) (e.g., `hibernate-processor`), `PropertyPath.of()` accepts metamodel attributes directly. The typed overloads also validate that path segments chain correctly — `Customer_.address` produces an `Address`, so the compiler enforces that the next segment must be an attribute of `Address`:
+>
+> ```java
+> // Single-segment: same refactoring safety as @FieldNameConstants
+> Specification<Customer> spec = is(PropertyPath.of(Customer_.name), "Bugs Bunny");
+>
+> // Multi-segment through a to-one association — compiler verifies the chain
+> var zipPath = PropertyPath.of(Customer_.address, Address_.zipCode);
+>
+> // Multi-segment through a to-many association — element type (Order) is extracted automatically
+> var datePath = PropertyPath.of(Customer_.orders, Order_.datePlaced);
+> ```
+>
+> To enable the metamodel processor with Maven, add `hibernate-processor` alongside Lombok in your compiler plugin configuration:
+>
+> ```xml
+> <annotationProcessorPaths>
+>     <path>
+>         <groupId>org.projectlombok</groupId>
+>         <artifactId>lombok</artifactId>
+>         <version>${lombok.version}</version>
+>     </path>
+>     <path>
+>         <groupId>org.hibernate.orm</groupId>
+>         <artifactId>hibernate-processor</artifactId>
+>     </path>
+> </annotationProcessorPaths>
+> ```
+>
+> Both approaches (`@FieldNameConstants` and the static metamodel) work with this library and can coexist within the same project.
 
 ## Getting Started
 

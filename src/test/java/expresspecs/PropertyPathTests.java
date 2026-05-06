@@ -2,6 +2,9 @@ package expresspecs;
 
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.Attribute;
+import jakarta.persistence.metamodel.PluralAttribute;
+import jakarta.persistence.metamodel.SingularAttribute;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -72,6 +75,124 @@ class PropertyPathTests {
 		void shouldHandleSingleSegment() {
 			PropertyPath path = PropertyPath.from("id");
 			assertThat(path.properties()).containsExactly("id");
+		}
+	}
+
+	@Nested
+	@DisplayName("Factory Method: of(Attribute<?,?>...)")
+	class OfAttributeVarargs {
+
+		@Test
+		@DisplayName("Should create path from single attribute")
+		@SuppressWarnings("unchecked")
+		void shouldCreateFromSingleAttribute() {
+			Attribute<Object, Object> attr = mock(Attribute.class);
+			when(attr.getName()).thenReturn("name");
+
+			assertThat(PropertyPath.of(attr).properties()).containsExactly("name");
+		}
+
+		@Test
+		@DisplayName("Should create path from multiple attributes in order")
+		@SuppressWarnings("unchecked")
+		void shouldCreateFromMultipleAttributes() {
+			Attribute<Object, Object> first = mock(Attribute.class);
+			Attribute<Object, Object> second = mock(Attribute.class);
+			when(first.getName()).thenReturn("address");
+			when(second.getName()).thenReturn("zipCode");
+
+			assertThat(PropertyPath.of(first, second).properties())
+					.containsExactly("address", "zipCode");
+		}
+
+		@Test
+		@DisplayName("Should throw for null attribute array")
+		void shouldThrowForNullArray() {
+			assertThatThrownBy(() -> PropertyPath.of((Attribute<?, ?>[]) null))
+					.isInstanceOf(IllegalArgumentException.class);
+		}
+
+		@Test
+		@DisplayName("Should throw for empty attribute array")
+		void shouldThrowForEmptyArray() {
+			assertThatThrownBy(() -> PropertyPath.of(new Attribute<?, ?>[0]))
+					.isInstanceOf(IllegalArgumentException.class);
+		}
+	}
+
+	@Nested
+	@DisplayName("Factory Method: of(SingularAttribute, Attribute)")
+	class OfSingularThenAttribute {
+
+		@Test
+		@DisplayName("Should create two-segment path from singular then leaf attribute")
+		@SuppressWarnings("unchecked")
+		void shouldCreateTwoSegmentPath() {
+			SingularAttribute<Object, Object> first = mock(SingularAttribute.class);
+			Attribute<Object, Object> second = mock(Attribute.class);
+			when(first.getName()).thenReturn("address");
+			when(second.getName()).thenReturn("zipCode");
+
+			assertThat(PropertyPath.of(first, second).properties())
+					.containsExactly("address", "zipCode");
+		}
+	}
+
+	@Nested
+	@DisplayName("Factory Method: of(PluralAttribute, Attribute)")
+	class OfPluralThenAttribute {
+
+		@Test
+		@DisplayName("Should create two-segment path from plural then leaf attribute")
+		@SuppressWarnings("unchecked")
+		void shouldCreateTwoSegmentPath() {
+			PluralAttribute<Object, ?, Object> first = mock(PluralAttribute.class);
+			Attribute<Object, Object> second = mock(Attribute.class);
+			when(first.getName()).thenReturn("orders");
+			when(second.getName()).thenReturn("datePlaced");
+
+			assertThat(PropertyPath.of(first, second).properties())
+					.containsExactly("orders", "datePlaced");
+		}
+	}
+
+	@Nested
+	@DisplayName("Factory Method: of(SingularAttribute, SingularAttribute, Attribute)")
+	class OfSingularSingularThenAttribute {
+
+		@Test
+		@DisplayName("Should create three-segment path through two singular associations")
+		@SuppressWarnings("unchecked")
+		void shouldCreateThreeSegmentPath() {
+			SingularAttribute<Object, Object> first = mock(SingularAttribute.class);
+			SingularAttribute<Object, Object> second = mock(SingularAttribute.class);
+			Attribute<Object, Object> third = mock(Attribute.class);
+			when(first.getName()).thenReturn("address");
+			when(second.getName()).thenReturn("region");
+			when(third.getName()).thenReturn("name");
+
+			assertThat(PropertyPath.of(first, second, third).properties())
+					.containsExactly("address", "region", "name");
+		}
+	}
+
+	@Nested
+	@DisplayName("Factory Method: of(SingularAttribute, PluralAttribute, Attribute)")
+	class OfSingularPluralThenAttribute {
+
+		@Test
+		@DisplayName("Should create three-segment path through a singular then plural association")
+		@SuppressWarnings("unchecked")
+		void shouldCreateThreeSegmentPath() {
+			SingularAttribute<Object, Object> first = mock(SingularAttribute.class);
+			PluralAttribute<Object, ?, Object> second = mock(PluralAttribute.class);
+			Attribute<Object, Object> third = mock(Attribute.class);
+			when(first.getName()).thenReturn("customer");
+			when(second.getName()).thenReturn("orders");
+			when(third.getName()).thenReturn("datePlaced");
+
+			assertThat(PropertyPath.of(first, second, third).properties())
+					.containsExactly("customer", "orders", "datePlaced");
 		}
 	}
 
