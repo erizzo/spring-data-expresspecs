@@ -62,7 +62,39 @@ Specification<Customer> spec = contains(Customer.Fields.name, "Bugs");
 
 ## Getting Started
 
-*(Add your Maven/Gradle dependency information here when published)*
+### Dependency
+
+**Maven:**
+
+```xml
+<dependency>
+    <groupId>com.rizzoweb</groupId>
+    <artifactId>spring-data-expresspecs</artifactId>
+    <version>0.1.0</version>
+</dependency>
+```
+
+**Gradle:**
+
+```groovy
+implementation 'com.rizzoweb:spring-data-expresspecs:0.1.0'
+```
+
+Snapshot builds are available from the Maven Central snapshot repository:
+
+```xml
+<repositories>
+    <repository>
+        <id>central-snapshots</id>
+        <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+        <snapshots><enabled>true</enabled></snapshots>
+    </repository>
+</repositories>
+```
+
+Then use version `0.1-SNAPSHOT`.
+
+### Your JPA Repository
 
 **Important:** To execute `Specification`s, your Spring Data repository interface must extend `JpaSpecificationExecutor<T>` in addition to your standard repository extension.
 
