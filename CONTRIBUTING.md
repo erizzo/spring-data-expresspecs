@@ -24,8 +24,8 @@ src/
 
 - **`sb4`** (default) — uses Spring Boot 4.0, adds `src/test-springboot4/java`
 - **`sb3`** — uses Spring Boot 3.5, adds `src/test-springboot3/java`
-- **`tc`** — adds Testcontainers dependencies and `src/test-containers/java`; combine with `sb4` or `sb3`
-- **`oracle`** — adds the Oracle Free Testcontainers module and `src/test-containers-oracle/java`; must be combined with `tc`
+- **`tc`** — adds Testcontainers dependencies and `src/test-containers/java`; **SB4 only** (see below)
+- **`oracle`** — adds the Oracle Free Testcontainers module and `src/test-containers-oracle/java`; must be combined with `tc`; **SB4 only**
 
 **Common test code** (`src/test/java`) contains abstract base test classes (e.g., `BaseJPAIntegrationTest`), entities, and an `EntityManagerWrapper`.
 **Version-specific test code** contains only the Spring configurations and thin, empty subclasses of the base test classes.
@@ -37,14 +37,18 @@ src/
 ./mvnw clean test           # Spring Boot 4 (default)
 ./mvnw clean test -Psb3     # Spring Boot 3.5
 
-# Testcontainers — real databases via Docker (requires Docker)
+# Testcontainers — real databases via Docker (requires Docker; SB4 only)
 ./mvnw clean test -Psb4,tc              # PostgreSQL, MySQL, MariaDB, SQL Server
-./mvnw clean test -Psb3,tc             # same databases under Spring Boot 3.5
 ./mvnw clean test -Psb4,tc,oracle      # adds Oracle Free (~60–90 s startup)
 ```
 
-> **Note:** Explicitly passing `-Psb4` (or `-Psb3`) is required when also passing `-Ptc` or `-Poracle`,
+> **Note:** Explicitly passing `-Psb4` is required when also passing `-Ptc` or `-Poracle`,
 > because specifying any `-P` flag deactivates the `sb4` profile's `activeByDefault` setting.
+
+> **Testcontainers requires Spring Boot 4.** The `tc` and `oracle` profiles do not work with `-Psb3`.
+> Spring Boot 3's dependency management targets Testcontainers 1.x artifact names, while
+> this project uses Testcontainers 2.x (managed by the Spring Boot 4 BOM). Combining `-Psb3,tc`
+> produces a build error because versions cannot be resolved for the TC 2.x artifacts.
 
 #### Why Testcontainers?
 

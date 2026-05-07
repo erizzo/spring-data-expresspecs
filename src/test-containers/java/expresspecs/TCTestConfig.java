@@ -2,7 +2,6 @@ package expresspecs;
 
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +25,6 @@ import rizzoweb.spring.jpa.EntityManagerWrapper;
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan(basePackageClasses = ComponentScanMarker.class)
-@EntityScan(basePackageClasses = ComponentScanMarker.class)
 @EnableJpaRepositories(basePackageClasses = ComponentScanMarker.class)
 public class TCTestConfig {
 
