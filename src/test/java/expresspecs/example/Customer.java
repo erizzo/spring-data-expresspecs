@@ -2,9 +2,15 @@ package expresspecs.example;
 
 import static lombok.AccessLevel.NONE;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embedded;
@@ -48,6 +54,14 @@ public class Customer {
 	private Integer creditLimit = 100;
 
 	private OffsetDateTime createdTimestamp;
+
+	private Instant instantTimestamp;
+
+	private LocalDate localDateOnly;
+
+	@SuppressWarnings("deprecation")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date legacyDate;
 
 	@OneToOne
 	private Address address;

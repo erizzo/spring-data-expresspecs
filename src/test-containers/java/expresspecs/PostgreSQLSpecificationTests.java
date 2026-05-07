@@ -1,0 +1,12 @@
+package expresspecs;
+
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+
+class PostgreSQLSpecificationTests extends AbstractContainerSpecificationTests {
+
+	@Container
+	@ServiceConnection
+	static PostgreSQLContainer<?> db = new PostgreSQLContainer<>("postgres:17-alpine");
+}

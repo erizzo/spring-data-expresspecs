@@ -12,6 +12,7 @@ public abstract class SpecificationIntegrationTests extends BaseJPAIntegrationTe
 		BasicSpecificationIntegrationTests,
 		RangeSpecificationIntegrationTests,
 		DateTimeSpecificationIntegrationTests,
+		OnDateTypeCoverageTests,
 		CollectionSpecificationIntegrationTests,
 		SpecificationExtensionsIntegrationTests {
 
