@@ -15,7 +15,7 @@ import rizzoweb.spring.jpa.BaseJPAIntegrationTest;
  * Base class for {@link CustomersService} integration tests.
  */
 @Transactional
-public abstract class CustomersServiceIntegrationTests extends BaseJPAIntegrationTest {
+public abstract class CustomersServiceIntegrationTests extends BaseJPAIntegrationTest<Customer> {
 
 	@Autowired
 	protected CustomersService customersService;

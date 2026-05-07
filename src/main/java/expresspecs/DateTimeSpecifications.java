@@ -18,8 +18,7 @@ import lombok.experimental.UtilityClass;
  * Predicate factories for Date/Time-based JPA Specifications.
  *
  * <p>All factory methods accept {@code null} filter values and return an {@linkplain BasicSpecifications#unrestricted()
- * unrestricted specification} in that case, making them safe to use directly from optional query parameters without
- * null-checking at the call site.
+ * unrestricted specification} in that case, making them safe to use without null-checking at the call site.
  */
 @UtilityClass
 public class DateTimeSpecifications {

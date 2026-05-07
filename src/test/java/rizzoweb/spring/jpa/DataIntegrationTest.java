@@ -1,10 +1,10 @@
 package rizzoweb.spring.jpa;
 
-import expresspecs.example.CustomerRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface DataIntegrationTest {
+public interface DataIntegrationTest<E> {
 
-	CustomerRepository getRepo();
+	JpaSpecificationExecutor<E> getRepo();
 
 	EntityManagerWrapper getEntityManager();
 

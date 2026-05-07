@@ -13,7 +13,7 @@ import expresspecs.example.Customer.Fields;
 import rizzoweb.spring.jpa.DataIntegrationTest;
 
 @Transactional
-public interface DateTimeSpecificationIntegrationTests extends DataIntegrationTest {
+public interface DateTimeSpecificationIntegrationTests extends DataIntegrationTest<Customer> {
 
 	@Test
 	default void onDate() {

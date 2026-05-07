@@ -11,7 +11,7 @@ import expresspecs.example.Customer;
 import expresspecs.example.PhoneNumber;
 
 @Transactional
-public interface BasicSpecificationIntegrationTests extends BaseIntegrationTest {
+public interface BasicSpecificationIntegrationTests extends BaseIntegrationTest<Customer> {
 
 	@Test
 	default void is() {

@@ -12,7 +12,7 @@ import expresspecs.example.Order;
 import rizzoweb.spring.jpa.DataIntegrationTest;
 
 @Transactional
-public interface SpecificationExtensionsIntegrationTests extends DataIntegrationTest {
+public interface SpecificationExtensionsIntegrationTests extends DataIntegrationTest<Customer> {
 
 	@Test
 	default void resultsAreDistinct() {
