@@ -3,6 +3,9 @@ package expresspecs;
 import static expresspecs.BasicSpecifications.unrestricted;
 import static expresspecs.RangeSpecifications.atLeast;
 import static expresspecs.RangeSpecifications.lessThan;
+import static jakarta.persistence.criteria.LocalDateTimeField.DAY;
+import static jakarta.persistence.criteria.LocalDateTimeField.MONTH;
+import static jakarta.persistence.criteria.LocalDateTimeField.YEAR;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,7 +14,6 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Path;
 import lombok.experimental.UtilityClass;
 
 /**
@@ -49,8 +51,7 @@ public class DateTimeSpecifications {
 			return unrestricted();
 		}
 		return (root, query, cb) -> {
-			Path<?> path = propertyPath.asPath(root);
-			Expression<Integer> yearExpr = cb.function("year", Integer.class, path);
+			Expression<Integer> yearExpr = cb.extract(YEAR, propertyPath.asPath(root));
 			return cb.equal(yearExpr, year);
 		};
 	}
@@ -81,8 +82,7 @@ public class DateTimeSpecifications {
 			return unrestricted();
 		}
 		return (root, query, cb) -> {
-			Path<?> path = propertyPath.asPath(root);
-			Expression<Integer> monthExpr = cb.function("month", Integer.class, path);
+			Expression<Integer> monthExpr = cb.extract(MONTH, propertyPath.asPath(root));
 			return cb.equal(monthExpr, month);
 		};
 	}
@@ -113,8 +113,7 @@ public class DateTimeSpecifications {
 			return unrestricted();
 		}
 		return (root, query, cb) -> {
-			Path<?> path = propertyPath.asPath(root);
-			Expression<Integer> dayExpr = cb.function("day", Integer.class, path);
+			Expression<Integer> dayExpr = cb.extract(DAY, propertyPath.asPath(root));
 			return cb.equal(dayExpr, dayOfMonth);
 		};
 	}
