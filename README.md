@@ -183,6 +183,11 @@ var datePath = PropertyPath.of(Customer.Fields.orders, Order.Fields.datePlaced);
 Specification<Customer> spec = onDate(datePath, LocalDate.now());
 ```
 
+> [!NOTE]
+> Some methods in `DateTimeSpecifications` require Hibernate as the JPA provider and will throw an
+> exception at runtime with any other provider.
+> See the `DateTimeSpecifications` Javadoc for details.
+
 ## Best Practice: Domain-Specific Factories
 
 While using the library's utility methods directly is great, the true expressiveness shines when you wrap them in domain-specific factory methods for your entities. This creates a clean, type-safe DSL (Domain Specific Language) for your application code.
