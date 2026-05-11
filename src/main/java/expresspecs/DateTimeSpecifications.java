@@ -3,16 +3,14 @@ package expresspecs;
 import static expresspecs.BasicSpecifications.unrestricted;
 import static expresspecs.RangeSpecifications.atLeast;
 import static expresspecs.RangeSpecifications.lessThan;
-import static jakarta.persistence.criteria.LocalDateTimeField.DAY;
-import static jakarta.persistence.criteria.LocalDateTimeField.MONTH;
-import static jakarta.persistence.criteria.LocalDateTimeField.YEAR;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
+import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.domain.Specification;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import lombok.experimental.UtilityClass;
 
@@ -21,9 +19,19 @@ import lombok.experimental.UtilityClass;
  *
  * <p>All factory methods accept {@code null} filter values and return an {@linkplain BasicSpecifications#unrestricted()
  * unrestricted specification} in that case, making them safe to use without null-checking at the call site.
+ *
+ * <p><strong>Hibernate requirement:</strong> Some methods (such as {@link #yearIs}, {@link #monthIs},
+ * and {@link #dayOfMonthIs}) use the Hibernate-specific {@code HibernateCriteriaBuilder} API to
+ * generate portable {@code EXTRACT}-based SQL that works across all supported databases. These methods
+ * will throw {@link ClassCastException} at runtime if the JPA provider is not Hibernate. All other
+ * methods in this class rely only on the standard JPA Criteria API and are provider-neutral.
  */
 @UtilityClass
 public class DateTimeSpecifications {
+
+	private HibernateCriteriaBuilder hibernateBuilder(CriteriaBuilder builder) {
+		return (HibernateCriteriaBuilder) builder;
+	}
 
 	/**
 	 * Creates a specification that matches entities where the year of the specified date-time property
@@ -51,7 +59,7 @@ public class DateTimeSpecifications {
 			return unrestricted();
 		}
 		return (root, query, cb) -> {
-			Expression<Integer> yearExpr = cb.extract(YEAR, propertyPath.asPath(root));
+			Expression<Integer> yearExpr = hibernateBuilder(cb).year(propertyPath.asPath(root));
 			return cb.equal(yearExpr, year);
 		};
 	}
@@ -82,7 +90,7 @@ public class DateTimeSpecifications {
 			return unrestricted();
 		}
 		return (root, query, cb) -> {
-			Expression<Integer> monthExpr = cb.extract(MONTH, propertyPath.asPath(root));
+			Expression<Integer> monthExpr = hibernateBuilder(cb).month(propertyPath.asPath(root));
 			return cb.equal(monthExpr, month);
 		};
 	}
@@ -113,7 +121,7 @@ public class DateTimeSpecifications {
 			return unrestricted();
 		}
 		return (root, query, cb) -> {
-			Expression<Integer> dayExpr = cb.extract(DAY, propertyPath.asPath(root));
+			Expression<Integer> dayExpr = hibernateBuilder(cb).day(propertyPath.asPath(root));
 			return cb.equal(dayExpr, dayOfMonth);
 		};
 	}
