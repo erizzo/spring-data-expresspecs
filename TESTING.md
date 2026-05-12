@@ -15,17 +15,18 @@ The project uses **Maven profiles** (`sb3` and `sb4`) with **separate test sourc
 ```
 src/
 ├── main/java/                    # Production code — version-independent
-├── test/java/                    # Common test code (base classes, entities, unit tests)
-├── test-springboot3/java/        # SB3-specific: thin subclasses + config
-├── test-springboot4/java/        # SB4-specific: thin subclasses + config
-├── test-containers/java/         # Testcontainers tests (PostgreSQL, MySQL, MariaDB, SQL Server)
-└── test-containers-oracle/java/  # Testcontainers test for Oracle (separate due to startup cost)
+└── test/
+    ├── java/                     # Common test code (base classes, entities, unit tests)
+    ├── springboot3/java/         # SB3-specific: thin subclasses + config
+    ├── springboot4/java/         # SB4-specific: thin subclasses + config
+    ├── containers/java/          # Testcontainers tests (PostgreSQL, MySQL, MariaDB, SQL Server)
+    └── containers-oracle/java/   # Testcontainers test for Oracle (separate due to startup cost)
 ```
 
-- **`sb4`** (default) — uses Spring Boot 4.0, adds `src/test-springboot4/java`
-- **`sb3`** — uses Spring Boot 3.5, adds `src/test-springboot3/java`
-- **`tc`** — adds Testcontainers dependencies and `src/test-containers/java`; **SB4 only** (see below)
-- **`oracle`** — adds the Oracle Free Testcontainers module and `src/test-containers-oracle/java`; must be combined with `tc`; **SB4 only**
+- **`sb4`** (default) — uses Spring Boot 4.0, adds `src/test/springboot4/java`
+- **`sb3`** — uses Spring Boot 3.5, adds `src/test/springboot3/java`
+- **`tc`** — adds Testcontainers dependencies and `src/test/containers/java`; **SB4 only** (see below)
+- **`oracle`** — adds the Oracle Free Testcontainers module and `src/test/containers-oracle/java`; must be combined with `tc`; **SB4 only**
 
 **Common test code** (`src/test/java`) contains abstract base test classes (e.g., `BaseJPAIntegrationTest`), entities, and an `EntityManagerWrapper`.
 **Version-specific test code** contains only the Spring configurations and thin, empty subclasses of the base test classes.
@@ -60,7 +61,7 @@ Here's an example of specifying a PostgreSQL 16 image:
 ./mvnw test -Psb4,tc -Dtc.image.postgresql=postgres:16-alpine
 ```
 
-You can find the default image tags and the exact `tc.image.*` property keys in [`ContainerImages.java`](src/test-containers/java/expresspecs/ContainerImages.java).
+You can find the default image tags and the exact `tc.image.*` property keys in [`ContainerImages.java`](src/test/containers/java/expresspecs/ContainerImages.java).
 
 ## Why Database-Specific Tests?
 
