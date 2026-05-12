@@ -51,6 +51,12 @@ src/
 > `-Poracle` with `sb3`) will not compile or resolve correctly — always use `-Psb4,tc` (and pass
 > `sb4` explicitly whenever you pass any other `-P`, since it is `activeByDefault`).
 
+> **Profile guard:** The `tc` profile runs the **Maven Enforcer** `requireActiveProfile` rule in the
+> `validate` phase so that `sb4` must also be active (clear message if you use `-Ptc` alone). The
+> `oracle` profile requires both `sb4` and `tc`. If you combine `sb3` with `tc`, the build may fail
+> earlier while resolving Testcontainers dependency versions from the Spring Boot 3 BOM, before that
+> message appears.
+
 #### Why Testcontainers?
 
 The H2 test suite provides fast feedback but masks real-world dialect issues because H2 silently

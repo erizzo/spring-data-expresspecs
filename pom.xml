@@ -105,6 +105,15 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.5.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -315,6 +324,33 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>enforce-tc-needs-sb4</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <phase>validate</phase>
+                                <configuration>
+                                    <rules>
+                                        <requireActiveProfile>
+                                            <profiles>sb4</profiles>
+                                            <message>
+                                                Profile &apos;tc&apos; (Testcontainers) must be used together with profile &apos;sb4&apos; (Spring Boot 4).
+    Example: ./mvnw test -Psb4,tc
+    If you pass only -Ptc, Maven deactivates &apos;sb4&apos; (activeByDefault is ignored once any -P is set).
+    Do not use -Psb3,tc - Spring Boot 3 manages Testcontainers 1.x; this project&apos;s container tests target Testcontainers 2.x from the Spring Boot 4 BOM (different coordinates and Java packages).
+                                            </message>
+                                        </requireActiveProfile>
+                                    </rules>
+                                    <fail>true</fail>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
                         <version>3.6.0</version>
@@ -360,6 +396,32 @@
             </dependencies>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>enforce-oracle-needs-sb4-and-tc</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <phase>validate</phase>
+                                <configuration>
+                                    <rules>
+                                        <requireActiveProfile>
+                                            <profiles>sb4,tc</profiles>
+                                            <message>
+                                                Profile &apos;oracle&apos; must be used together with &apos;sb4&apos; and &apos;tc&apos;
+    Example: ./mvnw test -Psb4,tc,oracle
+    Oracle tests reuse sources and dependencies from the Testcontainers base profile and require Spring Boot 4 / Testcontainers 2.x.
+                                            </message>
+                                        </requireActiveProfile>
+                                    </rules>
+                                    <fail>true</fail>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
