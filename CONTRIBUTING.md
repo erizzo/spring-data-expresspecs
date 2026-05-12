@@ -46,9 +46,10 @@ src/
 > because specifying any `-P` flag deactivates the `sb4` profile's `activeByDefault` setting.
 
 > **Testcontainers requires Spring Boot 4.** The `tc` and `oracle` profiles do not work with `-Psb3`.
-> Spring Boot 3's dependency management targets Testcontainers 1.x artifact names, while
-> this project uses Testcontainers 2.x (managed by the Spring Boot 4 BOM). Combining `-Psb3,tc`
-> produces a build error because versions cannot be resolved for the TC 2.x artifacts.
+> Spring Boot 3's BOM manages Testcontainers **1.x**; Spring Boot 4 manages Testcontainers **2.x**.
+> The two lines use different Maven coordinates and **Java package names**, so `-Psb3,tc` (or
+> `-Poracle` with `sb3`) will not compile or resolve correctly — always use `-Psb4,tc` (and pass
+> `sb4` explicitly whenever you pass any other `-P`, since it is `activeByDefault`).
 
 #### Why Testcontainers?
 

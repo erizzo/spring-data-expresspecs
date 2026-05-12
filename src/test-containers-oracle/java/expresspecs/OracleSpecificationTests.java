@@ -10,5 +10,5 @@ class OracleSpecificationTests extends AbstractContainerSpecificationTests {
 	// Even so, expect ~60–90 s on first run while Docker pulls and initialises the image.
 	@Container
 	@ServiceConnection
-	static OracleContainer db = new OracleContainer("gvenzl/oracle-free:23-slim-faststart");
+	static OracleContainer db = new OracleContainer(ContainerImages.ORACLE);
 }
