@@ -11,7 +11,7 @@ class SQLServerSpecificationTests extends AbstractContainerSpecificationTests {
 	static MSSQLServerContainer db = createContainer();
 
 	private static MSSQLServerContainer createContainer() {
-		var container = new MSSQLServerContainer("mcr.microsoft.com/mssql/server:2022-latest");
+		var container = new MSSQLServerContainer(ContainerImages.MSSQLSERVER);
 		container.acceptLicense();
 		return container;
 	}

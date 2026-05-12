@@ -8,5 +8,5 @@ class MariaDBSpecificationTests extends AbstractContainerSpecificationTests {
 
 	@Container
 	@ServiceConnection
-	static MariaDBContainer db = new MariaDBContainer("mariadb:11.4");
+	static MariaDBContainer db = new MariaDBContainer(ContainerImages.MARIADB);
 }

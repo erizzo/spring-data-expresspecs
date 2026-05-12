@@ -8,5 +8,5 @@ class PostgreSQLSpecificationTests extends AbstractContainerSpecificationTests {
 
 	@Container
 	@ServiceConnection
-	static PostgreSQLContainer db = new PostgreSQLContainer("postgres:17-alpine");
+	static PostgreSQLContainer db = new PostgreSQLContainer(ContainerImages.POSTGRESQL);
 }

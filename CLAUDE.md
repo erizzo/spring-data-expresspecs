@@ -65,10 +65,13 @@ All factory methods handle null or empty inputs by returning `BasicSpecification
 
 ### Testing
 
+See **[TESTING.md](TESTING.md)** for Maven commands, profiles, Testcontainers, Enforcer rules, and CI. In brief:
+
 - `src/test/java` — unit tests (mock-based) and Spring Boot 4 integration tests using H2.
 - `src/test-springboot3/java` — Spring Boot 3-compatible versions of the integration tests (activated by the `sb3` Maven profile).
+- `src/test-containers/java` (profile `tc`) and `src/test-containers-oracle/java` (profile `oracle`) — Docker-backed databases; **Spring Boot 4 only** (`-Psb4,tc`). They use Testcontainers 2.x from the SB4 BOM; do not combine with `-Psb3` (SB3 uses TC 1.x — different coordinates and Java packages). Wrong combos are caught in `validate` via **Maven Enforcer** (`tc` requires `sb4`; `oracle` requires `sb4` and `tc`).
 - The `example` subpackage contains a worked example domain (Customer, Order, Address) with a `CustomerSpecifications` factory class demonstrating how to build a business-language DSL on top of this library.
 
 ### Dual Spring Boot support
 
-The `sb3` Maven profile switches the Spring Boot BOM version and activates the `src/test-springboot3/java` test source tree. When adding new features, verify behaviour under both profiles.
+The `sb3` Maven profile switches the Spring Boot BOM version and activates the `src/test-springboot3/java` test source tree. When adding new features, verify behaviour under both profiles (H2 integration tests). Testcontainers profiles are excluded — they require `sb4`.
