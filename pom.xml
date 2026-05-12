@@ -195,7 +195,7 @@
                                 </goals>
                                 <configuration>
                                     <sources>
-                                        <source>src/test-springboot4/java</source>
+                                        <source>src/test/springboot4/java</source>
                                     </sources>
                                 </configuration>
                             </execution>
@@ -239,7 +239,7 @@
                                 </goals>
                                 <configuration>
                                     <sources>
-                                        <source>src/test-springboot3/java</source>
+                                        <source>src/test/springboot3/java</source>
                                     </sources>
                                 </configuration>
                             </execution>
@@ -363,7 +363,7 @@
                                 </goals>
                                 <configuration>
                                     <sources>
-                                        <source>src/test-containers/java</source>
+                                        <source>src/test/containers/java</source>
                                     </sources>
                                 </configuration>
                             </execution>
@@ -435,7 +435,7 @@
                                 </goals>
                                 <configuration>
                                     <sources>
-                                        <source>src/test-containers-oracle/java</source>
+                                        <source>src/test/containers-oracle/java</source>
                                     </sources>
                                 </configuration>
                             </execution>

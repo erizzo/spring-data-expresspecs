@@ -1,0 +1,12 @@
+---
+description: 
+alwaysApply: true
+---
+
+# Git: user-owned workflow
+
+Do **not** run `git add`, `git commit`, `git push`, merge, rebase, or otherwise stage or publish changes unless the user **explicitly** asks for a specific git operation.
+
+After code or config edits, leave the working tree as-is. The user stages, commits, and pushes manually.
+
+Read-only git commands (e.g. `git status`, `git diff`, `git log`) are fine when needed to answer a question or diagnose an issue.

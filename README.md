@@ -2,7 +2,7 @@
 
 > The name is a mashup of *express* and *specs* — capturing two ideas at once: the specs are
 > *expressive* (readable, intent-revealing factory methods instead of raw `CriteriaBuilder` noise),
-> and they let you *express* queries quickly, without boilerplate.
+> and they're like an *express* train (fast, direct) to Specification/Criteria queries without boilerplate.
 
 This library provides a set of highly expressive, composable factory methods that eliminate the boilerplate of Spring Data JPA Specifications and the underlying Criteria API.
 
@@ -185,8 +185,7 @@ Specification<Customer> spec = onDate(datePath, LocalDate.now());
 
 > [!NOTE]
 > Some methods in `DateTimeSpecifications` require Hibernate as the JPA provider and will throw an
-> exception at runtime with any other provider.
-> See the `DateTimeSpecifications` Javadoc for details.
+> exception at runtime with any other provider. See the `DateTimeSpecifications` Javadoc for details.
 
 ## Best Practice: Domain-Specific Factories
 
@@ -244,9 +243,6 @@ public Page<Customer> findSpecialCustomers(Set<String> zipCodes, Integer minCred
 
 One of the hidden superpowers of this library is that **it safely handles null and empty inputs automatically**. If you pass `null` or an empty collection into the factory methods, they safely return an "unrestricted" specification that acts as a no-op when chained. 
 
-> [!NOTE]
-> Most factory methods behave this way, though there are a few exceptions. Consult the Javadoc on each method for details.
-
 This means you can drop the `if` statements entirely and collapse your search APIs into a perfectly fluid chain:
 
 ```java
@@ -258,6 +254,9 @@ public Page<Customer> findSpecialCustomers(Set<String> zipCodes, Integer minCred
     return customerRepository.findAll(spec, pageable);
 }
 ```
+
+> [!NOTE]
+> Most factory methods behave this way, though there are a few exceptions. Consult the Javadoc on each method for details.
 
 ### Complete Example Source Code
 
