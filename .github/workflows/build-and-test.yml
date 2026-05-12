@@ -42,7 +42,7 @@ jobs:
   # Split from the main build matrix so PRs still get fast sb3/sb4 package checks without
   # blocking on container startup; Oracle stays in test-oracle below.
   test-tc:
-    name: Integration tests against real DBs (Docker-based)
+    name: Test against real DBs (Docker-based)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -61,7 +61,7 @@ jobs:
   # Keeping them separate avoids slowing down the main build matrix and isolates
   # the cache configuration from the standard Maven build steps.
   test-oracle:
-    name: Integration tests against Oracle (Docker-based)
+    name: Tests against Oracle (Docker-based)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
