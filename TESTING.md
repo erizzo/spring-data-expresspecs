@@ -4,11 +4,7 @@ This document describes how tests are organized, how to run them (including Test
 
 ## Spring Boot 3 and 4 compatibility
 
-This library supports both **Spring Boot 3.5** and **Spring Boot 4.0** from a single codebase.
-
-### Why
-
-The library's production code depends only on the JPA Criteria API and Spring Data JPA's `Specification` interface—APIs that are identical across both Spring Boot versions. No version-specific code is needed at runtime.
+This library supports both **Spring Boot 3.5** and **Spring Boot 4.0** from a single codebase. The production code depends only on the JPA Criteria API and Spring Data JPA's `Specification` interface—APIs that are identical across both Spring Boot versions. No version-specific code is needed at runtime.
 
 The challenge is in the **test infrastructure**. Spring Boot 4 relocated several key test classes (like `@DataJpaTest`) to new packages.
 
@@ -52,7 +48,21 @@ src/
 >
 > Maven disables the **`sb4`** profile's `activeByDefault` whenever you pass **any** **`-P`** list, so **include `sb4`** whenever you add `tc` or `oracle`.
 
-## Why Testcontainers?
+## Overriding Testcontainers images
+
+The Testcontainers profile uses database Docker images from curated public images so the suite behaves predictably in CI and on a typical developer machine. There are situations where those default images are not enough: you may need to test against specific images for compliance or to align with versions you use in production. In those cases you can keep the same Maven targets and set of tests but specify alternate database images.
+
+Do that with **JVM system properties** by adding `-Dtc.image.<database>=<image>:<tag>` on the maven command line when you run the tests. The `<database>` segment is `postgresql`, `mysql`, `mariadb`, `mssqlserver`, or `oracle`. Leave a property unset to keep that database’s default image; add as many `-D` pairs as you need in one invocation.
+
+Here's an example of specifying a PostgreSQL 16 image:
+
+```bash
+./mvnw test -Psb4,tc -Dtc.image.postgresql=postgres:16-alpine
+```
+
+You can find the default image tags and the exact `tc.image.*` property keys in [`ContainerImages.java`](src/test-containers/java/expresspecs/ContainerImages.java).
+
+## Why Database-Specific Tests?
 
 The H2 test suite provides fast feedback but masks real-world dialect issues because H2 silently
 coerces type mismatches that strict databases reject outright. The Testcontainers suite runs the
@@ -64,7 +74,7 @@ coerces type mismatches that strict databases reject outright. The Testcontainer
 
 The `tc` profile (PostgreSQL, MySQL, MariaDB, SQL Server) is intended to run in CI on every push
 alongside the H2 suite. Oracle is kept in a separate profile because the Docker image is ~2 GB
-and takes 60–90 seconds to initialise; it is best suited to a nightly scheduled job.
+and takes 60–90 seconds to initialise; keeping is separate allows selective or parallel running of it.
 
 On GitHub Actions, Docker is available out of the box on `ubuntu-latest` runners — no additional
 setup is needed beyond activating the profile.
