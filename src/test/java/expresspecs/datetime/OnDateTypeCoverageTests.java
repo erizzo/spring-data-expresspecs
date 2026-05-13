@@ -1,4 +1,4 @@
-package expresspecs;
+package expresspecs.datetime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -8,7 +8,6 @@ import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,9 +17,8 @@ import expresspecs.example.Customer.Fields;
 import rizzoweb.spring.jpa.DataIntegrationTest;
 
 /**
- * Integration tests that exercise {@link DateTimeSpecifications#onDate} against every common
- * temporal field type. Several of these are expected to fail with the current implementation,
- * demonstrating that {@code onDate} only works correctly for {@code LocalDateTime} fields today.
+ * Integration tests that exercise {@link DateTimeSpecifications#onDate} against common temporal
+ * field types ({@code LocalDate}, {@code Instant}, legacy {@code Date}, {@code OffsetDateTime}).
  */
 @Transactional
 public interface OnDateTypeCoverageTests extends DataIntegrationTest<Customer> {
@@ -79,9 +77,6 @@ public interface OnDateTypeCoverageTests extends DataIntegrationTest<Customer> {
 	 * that is unambiguously Dec 3 UTC. A query for Dec 3 should return only the latter.
 	 */
 	@Test
-	@Disabled("onDate() uses LocalDateTime bounds regardless of field type; " +
-			"timezone offset is ignored, causing false positives when an offset crosses midnight. " +
-			"Fix tracked in Fix 2 of the date/time improvement plan.")
 	default void onDate_OffsetDateTimeField_offsetCrossesMidnight() {
 		var clearlyDec3 = persistAndFlush(Customer.builder()
 				.createdTimestamp(OffsetDateTime.parse("2007-12-03T10:00:00+00:00"))

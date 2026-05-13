@@ -2,6 +2,8 @@ package expresspecs;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import expresspecs.datetime.DateTimeSpecificationIntegrationTests;
+import expresspecs.datetime.OnDateTypeCoverageTests;
 import expresspecs.example.Customer;
 import expresspecs.example.CustomerRepository;
 import lombok.Getter;

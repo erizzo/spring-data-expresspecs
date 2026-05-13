@@ -9,7 +9,7 @@ import org.testcontainers.utility.DockerImageName;
  * a corresponding JVM system property (e.g. via Maven):
  *
  * <pre>
- *   ./mvnw test -Psb4,tc -Dtc.image.postgresql=postgres:16-alpine
+ *   ./mvnw clean test -Psb4,tc -Dtc.image.postgresql=postgres:16-alpine
  * </pre>
  */
 public final class ContainerImages {
