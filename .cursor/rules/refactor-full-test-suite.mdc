@@ -17,4 +17,17 @@ Run from the repo root, in order:
 
 The last command needs **Docker** (Testcontainers). If Docker is unavailable, say so and run at least the first two; otherwise run all three.
 
-See [TESTING.md](TESTING.md) for profile details. After `pom.xml` changes or `-Psb3` runs, still follow [.cursor/rules/jdt-workspace-sync.mdc](.cursor/rules/jdt-workspace-sync.mdc) for `jdt maven update`.
+See [TESTING.md](TESTING.md) for profile details.
+
+## JDT workspace sync (mandatory — same session as tests)
+
+The second command above uses **`sb3`**, which switches the Maven classpath and test source roots. **Do not treat the refactor as finished until** you have run the following **after** `./mvnw clean test -Psb3` completes (same agent turn / same session), from the repo root:
+
+```bash
+jdt maven update --project spring-data-expresspecs -f
+jdt problems --project spring-data-expresspecs
+```
+
+Skipping this step is incorrect: Eclipse/JDT will not match Maven until `jdt maven update` runs. Details and rationale: [.cursor/rules/jdt-workspace-sync.mdc](.cursor/rules/jdt-workspace-sync.mdc).
+
+If you also edited `pom.xml` (or other Maven model files this project uses), run the same two commands after those edits as well (even when no `sb3` run occurred).

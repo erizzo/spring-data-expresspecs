@@ -9,11 +9,11 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 
-final class OnDateOffsetDateTimeStrategy implements OnDateComparisonStrategy {
+final class SameCalendarDayForOffsetDateTime implements SameCalendarDay {
 
 	@Override
-	public boolean supports(Class<?> leafJavaType) {
-		return OffsetDateTime.class.equals(leafJavaType);
+	public boolean supports(Class<?> javaType) {
+		return OffsetDateTime.class.equals(javaType);
 	}
 
 	@Override

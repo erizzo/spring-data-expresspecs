@@ -8,11 +8,11 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 
-final class OnDateZonedDateTimeStrategy implements OnDateComparisonStrategy {
+final class SameCalendarDayForZonedDateTime implements SameCalendarDay {
 
 	@Override
-	public boolean supports(Class<?> leafJavaType) {
-		return ZonedDateTime.class.equals(leafJavaType);
+	public boolean supports(Class<?> javaType) {
+		return ZonedDateTime.class.equals(javaType);
 	}
 
 	@Override

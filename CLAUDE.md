@@ -18,7 +18,7 @@ jdt build --project spring-data-expresspecs             # incremental compile (a
 jdt status -q                       # snapshot of open editors, errors, running tests
 ```
 
-**Workspace sync from Maven:** After any change to `pom.xml`, or after running Maven with the `sb3` profile (`./mvnw clean test -Psb3`), run `jdt maven update --project spring-data-expresspecs -f` then `jdt problems --project spring-data-expresspecs` so M2E/JDT matches the POM (classpath, test source roots). Use `jdt maven update`, not `jdt build`, for that purpose.
+**Workspace sync from Maven (mandatory):** After any change to `pom.xml`, or **immediately after** any Maven command that uses the `sb3` profile (e.g. `./mvnw clean test -Psb3`, `./mvnw clean install -Psb3`), run `jdt maven update --project spring-data-expresspecs -f` then `jdt problems --project spring-data-expresspecs` in the **same session** before you treat the task as done. Do not skip this after `sb3`: M2E/JDT will not match Maven’s classpath and test roots until `jdt maven update` runs. Use `jdt maven update`, not `jdt build`, for that purpose.
 
 ## Build & test commands
 

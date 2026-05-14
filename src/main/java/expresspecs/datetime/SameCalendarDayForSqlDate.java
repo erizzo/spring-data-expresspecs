@@ -6,11 +6,11 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 
-final class OnDateSqlDateStrategy implements OnDateComparisonStrategy {
+final class SameCalendarDayForSqlDate implements SameCalendarDay {
 
 	@Override
-	public boolean supports(Class<?> leafJavaType) {
-		return java.sql.Date.class.equals(leafJavaType);
+	public boolean supports(Class<?> javaType) {
+		return java.sql.Date.class.equals(javaType);
 	}
 
 	@Override

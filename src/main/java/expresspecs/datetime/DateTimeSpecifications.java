@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.List;
 
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.jspecify.annotations.NonNull;
@@ -34,7 +35,17 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class DateTimeSpecifications {
 
-	private static final DefaultOnDateStrategyChain ON_DATE_CHAIN = DefaultOnDateStrategyChain.defaults();
+	// The ordering of this list is important
+	private static final List<SameCalendarDay> SAME_CALENDAR_DAY_STRATEGIES = List.of(
+			new SameCalendarDayForLocalDate(),
+			new SameCalendarDayForSqlDate(),
+			new SameCalendarDayForInstant(),
+			new SameCalendarDayForOffsetDateTime(),
+			new SameCalendarDayForZonedDateTime(),
+			new SameCalendarDayForLocalDateTime(),
+			new SameCalendarDayForUtilDate(),
+			new SameCalendarDayFallback());
+
 
 	private HibernateCriteriaBuilder hibernateBuilder(CriteriaBuilder builder) {
 		return (HibernateCriteriaBuilder) builder;
@@ -151,8 +162,8 @@ public class DateTimeSpecifications {
 	 * Creates a specification that matches entities where the specified temporal property falls on the
 	 * given calendar {@code targetDate}.
 	 *
-	 * <p>Predicate construction is delegated to a {@link DefaultOnDateStrategyChain} using
-	 * {@linkplain OnDateBuiltinStrategies built-in strategies}.
+	 * <p>Predicate construction walks a fixed-order list of {@link SameCalendarDay} implementations until one
+	 * {@linkplain SameCalendarDay#supports(Class) supports} the leaf property type.
 	 *
 	 * <p><strong>Semantics by leaf property type</strong>
 	 *
@@ -183,8 +194,18 @@ public class DateTimeSpecifications {
 
 		return (root, query, cb) -> {
 			Path<?> path = propertyPath.asPath(root);
-			return ON_DATE_CHAIN.build(path, targetDate, cb);
+			Class<?> javaType = path.getJavaType();
+			return getSameCalendarDayStrategy(javaType).toPredicate(path, targetDate, cb);
 		};
+	}
+
+	private static SameCalendarDay getSameCalendarDayStrategy(Class<?> propertyType) {
+		return SAME_CALENDAR_DAY_STRATEGIES
+				.stream()
+				.filter(s -> s.supports(propertyType))
+				.findFirst()
+				// This would be a programming error in the fallback strategy
+				.orElseThrow(() -> new AssertionError("Fallback strategy must support any leaf type"));
 	}
 
 }

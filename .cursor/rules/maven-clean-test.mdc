@@ -15,3 +15,5 @@ Examples:
 - `./mvnw clean test -Dtest=SomeClass`
 
 This avoids stale `target/` outputs skewing results. Documentation and copy-paste examples in the repo should follow the same pattern.
+
+If the Maven command includes **`-Psb3`**, you **must** immediately afterward run `jdt maven update` and `jdt problems` as specified in [.cursor/rules/jdt-workspace-sync.mdc](.cursor/rules/jdt-workspace-sync.mdc) (same session as the Maven run).

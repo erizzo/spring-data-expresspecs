@@ -7,10 +7,10 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 
-final class OnDateFallbackStrategy implements OnDateComparisonStrategy {
+final class SameCalendarDayFallback implements SameCalendarDay {
 
 	@Override
-	public boolean supports(Class<?> leafJavaType) {
+	public boolean supports(Class<?> javaType) {
 		return true;
 	}
 
