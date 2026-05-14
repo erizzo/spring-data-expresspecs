@@ -1,4 +1,4 @@
-package expresspecs;
+package expresspecs.datetime;
 
 import static expresspecs.SpecificationAssert.assertThat;
 
@@ -6,6 +6,8 @@ import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.data.jpa.domain.Specification;
+
+import expresspecs.PropertyPath;
 
 class DateTimeSpecificationsTests {
 

@@ -1,0 +1,19 @@
+---
+description: Always use Maven clean when running tests
+alwaysApply: true
+---
+
+# Maven: always `clean` with `test`
+
+When running this project's tests via Maven, **always** include the `clean` lifecycle phase before `test`. Use `./mvnw clean test` (with whatever `-P` profiles or `-D` properties apply), not `./mvnw test`.
+
+Examples:
+
+- `./mvnw clean test`
+- `./mvnw clean test -Psb3`
+- `./mvnw clean test -Psb4,tc`
+- `./mvnw clean test -Dtest=SomeClass`
+
+This avoids stale `target/` outputs skewing results. Documentation and copy-paste examples in the repo should follow the same pattern.
+
+If the Maven command includes **`-Psb3`**, you **must** immediately afterward run `jdt maven update` and `jdt problems` as specified in [.cursor/rules/jdt-workspace-sync.mdc](.cursor/rules/jdt-workspace-sync.mdc) (same session as the Maven run).

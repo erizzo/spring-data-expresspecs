@@ -13,11 +13,16 @@ This project is developed in Eclipse with the `jdt` CLI bridge, which exposes th
 ```bash
 jdt problems                        # check compilation errors after edits
 jdt test run <FQN> -f -q            # run a single test class and stream results
-jdt build --project spring-data-expresspecs    # trigger incremental build
+jdt maven update --project spring-data-expresspecs -f   # sync Eclipse project from POM (Maven › Update Project / Alt+F5)
+jdt build --project spring-data-expresspecs             # incremental compile (after sources change)
 jdt status -q                       # snapshot of open editors, errors, running tests
 ```
 
+**Workspace sync from Maven (mandatory):** After any change to `pom.xml`, or **immediately after** any Maven command that uses the `sb3` profile (e.g. `./mvnw clean test -Psb3`, `./mvnw clean install -Psb3`), run `jdt maven update --project spring-data-expresspecs -f` then `jdt problems --project spring-data-expresspecs` in the **same session** before you treat the task as done. Do not skip this after `sb3`: M2E/JDT will not match Maven’s classpath and test roots until `jdt maven update` runs. Use `jdt maven update`, not `jdt build`, for that purpose.
+
 ## Build & test commands
+
+Always use `./mvnw clean test` (not `./mvnw test`) when running tests via Maven.
 
 ```bash
 # Build (default: Spring Boot 4)
@@ -27,37 +32,37 @@ jdt status -q                       # snapshot of open editors, errors, running 
 ./mvnw clean install -Psb3
 
 # Run all tests
-./mvnw test
+./mvnw clean test
 
 # Run tests with Spring Boot 3
-./mvnw test -Psb3
+./mvnw clean test -Psb3
 
 # Run a single test class
-./mvnw test -Dtest=BasicSpecificationsTests
+./mvnw clean test -Dtest=BasicSpecificationsTests
 
 # Run a single test method
-./mvnw test -Dtest=BasicSpecificationsTests#testEqualTo
+./mvnw clean test -Dtest=BasicSpecificationsTests#testEqualTo
 ```
 
 ## Architecture
 
 ### Main source (`src/main/java/expresspecs/`)
 
-- **`PropertyPath`** — the core abstraction. A record representing a dot-notation JPA path (e.g., `"address.zipCode"`). It traverses associations via LEFT JOINs and embeddables via `.get()`, and reuses existing joins to prevent SQL duplicates. Most factory methods accept a `PropertyPath` (or a `String` shorthand for a single attribute).
+- `PropertyPath` — the core abstraction. A record representing a dot-notation JPA path (e.g., `"address.zipCode"`). It traverses associations via LEFT JOINs and embeddables via `.get()`, and reuses existing joins to prevent SQL duplicates. Most factory methods accept a `PropertyPath` (or a `String` shorthand for a single attribute).
 
-- **`BasicSpecifications`** — equality, null checks, boolean logic, IN clauses, and `unrestricted()` (a no-op Specification used as the safe null replacement).
+- `BasicSpecifications` — equality, null checks, boolean logic, IN clauses, and `unrestricted()` (a no-op Specification used as the safe null replacement).
 
-- **`StringSpecifications`** — LIKE/contains predicates with automatic escaping of SQL special characters (`_`, `%`) and optional case-insensitive matching.
+- `StringSpecifications` — LIKE/contains predicates with automatic escaping of SQL special characters (`_`, `%`) and optional case-insensitive matching.
 
-- **`RangeSpecifications`** — less-than, greater-than, between.
+- `RangeSpecifications` — less-than, greater-than, between.
 
-- **`DateTimeSpecifications`** — date-based predicates (e.g., `onDate`).
+- `expresspecs.datetime.DateTimeSpecifications` — date-based predicates (e.g., `onDate`).
 
-- **`CollectionSpecifications`** — collection-membership and size predicates.
+- `CollectionSpecifications` — collection-membership and size predicates.
 
-- **`SpecificationExtensions`** — `safeAnd`, `safeOr`, and `smartDistinct`. `smartDistinct` wraps a Specification to apply DISTINCT only when joins are present *and* the query return type is not `Long`, sidestepping the Spring Data pagination-with-join bug.
+- `SpecificationExtensions` — `safeAnd`, `safeOr`, and `smartDistinct`. `smartDistinct` wraps a Specification to apply DISTINCT only when joins are present *and* the query return type is not `Long`, sidestepping the Spring Data pagination-with-join bug.
 
-- **`SQLUtils`** — internal utility for escaping LIKE wildcards.
+- `SQLUtils` — internal utility for escaping LIKE wildcards.
 
 ### Null/empty safety convention
 

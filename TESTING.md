@@ -23,15 +23,18 @@ src/
     └── containers-oracle/java/   # Testcontainers test for Oracle (separate due to startup cost)
 ```
 
-- **`sb4`** (default) — uses Spring Boot 4.0, adds `src/test/springboot4/java`
-- **`sb3`** — uses Spring Boot 3.5, adds `src/test/springboot3/java`
-- **`tc`** — adds Testcontainers dependencies and `src/test/containers/java`; **SB4 only** (see below)
-- **`oracle`** — adds the Oracle Free Testcontainers module and `src/test/containers-oracle/java`; must be combined with `tc`; **SB4 only**
+- `sb4` (default) — uses Spring Boot 4.0, adds `src/test/springboot4/java`
+- `sb3` — uses Spring Boot 3.5, adds `src/test/springboot3/java`
+- `tc` — adds Testcontainers dependencies and `src/test/containers/java`; **SB4 only** (see below)
+- `oracle` — adds the Oracle Free Testcontainers module and `src/test/containers-oracle/java`; must be combined with `tc`; **SB4 only**
 
 **Common test code** (`src/test/java`) contains abstract base test classes (e.g., `BaseJPAIntegrationTest`), entities, and an `EntityManagerWrapper`.
+Date/time specification factories and their tests live under `expresspecs.datetime` (`src/main/java/expresspecs/datetime/`, `src/test/java/expresspecs/datetime/`).
 **Version-specific test code** contains only the Spring configurations and thin, empty subclasses of the base test classes.
 
 ## Running the tests
+
+Always use `clean` before `test` (for example `./mvnw clean test` with the profiles below), not `./mvnw test`, so a stale `target/` directory from a previous run doesn't affect test results. This is a consequence of supporting 2 incompatible versions of Spring and the conflicting classes the maven profiles produce.
 
 ```bash
 # H2 in-memory (fast, no Docker required)
@@ -43,11 +46,11 @@ src/
 ./mvnw clean test -Psb4,tc,oracle      # adds Oracle Free (~60–90 s startup)
 ```
 
-> **Using `tc` and `oracle`**
+> Using `tc` and `oracle`
 >
 > Run them only with **Spring Boot 4**: `-Psb4,tc` or `-Psb4,tc,oracle`. The Spring Boot 3 BOM manages Testcontainers **1.x**; these profiles use **2.x** from the Boot 4 BOM (different Maven coordinates and Java packages), so `-Psb3,tc` (or `oracle` with `sb3`) is not supported and often fails while resolving dependencies.
 >
-> Maven disables the **`sb4`** profile's `activeByDefault` whenever you pass **any** **`-P`** list, so **include `sb4`** whenever you add `tc` or `oracle`.
+> Maven disables the `sb4` profile's `activeByDefault` whenever you pass any `-P` list, so include `sb4` in the profile list whenever you add `tc` or `oracle`.
 
 ## Overriding Testcontainers images
 
@@ -58,7 +61,7 @@ Do that with **JVM system properties** by adding `-Dtc.image.<database>=<image>:
 Here's an example of specifying a PostgreSQL 16 image:
 
 ```bash
-./mvnw test -Psb4,tc -Dtc.image.postgresql=postgres:16-alpine
+./mvnw clean test -Psb4,tc -Dtc.image.postgresql=postgres:16-alpine
 ```
 
 You can find the default image tags and the exact `tc.image.*` property keys in [`ContainerImages.java`](src/test/containers/java/expresspecs/ContainerImages.java).

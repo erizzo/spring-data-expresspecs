@@ -128,6 +128,22 @@ Snapshot builds are available from the Maven Central snapshot repository:
 
 Then use version `0.2-SNAPSHOT`.
 
+### Compatibility
+
+**Spring Boot:** Supports Spring Boot 3.5 and 4.0.
+
+**Databases:** This library uses only standard JPA Criteria API and Hibernate, so it is compatible with any database that Hibernate supports — not just the ones listed below. The table shows what is actively verified against (using [Testcontainers](https://testcontainers.com/)) using the full test suite on every build:
+
+| Database | Testcontainers Image |
+|---|---|
+| PostgreSQL | `postgres:17-alpine` |
+| MySQL | `mysql:8.4` |
+| MariaDB | `mariadb:11.4` |
+| Microsoft SQL Server | `mcr.microsoft.com/mssql/server:2022-latest` |
+| Oracle | `gvenzl/oracle-free:23-slim-faststart` |
+
+If you want to run the test suite against a different database version, these images can be overridden. See [Overriding Testcontainers images](TESTING.md#overriding-testcontainers-images) in TESTING.md for details.
+
 ### Your JPA Repository
 
 **Important:** To execute `Specification`s, your Spring Data repository interface must extend `JpaSpecificationExecutor<T>` in addition to your standard repository extension.
@@ -175,7 +191,7 @@ For numbers, dates, and comparisons.
 
 ```java
 import static expresspecs.RangeSpecifications.*;
-import static expresspecs.DateTimeSpecifications.*;
+import static expresspecs.datetime.DateTimeSpecifications.*;
 
 Specification<Customer> spec = greaterThan(Customer.Fields.creditLimit, 1000);
 
@@ -186,6 +202,29 @@ Specification<Customer> spec = onDate(datePath, LocalDate.now());
 > [!NOTE]
 > Some methods in `DateTimeSpecifications` require Hibernate as the JPA provider and will throw an
 > exception at runtime with any other provider. See the `DateTimeSpecifications` Javadoc for details.
+
+#### `onDate` behavior by property type
+
+`onDate` constructs the appropriate SQL predicate based on the Java type of the mapped entity property. The behavior differs by type because different temporal types carry different amounts of information.
+
+| Property type | Predicate |
+|---|---|
+| `LocalDate` | Equality: property equals `targetDate` |
+| `java.sql.Date` | Equality: property equals the SQL-date equivalent of `targetDate` |
+| `Instant` | UTC half-open range: `[targetDate 00:00 UTC, targetDate+1 00:00 UTC)` |
+| `OffsetDateTime` | UTC half-open range (same UTC window, expressed as `OffsetDateTime` at `+00:00`) |
+| `ZonedDateTime` | UTC half-open range (same UTC window, expressed as `ZonedDateTime` at UTC) |
+| `java.util.Date` / `java.sql.Timestamp` | UTC half-open range (same UTC window, compared as `java.util.Date`) |
+| `LocalDateTime` | Wall-clock half-open range: `[targetDate at midnight, targetDate+1 at midnight)` — no zone conversion |
+
+**Date-only types** (`LocalDate`, `java.sql.Date`) use a simple equality check because the stored value already represents just a calendar date.
+
+**Zone-aware types** (`Instant`, `OffsetDateTime`, `ZonedDateTime`, `java.util.Date`, `java.sql.Timestamp`) use a UTC midnight-to-midnight window. "On 2025-03-15" means any instant in `[2025-03-15T00:00:00Z, 2025-03-16T00:00:00Z)`. A value stored as `2025-03-16T01:00+02:00` (which is `2025-03-15T23:00Z`) matches; a value stored as `2025-03-16T00:00:00Z` does not.
+
+**Zone-naive types** (`LocalDateTime`) compare the stored value directly against the wall-clock midnight boundaries with no zone conversion. `2025-03-15T23:45` matches, `2025-03-16T00:00` does not — regardless of where the server or database is located.
+
+> [!NOTE]
+> If the property type is not one of the above, `onDate` falls back to wall-clock `LocalDateTime` bounds. Whether the resulting predicate behaves correctly depends on how your JPA provider coerces `LocalDateTime` values to the mapped column type.
 
 ## Best Practice: Domain-Specific Factories
 

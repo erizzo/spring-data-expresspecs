@@ -1,0 +1,21 @@
+---
+description: Sync JDT/Eclipse workspace after POM or SB3 profile changes
+alwaysApply: true
+---
+
+# JDT: refresh workspace after Maven / SB3 changes
+
+**Agents:** This is a **hard requirement**, not a nice-to-have. If you ran Maven with **`sb3`** (or changed the POM), you **must** run the two commands in the next section **in that same session** before you report the task done or move on. Saying “tests passed” without `jdt maven update` after `-Psb3` is wrong.
+
+Whenever any `pom.xml` is edited (or other Maven model files this project uses), or after you run tests or builds with the `sb3` profile (e.g. `./mvnw clean test -Psb3`, `./mvnw clean install -Psb3`), you **must** refresh the JDT workspace so Eclipse and the `jdt` CLI see the same classpath and test sources as Maven.
+
+Run, from the repo root (this is Eclipse **Maven › Update Project**, Alt+F5, not a plain incremental build):
+
+```bash
+jdt maven update --project spring-data-expresspecs -f
+jdt problems --project spring-data-expresspecs
+```
+
+`jdt maven update` re-reads the POM and refreshes the M2E project configuration; `-f` waits for the auto-build to finish. Then use `jdt problems` to confirm there are no compilation errors.
+
+Do **not** substitute `jdt build` for this step when the goal is to sync from Maven after a POM or `sb3` classpath change—only `jdt maven update` applies the POM to the workspace.

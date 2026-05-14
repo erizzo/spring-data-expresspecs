@@ -1,23 +1,29 @@
-package expresspecs;
+package expresspecs.datetime;
 
 import static expresspecs.BasicSpecifications.unrestricted;
-import static expresspecs.RangeSpecifications.atLeast;
-import static expresspecs.RangeSpecifications.lessThan;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
+import java.util.Date;
+import java.util.List;
+
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.domain.Specification;
 
+import expresspecs.PropertyPath;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Path;
 import lombok.experimental.UtilityClass;
 
 /**
  * Predicate factories for Date/Time-based JPA Specifications.
  *
- * <p>All factory methods accept {@code null} filter values and return an {@linkplain BasicSpecifications#unrestricted()
+ * <p>All factory methods accept {@code null} filter values and return an {@linkplain expresspecs.BasicSpecifications#unrestricted()
  * unrestricted specification} in that case, making them safe to use without null-checking at the call site.
  *
  * <p><strong>Hibernate requirement:</strong> Some methods (such as {@link #yearIs}, {@link #monthIs},
@@ -28,6 +34,18 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 public class DateTimeSpecifications {
+
+	// The ordering of this list is important
+	private static final List<SameCalendarDay> SAME_CALENDAR_DAY_STRATEGIES = List.of(
+			new SameCalendarDayForLocalDate(),
+			new SameCalendarDayForSqlDate(),
+			new SameCalendarDayForInstant(),
+			new SameCalendarDayForOffsetDateTime(),
+			new SameCalendarDayForZonedDateTime(),
+			new SameCalendarDayForLocalDateTime(),
+			new SameCalendarDayForUtilDate(),
+			new SameCalendarDayFallback());
+
 
 	private HibernateCriteriaBuilder hibernateBuilder(CriteriaBuilder builder) {
 		return (HibernateCriteriaBuilder) builder;
@@ -127,9 +145,9 @@ public class DateTimeSpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified date-time property falls on the
-	 * given {@code targetDate} (inclusive of the start of the day and exclusive of the start of the
-	 * following day).
+	 * Creates a specification that matches entities where the specified temporal property falls on the
+	 * given {@code targetDate}. How {@code targetDate} is interpreted depends on the leaf property type
+	 * (see {@link #onDate(PropertyPath, LocalDate)}).
 	 *
 	 * @param <T>          The entity type being queried.
 	 * @param propertyPath Dot-delimited property path to compare.
@@ -141,9 +159,29 @@ public class DateTimeSpecifications {
 	}
 
 	/**
-	 * Creates a specification that matches entities where the specified date-time property falls on the
-	 * given {@code targetDate} (inclusive of the start of the day and exclusive of the start of the
-	 * following day).
+	 * Creates a specification that matches entities where the specified temporal property falls on the
+	 * given calendar {@code targetDate}.
+	 *
+	 * <p>Predicate construction walks a fixed-order list of {@link SameCalendarDay} implementations until one
+	 * {@linkplain SameCalendarDay#supports(Class) supports} the leaf property type.
+	 *
+	 * <p><strong>Semantics by leaf property type</strong>
+	 *
+	 * <ul>
+	 *   <li>{@link Instant}, {@link OffsetDateTime}, {@link ZonedDateTime}, {@link Date}, and
+	 *   {@link java.sql.Timestamp}: values are treated as instants on the UTC timeline. The range is
+	 *   {@code [targetDate at 00:00 UTC, targetDate.plusDays(1) at 00:00 UTC)} (half-open).</li>
+	 *   <li>{@link LocalDate}: {@linkplain jakarta.persistence.criteria.CriteriaBuilder#equal equal}
+	 *   to {@code targetDate}.</li>
+	 *   <li>{@link java.sql.Date}: equal to {@link java.sql.Date#valueOf(LocalDate)} for {@code targetDate}.</li>
+	 *   <li>{@link LocalDateTime}: half-open range using {@linkplain LocalDate#atStartOfDay() start of day}
+	 *   through the following midnight in the <em>same</em> {@link LocalDateTime} calendar (no zone
+	 *   conversion).</li>
+	 *   <li>Other types: half-open range using {@link LocalDateTime} bounds
+	 *   {@code targetDate.atStartOfDay()} (inclusive) through {@code targetDate.plusDays(1).atStartOfDay()}
+	 *   (exclusive). The property is compared to those bound values; the effective filter depends on the
+	 *   JPA provider and how JDBC coerces {@link LocalDateTime} to the mapped column type.</li>
+	 * </ul>
 	 *
 	 * @param <T>          The entity type being queried.
 	 * @param propertyPath Resolved property path to compare.
@@ -154,13 +192,20 @@ public class DateTimeSpecifications {
 			return unrestricted();
 		}
 
-		LocalDateTime start = targetDate.atStartOfDay();
-		LocalDateTime end = targetDate.plusDays(1).atStartOfDay();
+		return (root, query, cb) -> {
+			Path<?> path = propertyPath.asPath(root);
+			Class<?> javaType = path.getJavaType();
+			return getSameCalendarDayStrategy(javaType).toPredicate(path, targetDate, cb);
+		};
+	}
 
-		Specification<T> afterStart = atLeast(propertyPath, start);
-		Specification<T> beforeEnd = lessThan(propertyPath, end);
-
-		return afterStart.and(beforeEnd);
+	private static SameCalendarDay getSameCalendarDayStrategy(Class<?> propertyType) {
+		return SAME_CALENDAR_DAY_STRATEGIES
+				.stream()
+				.filter(s -> s.supports(propertyType))
+				.findFirst()
+				// This would be a programming error in the fallback strategy
+				.orElseThrow(() -> new AssertionError("Fallback strategy must support any leaf type"));
 	}
 
 }
