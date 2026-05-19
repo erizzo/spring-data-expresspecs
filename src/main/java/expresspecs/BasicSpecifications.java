@@ -18,6 +18,29 @@ import lombok.experimental.UtilityClass;
 public class BasicSpecifications {
 
 	/**
+	 * Returns {@code spec} unchanged, serving as a type anchor for chained specification expressions.
+	 *
+	 * <p>When building a specification by chaining factory methods, Java cannot infer the entity type
+	 * {@code T} from a factory call alone (e.g. {@code isTrue("active")}) because there is no target
+	 * type to constrain inference. Passing the entity class pins {@code T}, so subsequent {@code .and()}
+	 * and {@code .or()} calls inherit the correct type and {@code var} works without explicit
+	 * {@code Specification<MyEntity>} declarations:
+	 *
+	 * <pre>{@code
+	 * var spec = where(MyEntity.class, isTrue("active"))
+	 *         .and(containsIgnoreCase("name", partialName));
+	 * repository.findAll(spec);
+	 * }</pre>
+	 *
+	 * @param <T>        The entity type being queried.
+	 * @param entityType The entity class, used only to pin the type parameter {@code T}.
+	 * @param spec       The first specification in the chain.
+	 */
+	public static <T> @NonNull Specification<T> where(@NonNull Class<T> entityType, @NonNull Specification<T> spec) {
+		return spec;
+	}
+
+	/**
 	 * Returns an unrestricted specification that acts as a safe, backward-compatible replacement
 	 * for returning {@code null} out of specification factories, which Spring Boot 4's {@code findAll()}
 	 * no longer accepts.
@@ -214,7 +237,7 @@ public class BasicSpecifications {
 	 * to each other (a column-to-column comparison, not a comparison against a fixed value).
 	 *
 	 * <p>Use this when the filter criterion is a relationship between two attributes on the same
-	 * entity row — for example, matching orders whose {@code promisedDate} has not passed its
+	 * entity row; for example, matching orders whose {@code promisedDate} has not passed its
 	 * {@code shippedDate}. For comparing a single property against a fixed value, use
 	 * {@link #is(PropertyPath, Object)} instead.
 	 *
@@ -232,7 +255,7 @@ public class BasicSpecifications {
 	 * Accepts dot-delimited path strings (e.g., {@code "address.city"}).
 	 *
 	 * <p>Use this when the filter criterion is a relationship between two attributes on the same
-	 * entity row — for example, matching orders whose {@code promisedDate} has not passed its
+	 * entity row; for example, matching orders whose {@code promisedDate} has not passed its
 	 * {@code shippedDate}. For comparing a single property against a fixed value, use
 	 * {@link #is(PropertyPath, Object)} instead.
 	 *

@@ -142,4 +142,27 @@ class BasicSpecificationsTests {
 		Specification<Object> spec = BasicSpecifications.unrestricted();
 		assertThat(spec).isUnrestricted();
 	}
+
+	@Test
+	void where_WithEntityClass_ReturnsSameSpecification() {
+		Predicate predicate = mock(Predicate.class);
+		Specification<Object> original = (r, q, c) -> predicate;
+
+		Specification<Object> result = BasicSpecifications.where(Object.class, original);
+		assertThat(result.toPredicate(root, query, cb)).isSameAs(predicate);
+	}
+
+	@Test
+	void where_WithEntityClass_WithUnrestricted_IsUnrestricted() {
+		Specification<Object> result = BasicSpecifications.where(Object.class, BasicSpecifications.unrestricted());
+		assertThat(result).isUnrestricted();
+	}
+
+	@Test
+	void where_WithEntityClass_EnablesVarInference() {
+		// Compile-time proof: var resolves to Specification<Object> via Class<T> pin, no type witness needed.
+		var spec = BasicSpecifications.where(Object.class, BasicSpecifications.isTrue("active"))
+				.and(BasicSpecifications.isTrue("verified"));
+		assertThat(spec).isNotNull();
+	}
 }
