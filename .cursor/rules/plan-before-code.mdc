@@ -1,0 +1,27 @@
+---
+description: Answer-first for design questions; no repo edits without explicit implementation ask
+alwaysApply: true
+---
+
+# Plan before code; no unasked implementation
+
+## When the user is asking, not ordering
+
+If the message is **informational or exploratory** (for example: "is it possible?", "can X be declared so that…?", "how does Y work?", "what are the tradeoffs?", "why does Z fail?"), **treat it as a question**.
+
+- **Reply with analysis, options, and tradeoffs** in prose (and small illustrative snippets only if helpful).
+- **Do not** open the codebase to implement, refactor, add tests, or touch multiple files unless the user **clearly** asks you to make the change (for example: "implement that", "apply the fix", "update the code", "open a PR", "patch SpecificationExtensions").
+
+## When you may implement
+
+Implement or edit files only when the user **explicitly** requests implementation, or when the task is unambiguously an edit request (for example: "fix the NPE in Foo", "add a method bar()").
+
+If a request could be read either way, **ask one short clarifying question** before editing.
+
+## Optional plan for larger work
+
+For non-trivial implementation the user *does* request, if several files or design choices are involved, give a **short plan** (what will change and where), then proceed **after** they confirm **unless** they already gave a full go-ahead in the same message.
+
+## No rabbit holes
+
+Do **not** expand scope (extra APIs, example rewrites, new helpers, docs, broad test matrix runs) unless the user asked for that scope or agreed to it in the same thread.
