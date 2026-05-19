@@ -251,7 +251,7 @@
 
         <profile>
             <!--
-                Testcontainers integration tests — runs the full specification test suite against
+                Testcontainers integration tests. Runs the full specification test suite against
                 real databases in Docker. Use with Spring Boot 4 only (explicitly pass sb4 if you
                 also pass other -P flags, because activeByDefault is turned off):
 
@@ -259,7 +259,7 @@
                     ./mvnw clean test -Psb4,tc,oracle       (adds Oracle Free)
 
                 Do not combine with -Psb3: the Spring Boot 3 BOM manages Testcontainers 1.x, while
-                this profile relies on Testcontainers 2.x from the Spring Boot 4 BOM — incompatible
+                this profile relies on Testcontainers 2.x from the Spring Boot 4 BOM, incompatible
                 Maven coordinates and Java packages.
 
                 Requires Docker. Tests take longer than H2 due to container startup.
@@ -376,7 +376,7 @@
         <profile>
             <!--
                 Oracle Free via Testcontainers. Combine with sb4 + tc (e.g. ./mvnw clean test -Psb4,tc,oracle).
-                Not supported with sb3 — see tc profile comment.
+                Not supported with sb3,see tc profile comment.
 
                 The Oracle Free image (~2 GB, ~60–90 s startup) is excluded from the base tc
                 profile to keep CI feedback fast. Run it separately or in a nightly job.

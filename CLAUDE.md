@@ -20,6 +20,8 @@ jdt status -q                       # snapshot of open editors, errors, running 
 
 **Workspace sync from Maven (mandatory):** After any change to `pom.xml`, or **immediately after** any Maven command that uses the `sb3` profile (e.g. `./mvnw clean test -Psb3`, `./mvnw clean install -Psb3`), run `jdt maven update --project spring-data-expresspecs -f` then `jdt problems --project spring-data-expresspecs` in the **same session** before you treat the task as done. Do not skip this after `sb3`: M2E/JDT will not match Maven’s classpath and test roots until `jdt maven update` runs. Use `jdt maven update`, not `jdt build`, for that purpose.
 
+**Unresolved type errors after code changes:** If `jdt problems` reports unresolved imports or types (e.g. "cannot be resolved"), run `jdt maven update --project spring-data-expresspecs -f` to re-sync the workspace before concluding the error is a real code problem.
+
 ## Build & test commands
 
 Always use `./mvnw clean test` (not `./mvnw test`) when running tests via Maven.
@@ -80,4 +82,8 @@ See **[TESTING.md](TESTING.md)** for Maven commands, profiles, Testcontainers, E
 
 ### Dual Spring Boot support
 
-The `sb3` Maven profile switches the Spring Boot BOM version and activates the `src/test/springboot3/java` test source tree. When adding new features, verify behaviour under both profiles (H2 integration tests). Testcontainers profiles are excluded — they require `sb4`.
+The `sb3` Maven profile switches the Spring Boot BOM version and activates the `src/test/springboot3/java` test source tree. When adding new features, verify behaviour under both profiles (H2 integration tests). Testcontainers profiles are excluded - they require `sb4`.
+
+## Style rules
+
+**No em dashes:** Do not use the em dash character (U+2014, `—`) anywhere: documentation, Markdown files, Javadoc, or code comments (`//`, `/* */`, `/** */`). Use a comma, colon, semicolon, parentheses, or a hyphen with spaces instead.

@@ -1,0 +1,18 @@
+---
+description: Do not use em dash (Unicode) in documentation or code comments
+alwaysApply: true
+---
+
+# No em dash in documentation or code comments
+
+When writing or editing **documentation** (Markdown such as `README*.md`, `docs/**/*.md`, `TESTING.md`, Javadoc, package/module descriptions, and similar user-facing prose) or **code comments** (inline `//` comments, block `/* */` comments, Javadoc `/** */`), **do not** use the em dash character (Unicode U+2014, `—`).
+
+**Prefer instead:** a comma, a colon, parentheses, a hyphen surrounded by spaces, or split into two sentences.
+
+**Examples**
+
+- Bad: `CriteriaBuilder` noise—and they are like an express train
+- Good: `CriteriaBuilder` noise, and they are like an express train
+- Good: `CriteriaBuilder` noise; they are like an express train
+
+This does not forbid the **hyphen-minus** (`-`) in code, flags, kebab-case paths, or ordinary hyphenated words.

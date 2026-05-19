@@ -28,7 +28,7 @@ import jakarta.persistence.metamodel.SingularAttribute;
  * <p>During resolution, intermediate segments that are entity associations ({@code @ManyToOne},
  * {@code @OneToOne}, etc.) are traversed using LEFT JOINs, while embeddable or simple
  * intermediate segments use standard path navigation. The final (leaf) segment is always
- * resolved with {@code get()} — it is assumed to be the property being used in a predicate,
+ * resolved with {@code get()}, it is assumed to be the property being used in a predicate,
  * not a relationship being navigated through. This means the leaf should be a simple property,
  * an embeddable, or an association compared by its foreign key (e.g., {@code cb.equal()} or
  * {@code cb.isNull()}).
@@ -70,7 +70,7 @@ public record PropertyPath(List<String> properties) {
 	 *
 	 * <p>Accepts any mix of attribute types, including plural (collection) attributes.
 	 * The attribute names are extracted in order to form the path. This overload provides
-	 * refactoring safety — a renamed entity field breaks compilation here — but does not
+	 * refactoring safety: a renamed entity field breaks compilation here, but does not
 	 * enforce that the attribute types form a valid chain. For chain-type validation,
 	 * use the typed two- or three-segment overloads.
 	 *

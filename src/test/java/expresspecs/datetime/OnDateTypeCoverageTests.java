@@ -82,7 +82,7 @@ public interface OnDateTypeCoverageTests extends DataIntegrationTest<Customer> {
 				.createdTimestamp(OffsetDateTime.parse("2007-12-03T10:00:00+00:00"))
 				.build());
 
-		// Local time is Dec 3, but UTC equivalent is Dec 4 at 00:30 — must NOT appear in a Dec-3 query
+		// Local time is Dec 3, but UTC equivalent is Dec 4 at 00:30; must NOT appear in a Dec-3 query
 		persistAndFlush(Customer.builder()
 				.createdTimestamp(OffsetDateTime.parse("2007-12-03T23:30:00-01:00"))
 				.build());
