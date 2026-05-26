@@ -1,6 +1,6 @@
-# Spring Data Expresspecs | Usage guide
+# Spring Data ExpresSpecs | Usage guide
 
-This guide covers setup, compatibility, typing options, factory usage, edge cases, and patterns. For the high-level pitch and a quick before/after, see [README-CURSOR.md](../README-CURSOR.md).
+This guide covers setup, compatibility, typing options, factory usage, edge cases, and patterns. For the high-level pitch and a quick before/after, see the [README](../README.md).
 
 ## Table of contents
 
