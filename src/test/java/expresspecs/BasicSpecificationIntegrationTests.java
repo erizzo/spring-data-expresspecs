@@ -15,7 +15,7 @@ public interface BasicSpecificationIntegrationTests extends BaseIntegrationTest<
 
 	@Test
 	default void is() {
-		final String wileE = "Wile E. Coyote";
+		final var wileE = "Wile E. Coyote";
 		Customer coyote = customer(wileE);
 		coyote = persistAndFlush(coyote);
 
@@ -50,7 +50,7 @@ public interface BasicSpecificationIntegrationTests extends BaseIntegrationTest<
 
 	@Test
 	default void is_NestedProperty() {
-		final String zipCode = "33602";
+		final var zipCode = "33602";
 		Address address = zipCode(zipCode);
 		Customer customer = customer("c1", address);
 		persistAndFlush(address);
@@ -69,16 +69,16 @@ public interface BasicSpecificationIntegrationTests extends BaseIntegrationTest<
 
 	@Test
 	default void is_NestedProperty_Embeddable() {
-		final short areaCode = 813;
+		final var areaCode = "813";
 		Customer customer = Customer.builder()
-								.phoneNumber(new PhoneNumber(813, 5551212, null))
+								.phoneNumber(new PhoneNumber("813", "5551212", null))
 								.build();
 		customer = persistAndFlush(customer);
 
 		persistAndFlush(Customer.builder().build());	// No phone number
 		persistAndFlush(
 				Customer.builder()
-					.phoneNumber(new PhoneNumber(727, 1234567, null))	// Phone number but not matching area code
+					.phoneNumber(new PhoneNumber("727", "1234567", null))	// Phone number but not matching area code
 				.build());
 
 		var path = PropertyPath.of(Customer.Fields.phoneNumber, PhoneNumber.Fields.areaCode);
@@ -91,7 +91,7 @@ public interface BasicSpecificationIntegrationTests extends BaseIntegrationTest<
 
 	@Test
 	default void isNot() {
-		final String wileE = "Wile E. Coyote";
+		final var wileE = "Wile E. Coyote";
 		Customer coyote = customer(wileE);
 		coyote = persistAndFlush(coyote);
 
@@ -107,7 +107,7 @@ public interface BasicSpecificationIntegrationTests extends BaseIntegrationTest<
 
 	@Test
 	default void isNot_NestedProperty() {
-		final String zipCode = "33602";
+		final var zipCode = "33602";
 		Customer customer1 = customer("c1", zipCode(zipCode));
 		persistAndFlush(customer1.getAddress());
 		customer1 = persistAndFlush(customer1);
@@ -126,7 +126,7 @@ public interface BasicSpecificationIntegrationTests extends BaseIntegrationTest<
 
 	@Test
 	default void isAny() {
-		final String wileE = "Wile E. Coyote";
+		final var wileE = "Wile E. Coyote";
 		Customer coyote = customer(wileE);
 		coyote = persistAndFlush(coyote);
 
@@ -146,8 +146,8 @@ public interface BasicSpecificationIntegrationTests extends BaseIntegrationTest<
 
 	@Test
 	default void isNotAny() {
-		final String wileE = "Wile E. Coyote";
-		final String roadRunner = "Road Runner";
+		final var wileE = "Wile E. Coyote";
+		final var roadRunner = "Road Runner";
 		persistAndFlush(customer(wileE));
 		Customer runner = persistAndFlush(customer(roadRunner));
 
@@ -162,7 +162,7 @@ public interface BasicSpecificationIntegrationTests extends BaseIntegrationTest<
 
 	@Test
 	default void isAny_NestedProperty() {
-		final String zipCode = "33602";
+		final var zipCode = "33602";
 		Customer customer = customer("c1", zipCode(zipCode));
 		persistAndFlush(customer.getAddress());
 		customer = persistAndFlush(customer);
@@ -178,7 +178,7 @@ public interface BasicSpecificationIntegrationTests extends BaseIntegrationTest<
 
 	@Test
 	default void isNotAny_NestedProperty() {
-		final String zipCode = "33602";
+		final var zipCode = "33602";
 		Customer customer = customer("c1", zipCode(zipCode));
 		persistAndFlush(customer.getAddress());
 		persistAndFlush(customer);

@@ -21,11 +21,11 @@ import lombok.experimental.FieldNameConstants;
 public class PhoneNumber {
 
 	@Column(name = "phone_area_code")
-	private int areaCode;
+	private String areaCode;
 
 	@Column(name = "phone_number")
-	private int number;
+	private String number;
 
 	@Column(name = "phone_extension")
-	private Integer extension;
+	private String extension;
 }
