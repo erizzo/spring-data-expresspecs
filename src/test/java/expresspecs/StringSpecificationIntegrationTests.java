@@ -201,6 +201,98 @@ public interface StringSpecificationIntegrationTests extends BaseIntegrationTest
 	}
 
 	@Test
+	default void startsWith() {
+		Customer coyote = customer("Wile E. Coyote");
+		coyote = persistAndFlush(coyote);
+
+		persistAndFlush(customer("Road Runner"));
+
+		Specification<Customer> spec = StringSpecifications.startsWith(Customer.Fields.name, "Wile");
+
+		List<Customer> results = getRepo().findAll(spec);
+
+		assertThat(results).containsExactly(coyote);
+	}
+
+	@Test
+	default void startsWithIgnoreCase() {
+		Customer coyote = customer("Wile E. Coyote");
+		coyote = persistAndFlush(coyote);
+
+		persistAndFlush(customer("Road Runner"));
+
+		Specification<Customer> spec = StringSpecifications.startsWithIgnoreCase(Customer.Fields.name, "WILE");
+
+		List<Customer> results = getRepo().findAll(spec);
+
+		assertThat(results).containsExactly(coyote);
+	}
+
+	@Test
+	default void startsWith_NestedProperty() {
+		Customer coyote = customer("Wile E. Coyote", city("Albuquerque"));
+		persistAndFlush(coyote.getAddress());
+		coyote = persistAndFlush(coyote);
+
+		final Customer rabbit = customer("Bugs Bunny", city("Atlanta"));
+		persistAndFlush(rabbit.getAddress());
+		persistAndFlush(rabbit);
+
+		var path = PropertyPath.of(Customer.Fields.address, Address.Fields.city);
+		Specification<Customer> spec = StringSpecifications.startsWith(path, "Alb");
+
+		List<Customer> results = getRepo().findAll(spec);
+
+		assertThat(results).containsExactly(coyote);
+	}
+
+	@Test
+	default void endsWith() {
+		Customer coyote = customer("Wile E. Coyote");
+		coyote = persistAndFlush(coyote);
+
+		persistAndFlush(customer("Road Runner"));
+
+		Specification<Customer> spec = StringSpecifications.endsWith(Customer.Fields.name, "Coyote");
+
+		List<Customer> results = getRepo().findAll(spec);
+
+		assertThat(results).containsExactly(coyote);
+	}
+
+	@Test
+	default void endsWithIgnoreCase() {
+		Customer coyote = customer("Wile E. Coyote");
+		coyote = persistAndFlush(coyote);
+
+		persistAndFlush(customer("Road Runner"));
+
+		Specification<Customer> spec = StringSpecifications.endsWithIgnoreCase(Customer.Fields.name, "COYOTE");
+
+		List<Customer> results = getRepo().findAll(spec);
+
+		assertThat(results).containsExactly(coyote);
+	}
+
+	@Test
+	default void endsWith_NestedProperty() {
+		Customer coyote = customer("Wile E. Coyote", city("Albuquerque"));
+		persistAndFlush(coyote.getAddress());
+		coyote = persistAndFlush(coyote);
+
+		final Customer rabbit = customer("Bugs Bunny", city("Atlanta"));
+		persistAndFlush(rabbit.getAddress());
+		persistAndFlush(rabbit);
+
+		var path = PropertyPath.of(Customer.Fields.address, Address.Fields.city);
+		Specification<Customer> spec = StringSpecifications.endsWith(path, "que");
+
+		List<Customer> results = getRepo().findAll(spec);
+
+		assertThat(results).containsExactly(coyote);
+	}
+
+	@Test
 	default void equalsIgnoreCase() {
 		final String city = "Albuquerque";
 		Customer coyote = customer("Wile E. Coyote", city(city));

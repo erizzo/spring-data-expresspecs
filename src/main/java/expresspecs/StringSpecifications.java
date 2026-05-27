@@ -240,6 +240,138 @@ public class StringSpecifications {
 	}
 
 	/**
+	 * Creates a specification that matches entities where the specified property starts with
+	 * {@code value}. Matching is case-sensitive.
+	 *
+	 * @param <T>          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param value        Prefix to match at the start of the property value.
+	 * @see PropertyPath#from(String)
+	 */
+	public static <T> @NonNull Specification<T> startsWith(String propertyPath, String value) {
+		return startsWith(PropertyPath.from(propertyPath), value);
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property starts with
+	 * {@code value}. Matching is case-sensitive.
+	 *
+	 * @param <T>          The entity type being queried.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param value        Prefix to match at the start of the property value.
+	 */
+	public static <T> @NonNull Specification<T> startsWith(PropertyPath propertyPath, String value) {
+		if (StringUtils.isEmpty(value)) {
+			return unrestricted();
+		}
+
+		String escapedValue = escapeLike(value, ESCAPE_CHAR);
+		return (root, query, cb) -> {
+			Path<String> path = propertyPath.asPath(root);
+			return cb.like(path, escapedValue + "%", ESCAPE_CHAR);
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property starts with
+	 * {@code value}. Matching ignores case.
+	 *
+	 * @param <T>          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param value        Prefix to match at the start of the property value.
+	 * @see PropertyPath#from(String)
+	 */
+	public static <T> @NonNull Specification<T> startsWithIgnoreCase(String propertyPath, String value) {
+		return startsWithIgnoreCase(PropertyPath.from(propertyPath), value);
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property starts with
+	 * {@code value}. Matching ignores case.
+	 *
+	 * @param <T>          The entity type being queried.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param value        Prefix to match at the start of the property value.
+	 */
+	public static <T> @NonNull Specification<T> startsWithIgnoreCase(PropertyPath propertyPath, String value) {
+		if (StringUtils.isEmpty(value)) {
+			return unrestricted();
+		}
+
+		String escapedValue = escapeLike(value.toLowerCase(Locale.ROOT), ESCAPE_CHAR);
+		return (root, query, cb) -> {
+			Path<String> path = propertyPath.asPath(root);
+			return cb.like(cb.lower(path), escapedValue + "%", ESCAPE_CHAR);
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property ends with
+	 * {@code value}. Matching is case-sensitive.
+	 *
+	 * @param <T>          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param value        Suffix to match at the end of the property value.
+	 * @see PropertyPath#from(String)
+	 */
+	public static <T> @NonNull Specification<T> endsWith(String propertyPath, String value) {
+		return endsWith(PropertyPath.from(propertyPath), value);
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property ends with
+	 * {@code value}. Matching is case-sensitive.
+	 *
+	 * @param <T>          The entity type being queried.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param value        Suffix to match at the end of the property value.
+	 */
+	public static <T> @NonNull Specification<T> endsWith(PropertyPath propertyPath, String value) {
+		if (StringUtils.isEmpty(value)) {
+			return unrestricted();
+		}
+
+		String escapedValue = escapeLike(value, ESCAPE_CHAR);
+		return (root, query, cb) -> {
+			Path<String> path = propertyPath.asPath(root);
+			return cb.like(path, "%" + escapedValue, ESCAPE_CHAR);
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property ends with
+	 * {@code value}. Matching ignores case.
+	 *
+	 * @param <T>          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param value        Suffix to match at the end of the property value.
+	 * @see PropertyPath#from(String)
+	 */
+	public static <T> @NonNull Specification<T> endsWithIgnoreCase(String propertyPath, String value) {
+		return endsWithIgnoreCase(PropertyPath.from(propertyPath), value);
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property ends with
+	 * {@code value}. Matching ignores case.
+	 *
+	 * @param <T>          The entity type being queried.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param value        Suffix to match at the end of the property value.
+	 */
+	public static <T> @NonNull Specification<T> endsWithIgnoreCase(PropertyPath propertyPath, String value) {
+		if (StringUtils.isEmpty(value)) {
+			return unrestricted();
+		}
+
+		String escapedValue = escapeLike(value.toLowerCase(Locale.ROOT), ESCAPE_CHAR);
+		return (root, query, cb) -> {
+			Path<String> path = propertyPath.asPath(root);
+			return cb.like(cb.lower(path), "%" + escapedValue, ESCAPE_CHAR);
+		};
+	}
+
+	/**
 	 * Creates a specification that matches entities where the specified property contains at least
 	 * one of the values in {@code searchTerms}. Matching is case-sensitive.
 	 *

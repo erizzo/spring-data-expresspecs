@@ -142,4 +142,68 @@ class StringSpecificationsTests {
 		Specification<Object> result = StringSpecifications.containsAny("foo", terms);
 		assertThat(result).isNotNull();
 	}
+
+	@ParameterizedTest
+	@NullSource
+	@EmptySource
+	void startsWith_EmptySearchValue(String emptySearchValue) {
+		Specification<Object> result = StringSpecifications.startsWith("foo", emptySearchValue);
+		assertThat(result).isUnrestricted();
+	}
+
+	@ParameterizedTest
+	@NullSource
+	@EmptySource
+	void startsWith_NestedProperty_EmptySearchValue(String emptySearchValue) {
+		Specification<Object> result = StringSpecifications.startsWith(PropertyPath.of("foo", "bar"), emptySearchValue);
+		assertThat(result).isUnrestricted();
+	}
+
+	@ParameterizedTest
+	@NullSource
+	@EmptySource
+	void startsWithIgnoreCase_EmptySearchValue(String emptySearchValue) {
+		Specification<Object> result = StringSpecifications.startsWithIgnoreCase("foo", emptySearchValue);
+		assertThat(result).isUnrestricted();
+	}
+
+	@ParameterizedTest
+	@NullSource
+	@EmptySource
+	void startsWithIgnoreCase_NestedProperty_EmptySearchValue(String emptySearchValue) {
+		Specification<Object> result = StringSpecifications.startsWithIgnoreCase(PropertyPath.of("foo", "bar"), emptySearchValue);
+		assertThat(result).isUnrestricted();
+	}
+
+	@ParameterizedTest
+	@NullSource
+	@EmptySource
+	void endsWith_EmptySearchValue(String emptySearchValue) {
+		Specification<Object> result = StringSpecifications.endsWith("foo", emptySearchValue);
+		assertThat(result).isUnrestricted();
+	}
+
+	@ParameterizedTest
+	@NullSource
+	@EmptySource
+	void endsWith_NestedProperty_EmptySearchValue(String emptySearchValue) {
+		Specification<Object> result = StringSpecifications.endsWith(PropertyPath.of("foo", "bar"), emptySearchValue);
+		assertThat(result).isUnrestricted();
+	}
+
+	@ParameterizedTest
+	@NullSource
+	@EmptySource
+	void endsWithIgnoreCase_EmptySearchValue(String emptySearchValue) {
+		Specification<Object> result = StringSpecifications.endsWithIgnoreCase("foo", emptySearchValue);
+		assertThat(result).isUnrestricted();
+	}
+
+	@ParameterizedTest
+	@NullSource
+	@EmptySource
+	void endsWithIgnoreCase_NestedProperty_EmptySearchValue(String emptySearchValue) {
+		Specification<Object> result = StringSpecifications.endsWithIgnoreCase(PropertyPath.of("foo", "bar"), emptySearchValue);
+		assertThat(result).isUnrestricted();
+	}
 }
