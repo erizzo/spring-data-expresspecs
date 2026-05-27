@@ -6,6 +6,8 @@
 
 This library provides a set of highly expressive, composable factory methods that eliminate the boilerplate of Spring Data JPA Specifications and the underlying Criteria API.
 
+To be clear: this is a convenience library, not a framework. The patterns it encodes are not new or revolutionary, but having them pre-built, tested, and composable keeps application code focused on business logic rather than Criteria API mechanics. The resulting code reads like *intent* rather than plumbing.
+
 ## The Status Quo
 
 The typical way to use Spring Data JPA is to define query methods derived from the method name, or by writing custom `@Query` JPQL statements:
