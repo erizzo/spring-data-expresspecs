@@ -130,7 +130,7 @@ suite on every build:
 | Microsoft SQL Server | `mcr.microsoft.com/mssql/server:2022-latest` |
 | Oracle | `gvenzl/oracle-free:23-slim-faststart` |
 
-If you want to run the test suite against a different database version, these images can be overridden. See [Overriding Testcontainers images](TESTING.md#overriding-testcontainers-images) in TESTING.md for details.
+If you want to run the test suite against a different database version, these images can be overridden. See [Overriding Testcontainers images](docs/testing.md#overriding-testcontainers-images) in docs/testing.md for details.
 
 ---
 

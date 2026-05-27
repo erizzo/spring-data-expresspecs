@@ -65,7 +65,7 @@ Here's an example of specifying a PostgreSQL 16 image:
 ./mvnw clean test -Psb4,tc -Dtc.image.postgresql=postgres:16-alpine
 ```
 
-You can find the default image tags and the exact `tc.image.*` property keys in [`ContainerImages.java`](src/test/containers/java/expresspecs/ContainerImages.java).
+You can find the default image tags and the exact `tc.image.*` property keys in [`ContainerImages.java`](../src/test/containers/java/expresspecs/ContainerImages.java).
 
 ## Why Database-Specific Tests?
 

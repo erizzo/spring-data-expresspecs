@@ -1,7 +1,7 @@
 # Contributing
 
 The production API is compatible with both Spring Boot 3.5 and 4; however the _tests_ use Maven profiles and separate
-test source trees. For details about the profiles, directory layout, Testcontainers, and what runs in CI, see **[TESTING.md](TESTING.md)**.
+test source trees. For details about the profiles, directory layout, Testcontainers, and what runs in CI, see **[docs/testing.md](docs/testing.md)**.
 
 ### Publishing a Release to Maven Central
 

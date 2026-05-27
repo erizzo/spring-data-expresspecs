@@ -72,7 +72,7 @@ All factory methods handle null or empty inputs by returning `BasicSpecification
 
 ### Testing
 
-See **[TESTING.md](TESTING.md)** for Maven commands, profiles, Testcontainers, Enforcer rules, and CI. In brief:
+See **[docs/testing.md](docs/testing.md)** for Maven commands, profiles, Testcontainers, Enforcer rules, and CI. In brief:
 
 - `src/test/java` — unit tests (mock-based) and Spring Boot 4 integration tests using H2.
 - `src/test/springboot4/java` — Spring Boot 4–specific thin subclasses and test configuration (default `sb4` profile).

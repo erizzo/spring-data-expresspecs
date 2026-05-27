@@ -9,13 +9,13 @@ This guide covers setup, compatibility, typing options, factory usage, edge case
 - [Your JPA Repository](#your-jpa-repository)
 - [How to specify a property path](#how-to-specify-a-property-path)
 - [Best Practice: Domain-Specific Factories](#best-practice-domain-specific-factories)
-  - [Streamlining Optional Filters](#streamlining-optional-filters)
 - [Core Features & Usage](#core-features--usage)
   - [Basic Specifications](#basic-specifications)
   - [String Specifications](#string-specifications)
   - [Range & DateTime Specifications](#range--datetime-specifications)
     - [`onDate` behavior by property type](#ondate-behavior-by-property-type)
   - [Collection Specifications](#collection-specifications)
+- [Streamlining Optional Filters](#streamlining-optional-filters)
 - [The Magic of `smartDistinct`](#the-magic-of-smartdistinct)
 - [Complete Example Source Code](#complete-example-source-code)
 
@@ -57,15 +57,15 @@ Then use version `0.2-SNAPSHOT`.
 
 **Databases:** This library uses only standard JPA Criteria API and Hibernate, so it is compatible with any database that Hibernate supports (not just the ones listed below). The table shows what is actively verified against (using [Testcontainers](https://testcontainers.com/)) using the full test suite on every build:
 
-| Database | Testcontainers Image |
-|---|---|
-| PostgreSQL | `postgres:17-alpine` |
-| MySQL | `mysql:8.4` |
-| MariaDB | `mariadb:11.4` |
+| Database             | Testcontainers Image                         |
+| -------------------- | -------------------------------------------- |
+| PostgreSQL           | `postgres:17-alpine`                         |
+| MySQL                | `mysql:8.4`                                  |
+| MariaDB              | `mariadb:11.4`                               |
 | Microsoft SQL Server | `mcr.microsoft.com/mssql/server:2022-latest` |
-| Oracle | `gvenzl/oracle-free:23-slim-faststart` |
+| Oracle               | `gvenzl/oracle-free:23-slim-faststart`       |
 
-If you want to run the test suite against a different database version, these images can be overridden. See [Overriding Testcontainers images](../TESTING.md#overriding-testcontainers-images) in TESTING.md for details.
+If you want to run the test suite against a different database version, these images can be overridden. See [Overriding Testcontainers images](testing.md#overriding-testcontainers-images) in docs/testing.md for details.
 
 ## Your JPA Repository
 
@@ -144,44 +144,19 @@ public interface CustomerSpecifications {
 }
 ```
 
-Using these factory methods with static imports makes your service layer incredibly expressive. Traditionally, handling optional API search parameters requires checking for nulls or empty collections before appending to the query:
-
-```java
-public Page<Customer> findSpecialCustomers(Set<String> zipCodes, Integer minCredit, Pageable pageable) {
-    var spec = isActive();
-    
-    if (!CollectionUtils.isEmpty(zipCodes)) {
-        spec = spec.and(hasZipCode(zipCodes));
-    }
-    
-    if (minCredit != null) {
-        spec = spec.and(creditLimitOver(minCredit));
-    }
-    
-    return customerRepository.findAll(spec, pageable);
-}
-```
-
-### Streamlining Optional Filters
-
-One of the hidden superpowers of this library is that **it safely handles null and empty inputs automatically**. If you pass `null` or an empty collection into the factory methods, they safely return an "unrestricted" specification that acts as a no-op when chained. 
-
-This means you can drop the `if` statements entirely and collapse your search APIs into a perfectly fluid chain:
+Using these factory methods with static imports makes your service layer incredibly expressive. 
 
 ```java
 public Page<Customer> findSpecialCustomers(Set<String> zipCodes, Integer minCredit, Pageable pageable) {
     var spec = isActive()
-            .and(hasZipCode(zipCodes))
-            .and(creditLimitOver(minCredit));
-    
+               .and(hasZipCode(zipCodes))
+               .and(creditLimitOver(minCredit));
+
     return customerRepository.findAll(spec, pageable);
 }
 ```
 
-> [!NOTE]
-> Most factory methods behave this way, though there are a few exceptions. Consult the Javadoc on each method for details.
-
-## Core Features & Usage
+### Core Features & Usage
 
 The library's factory methods are organized into several classes by predicate type. The examples below show the most common ones.
 
@@ -265,15 +240,15 @@ Specification<Customer> spec = yearIs(Customer.Fields.createdTimestamp, 2024);
 
 `onDate` constructs the appropriate SQL predicate based on the Java type of the mapped entity property. The behavior differs by type because different temporal types carry different amounts of information.
 
-| Property type | Predicate |
-|---|---|
-| `LocalDate` | Equality: property equals `targetDate` |
-| `java.sql.Date` | Equality: property equals the SQL-date equivalent of `targetDate` |
-| `Instant` | UTC half-open range: `[targetDate 00:00 UTC, targetDate+1 00:00 UTC)` |
-| `OffsetDateTime` | UTC half-open range (same UTC window, expressed as `OffsetDateTime` at `+00:00`) |
-| `ZonedDateTime` | UTC half-open range (same UTC window, expressed as `ZonedDateTime` at UTC) |
-| `java.util.Date` / `java.sql.Timestamp` | UTC half-open range (same UTC window, compared as `java.util.Date`) |
-| `LocalDateTime` | Wall-clock half-open range: `[targetDate at midnight, targetDate+1 at midnight)`, no zone conversion |
+| Property type                           | Predicate                                                                                            |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `LocalDate`                             | Equality: property equals `targetDate`                                                               |
+| `java.sql.Date`                         | Equality: property equals the SQL-date equivalent of `targetDate`                                    |
+| `Instant`                               | UTC half-open range: `[targetDate 00:00 UTC, targetDate+1 00:00 UTC)`                                |
+| `OffsetDateTime`                        | UTC half-open range (same UTC window, expressed as `OffsetDateTime` at `+00:00`)                     |
+| `ZonedDateTime`                         | UTC half-open range (same UTC window, expressed as `ZonedDateTime` at UTC)                           |
+| `java.util.Date` / `java.sql.Timestamp` | UTC half-open range (same UTC window, compared as `java.util.Date`)                                  |
+| `LocalDateTime`                         | Wall-clock half-open range: `[targetDate at midnight, targetDate+1 at midnight)`, no zone conversion |
 
 **Date-only types** (`LocalDate`, `java.sql.Date`) use a simple equality check because the stored value already represents just a calendar date.
 
@@ -307,6 +282,43 @@ Specification<Customer> spec = containsMember(Customer.Fields.tags, "vip");
 ```
 
 For all available predicates and their descriptions, see [CollectionSpecifications.java](../src/main/java/expresspecs/CollectionSpecifications.java).
+
+## Streamlining Optional Filters
+
+Traditionally, handling optional API search parameters requires checking for nulls or empty collections before appending to the query:
+
+```java
+public Page<Customer> findSpecialCustomers(Set<String> zipCodes, Integer minCredit, Pageable pageable) {
+    var spec = isActive();
+
+    if (!CollectionUtils.isEmpty(zipCodes)) {
+        spec = spec.and(hasZipCode(zipCodes));
+    }
+
+    if (minCredit != null) {
+        spec = spec.and(creditLimitOver(minCredit));
+    }
+
+    return customerRepository.findAll(spec, pageable);
+}
+```
+
+One of the hidden superpowers of this library is that **it safely handles null and empty inputs automatically**. If you pass `null` or an empty collection into the factory methods, they safely return an "unrestricted" specification that acts as a no-op when chained.
+
+This means you can drop the `if` statements entirely and collapse your search APIs into a perfectly fluid chain as we saw above:
+
+```java
+public Page<Customer> findSpecialCustomers(Set<String> zipCodes, Integer minCredit, Pageable pageable) {
+    var spec = isActive()
+            .and(hasZipCode(zipCodes))
+            .and(creditLimitOver(minCredit));
+
+    return customerRepository.findAll(spec, pageable);
+}
+```
+
+> [!NOTE]
+> Most factory methods behave this way, though there are a few exceptions. Consult the Javadoc on each method for details.
 
 ## The Magic of `smartDistinct`
 
