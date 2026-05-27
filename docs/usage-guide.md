@@ -220,7 +220,7 @@ For all available predicates and their descriptions, see [BasicSpecifications.ja
 
 ### String Specifications
 
-For text-based searching (LIKE clauses, ignore case, etc.). Methods are provided for `contains`, `containsAny`, and `doesNotContain`, each available in both case-sensitive and case-insensitive variants, plus `equalsIgnoreCase` for case-insensitive equality. For case-sensitive string equality, `BasicSpecifications.is()` works directly.
+For text-based searching (LIKE clauses, ignore case, etc.). Methods are provided for `contains`, `containsAny`, `doesNotContain`, `startsWith`, and `endsWith`, each available in both case-sensitive and case-insensitive variants, plus `equalsIgnoreCase` for case-insensitive equality. For case-sensitive string equality, `BasicSpecifications.is()` works directly.
 
 > [!NOTE]
 > All `StringSpecifications` methods automatically append wildcard characters (`%`) and escape SQL `LIKE` special characters (like `_` and `%`) in your search terms, preventing query errors or unintended wildcard matches.
@@ -234,6 +234,8 @@ var cityPath = PropertyPath.of(Customer.Fields.address, Address.Fields.city);
 Specification<Customer> spec = doesNotContain(cityPath, "Heights");
 
 Specification<Customer> spec = containsAny(Customer.Fields.name, List.of("Bugs", "Daffy"));
+
+Specification<Customer> spec = startsWithIgnoreCase(Customer.Fields.name, "WILE");
 ```
 
 For all available predicates and their descriptions, see [StringSpecifications.java](../src/main/java/expresspecs/StringSpecifications.java).
