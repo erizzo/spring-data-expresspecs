@@ -14,6 +14,64 @@ import expresspecs.example.CustomerSpecifications;
 public interface StringSpecificationIntegrationTests extends BaseIntegrationTest<Customer> {
 
 	@Test
+	default void isNullOrEmpty() {
+		Customer withName = customer("Wile E. Coyote");
+		withName = persistAndFlush(withName);
+
+		Customer nullName = customer(null);
+		nullName = persistAndFlush(nullName);
+
+		Customer emptyName = customer("");
+		emptyName = persistAndFlush(emptyName);
+
+		Specification<Customer> spec = StringSpecifications.isNullOrEmpty(Customer.Fields.name);
+
+		List<Customer> results = getRepo().findAll(spec);
+
+		assertThat(results).containsExactlyInAnyOrder(nullName, emptyName);
+	}
+
+	@Test
+	default void isNullOrEmpty_NestedProperty() {
+		Customer withCity = customer("Wile E. Coyote", city("Albuquerque"));
+		persistAndFlush(withCity.getAddress());
+		withCity = persistAndFlush(withCity);
+
+		Customer nullCity = customer("Road Runner", city(null));
+		persistAndFlush(nullCity.getAddress());
+		nullCity = persistAndFlush(nullCity);
+
+		Customer emptyCity = customer("Bugs Bunny", city(""));
+		persistAndFlush(emptyCity.getAddress());
+		emptyCity = persistAndFlush(emptyCity);
+
+		var path = PropertyPath.of(Customer.Fields.address, Address.Fields.city);
+		Specification<Customer> spec = StringSpecifications.isNullOrEmpty(path);
+
+		List<Customer> results = getRepo().findAll(spec);
+
+		assertThat(results).containsExactlyInAnyOrder(nullCity, emptyCity);
+	}
+
+	@Test
+	default void isNotNullOrEmpty() {
+		Customer withName = customer("Wile E. Coyote");
+		withName = persistAndFlush(withName);
+
+		Customer nullName = customer(null);
+		persistAndFlush(nullName);
+
+		Customer emptyName = customer("");
+		persistAndFlush(emptyName);
+
+		Specification<Customer> spec = StringSpecifications.isNotNullOrEmpty(Customer.Fields.name);
+
+		List<Customer> results = getRepo().findAll(spec);
+
+		assertThat(results).containsExactly(withName);
+	}
+
+	@Test
 	default void contains() {
 		Customer coyote = customer("Wile E. Coyote");
 		coyote = persistAndFlush(coyote);

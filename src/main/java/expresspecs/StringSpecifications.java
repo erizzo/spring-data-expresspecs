@@ -61,6 +61,70 @@ public class StringSpecifications {
 	}
 
 	/**
+	 * Creates a specification that matches entities where the specified string property is empty:
+	 * either {@code null} or an empty string ({@code ""}).
+	 *
+	 * <p>Useful for schemas that store missing values as either {@code null} or empty string.
+	 * Produces the SQL predicate {@code (column IS NULL OR column = '')}.
+	 *
+	 * @param <T>          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to a string attribute.
+	 * @see PropertyPath#from(String)
+	 */
+	public static <T> @NonNull Specification<T> isNullOrEmpty(String propertyPath) {
+		return isNullOrEmpty(PropertyPath.from(propertyPath));
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified string property is empty:
+	 * either {@code null} or an empty string ({@code ""}).
+	 *
+	 * <p>Useful for schemas that store missing values as either {@code null} or empty string.
+	 * Produces the SQL predicate {@code (column IS NULL OR column = '')}.
+	 *
+	 * @param <T>          The entity type being queried.
+	 * @param propertyPath Resolved property path to a string attribute.
+	 */
+	public static <T> @NonNull Specification<T> isNullOrEmpty(PropertyPath propertyPath) {
+		return (root, query, cb) -> {
+			Path<String> path = propertyPath.asPath(root);
+			return cb.or(cb.isNull(path), cb.equal(path, ""));
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified string property is not empty:
+	 * neither {@code null} nor an empty string ({@code ""}).
+	 *
+	 * <p>This is the complement of {@link #isNullOrEmpty(PropertyPath)}.
+	 * Produces the SQL predicate {@code (column IS NOT NULL AND column <> '')}.
+	 *
+	 * @param <T>          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to a string attribute.
+	 * @see PropertyPath#from(String)
+	 */
+	public static <T> @NonNull Specification<T> isNotNullOrEmpty(String propertyPath) {
+		return isNotNullOrEmpty(PropertyPath.from(propertyPath));
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified string property is not empty:
+	 * neither {@code null} nor an empty string ({@code ""}).
+	 *
+	 * <p>This is the complement of {@link #isNullOrEmpty(PropertyPath)}.
+	 * Produces the SQL predicate {@code (column IS NOT NULL AND column <> '')}.
+	 *
+	 * @param <T>          The entity type being queried.
+	 * @param propertyPath Resolved property path to a string attribute.
+	 */
+	public static <T> @NonNull Specification<T> isNotNullOrEmpty(PropertyPath propertyPath) {
+		return (root, query, cb) -> {
+			Path<String> path = propertyPath.asPath(root);
+			return cb.and(cb.isNotNull(path), cb.notEqual(path, ""));
+		};
+	}
+
+	/**
 	 * Creates a specification that matches entities where the specified property contains
 	 * {@code value}. Matching is case-sensitive.
 	 *

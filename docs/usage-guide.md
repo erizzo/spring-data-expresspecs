@@ -195,10 +195,10 @@ For all available predicates and their descriptions, see [BasicSpecifications.ja
 
 ### String Specifications
 
-For text-based searching (LIKE clauses, ignore case, etc.). Methods are provided for `contains`, `containsAny`, `doesNotContain`, `startsWith`, and `endsWith`, each available in both case-sensitive and case-insensitive variants, plus `equalsIgnoreCase` for case-insensitive equality. For case-sensitive string equality, `BasicSpecifications.is()` works directly.
+For text-based searching (`LIKE` clauses, for example). Methods are provided for partial string matching (both case-sensitive and case-insensitive variants), null/emptiness checking, and `equalsIgnoreCase` for case-insensitive equality. For case-sensitive string equality, `BasicSpecifications.is()` works directly.
 
 > [!NOTE]
-> All `StringSpecifications` methods automatically append wildcard characters (`%`) and escape SQL `LIKE` special characters (like `_` and `%`) in your search terms, preventing query errors or unintended wildcard matches.
+> All methods that perform partial string matching automatically append wildcard characters (`%`) and escape SQL `LIKE` wildcards (`_` and `%`) in your search terms, preventing query errors or unintended wildcard matches.
 
 ```java
 import static expresspecs.StringSpecifications.*;
