@@ -219,18 +219,13 @@ Specification<Customer> spec = isNullOrEmpty("address.zipCode");
 Specification<Customer> spec = isNotNullOrEmpty(Customer.Fields.name);
 ```
 
-> [!NOTE]
-> `isNotNullOrEmpty` uses Hibernate-internal dialect detection to emit an index-friendly SQL
-> predicate for the connected database. The reason for this is Oracle's empty-string behavior:
-> Oracle coerces `''` to `NULL` at storage time, which means a simple
-> `NOT (column IS NULL OR column = '')` predicate produces wrong results on Oracle due to SQL
-> three-valued logic (the `= ''` comparison becomes `= NULL`, which is UNKNOWN, and `NOT UNKNOWN`
-> is also UNKNOWN, silently excluding every row). To work around this, the library detects the
-> Hibernate dialect at query build time and emits `column IS NOT NULL` on Oracle (correct and
-> index-friendly, since empty strings cannot exist there) or `(column IS NOT NULL AND column <> '')`
-> on all other databases. Detection is performed once per SessionFactory and cached. If the dialect
-> cannot be detected (for example, when using a non-Hibernate JPA provider), a runtime exception
-> is thrown from this predicate.
+> [!WARNING]
+> `isNotNullOrEmpty` does not behave correctly on Oracle. Oracle coerces `''` to `NULL` at storage
+> time, so the `column <> ''` predicate binds as `column <> NULL`, which is UNKNOWN under SQL
+> three-valued logic (`NOT UNKNOWN` is also UNKNOWN), silently excluding every row including those
+> with real values. If your application targets Oracle, avoid `isNotNullOrEmpty` and express the
+> condition another way (for example, checking only `isNotNull`, since Oracle cannot store an
+> empty string and a non-null column value is therefore guaranteed to be non-empty).
 
 
 ### Range & DateTime Specifications

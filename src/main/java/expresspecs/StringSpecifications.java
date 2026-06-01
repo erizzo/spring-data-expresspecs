@@ -6,14 +6,11 @@ import static expresspecs.SQLUtils.escapeLike;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.domain.Specification;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import lombok.experimental.UtilityClass;
@@ -30,9 +27,6 @@ public class StringSpecifications {
 
 	static final char ESCAPE_CHAR = '\\';
 
-	private enum Dialect { ORACLE, OTHER }
-
-	private static final ConcurrentHashMap<Object, Dialect> dialectCache = new ConcurrentHashMap<>();
 
 	/**
 	 * Creates a specification that matches entities where the specified property equals
@@ -103,10 +97,14 @@ public class StringSpecifications {
 	 * neither {@code null} nor an empty string ({@code ""}).
 	 *
 	 * <p>This is the logical complement of {@link #isNullOrEmpty(String)}.
-	 * The emitted SQL predicate is chosen to be index-friendly based on the detected database:
-	 * Oracle emits {@code column IS NOT NULL} (empty strings cannot be stored on Oracle, so this
-	 * is equivalent); all other databases emit {@code (column IS NOT NULL AND column <> '')}.
-	 * Throws a runtime exception at query execution time if the database dialect cannot be detected.
+	 * Produces the SQL predicate {@code (column IS NOT NULL AND column <> '')}.
+	 *
+	 * <p><strong>Oracle compatibility note:</strong> This predicate does not behave correctly on Oracle.
+	 * Oracle coerces {@code ''} to {@code NULL} at storage time, so the {@code column <> ''} term
+	 * binds as {@code column <> NULL}, which is UNKNOWN under SQL three-valued logic. This causes
+	 * every row to be excluded, even rows with real values. On Oracle, use
+	 * {@link BasicSpecifications#notNull(String)} instead: since Oracle cannot store an empty string,
+	 * a non-null value is guaranteed to be non-empty.
 	 *
 	 * @param <T>          The entity type being queried.
 	 * @param propertyPath Dot-delimited property path to a string attribute.
@@ -121,10 +119,14 @@ public class StringSpecifications {
 	 * neither {@code null} nor an empty string ({@code ""}).
 	 *
 	 * <p>This is the logical complement of {@link #isNullOrEmpty(PropertyPath)}.
-	 * The emitted SQL predicate is chosen to be index-friendly based on the detected database:
-	 * Oracle emits {@code column IS NOT NULL} (empty strings cannot be stored on Oracle, so this
-	 * is equivalent); all other databases emit {@code (column IS NOT NULL AND column <> '')}.
-	 * Throws a runtime exception at query execution time if the database dialect cannot be detected.
+	 * Produces the SQL predicate {@code (column IS NOT NULL AND column <> '')}.
+	 *
+	 * <p><strong>Oracle compatibility note:</strong> This predicate does not behave correctly on Oracle.
+	 * Oracle coerces {@code ''} to {@code NULL} at storage time, so the {@code column <> ''} term
+	 * binds as {@code column <> NULL}, which is UNKNOWN under SQL three-valued logic. This causes
+	 * every row to be excluded, even rows with real values. On Oracle, use
+	 * {@link BasicSpecifications#notNull(PropertyPath)} instead: since Oracle cannot store an empty string,
+	 * a non-null value is guaranteed to be non-empty.
 	 *
 	 * @param <T>          The entity type being queried.
 	 * @param propertyPath Resolved property path to a string attribute.
@@ -132,10 +134,7 @@ public class StringSpecifications {
 	public static <T> @NonNull Specification<T> isNotNullOrEmpty(PropertyPath propertyPath) {
 		return (root, query, cb) -> {
 			Path<String> path = propertyPath.asPath(root);
-			return switch (detectDialect(cb)) {
-				case ORACLE  -> cb.isNotNull(path);
-				case OTHER   -> cb.and(cb.isNotNull(path), cb.notEqual(path, ""));
-			};
+			return cb.and(cb.isNotNull(path), cb.notEqual(path, ""));
 		};
 	}
 
@@ -493,19 +492,6 @@ public class StringSpecifications {
 					.toArray(Predicate[]::new);
 			return cb.or(predicates);
 		};
-	}
-
-	private static Dialect detectDialect(CriteriaBuilder cb) {
-		return dialectCache.computeIfAbsent(cb, criteriaBuilder -> {
-			try {
-				Object sessionFactory = criteriaBuilder.getClass().getMethod("getFactory").invoke(criteriaBuilder);
-				Object jdbcServices = sessionFactory.getClass().getMethod("getJdbcServices").invoke(sessionFactory);
-				Object dialect = jdbcServices.getClass().getMethod("getDialect").invoke(jdbcServices);
-				return dialect.getClass().getName().contains("Oracle") ? Dialect.ORACLE : Dialect.OTHER;
-			} catch (Exception e) {
-				throw new UnknownDialectException("Could not determine dialect for CriteriaBuilder " + cb, e);
-			}
-		});
 	}
 
 }

@@ -1,4 +1,4 @@
-activeProfiles=sb4, tc
+activeProfiles=sb4, tc, oracle
 eclipse.preferences.version=1
 resolveWorkspaceProjects=true
 version=1
