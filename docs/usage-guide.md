@@ -200,6 +200,9 @@ For text-based searching (`LIKE` clauses, for example). Methods are provided for
 > [!NOTE]
 > All methods that perform partial string matching automatically append wildcard characters (`%`) and escape SQL `LIKE` wildcards (`_` and `%`) in your search terms, preventing query errors or unintended wildcard matches.
 
+Here are some examples; see [StringSpecifications.java](../src/main/java/expresspecs/StringSpecifications.java) for
+all available predicates and their descriptions.
+
 ```java
 import static expresspecs.StringSpecifications.*;
 
@@ -211,9 +214,24 @@ Specification<Customer> spec = doesNotContain(cityPath, "Heights");
 Specification<Customer> spec = containsAny(Customer.Fields.name, List.of("Bugs", "Daffy"));
 
 Specification<Customer> spec = startsWithIgnoreCase(Customer.Fields.name, "WILE");
+
+Specification<Customer> spec = isNullOrEmpty("address.zipCode");
+Specification<Customer> spec = isNotNullOrEmpty(Customer.Fields.name);
 ```
 
-For all available predicates and their descriptions, see [StringSpecifications.java](../src/main/java/expresspecs/StringSpecifications.java).
+> [!NOTE]
+> `isNotNullOrEmpty` uses Hibernate-internal dialect detection to emit an index-friendly SQL
+> predicate for the connected database. The reason for this is Oracle's empty-string behavior:
+> Oracle coerces `''` to `NULL` at storage time, which means a simple
+> `NOT (column IS NULL OR column = '')` predicate produces wrong results on Oracle due to SQL
+> three-valued logic (the `= ''` comparison becomes `= NULL`, which is UNKNOWN, and `NOT UNKNOWN`
+> is also UNKNOWN, silently excluding every row). To work around this, the library detects the
+> Hibernate dialect at query build time and emits `column IS NOT NULL` on Oracle (correct and
+> index-friendly, since empty strings cannot exist there) or `(column IS NOT NULL AND column <> '')`
+> on all other databases. Detection is performed once per SessionFactory and cached. If the dialect
+> cannot be detected (for example, when using a non-Hibernate JPA provider), a runtime exception
+> is thrown from this predicate.
+
 
 ### Range & DateTime Specifications
 
