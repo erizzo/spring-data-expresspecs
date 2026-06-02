@@ -8,6 +8,9 @@ This library provides a set of highly expressive, composable factory methods tha
 
 To be clear: this is a convenience library, not a framework. The patterns it encodes are not new or revolutionary, but having them pre-built, tested, and composable keeps application code focused on business logic rather than Criteria API mechanics. The resulting code reads like *intent* rather than plumbing.
 
+[![Build](https://github.com/erizzo/spring-data-expresspecs/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/erizzo/spring-data-expresspecs/actions/workflows/build-and-test.yml)
+[![Coverage](https://erizzo.github.io/spring-data-expresspecs/badges/jacoco.svg)](https://erizzo.github.io/spring-data-expresspecs/target/site/jacoco/)
+
 ## The Status Quo
 
 The typical way to use Spring Data JPA is to define query methods derived from the method name, or by writing custom `@Query` JPQL statements:
