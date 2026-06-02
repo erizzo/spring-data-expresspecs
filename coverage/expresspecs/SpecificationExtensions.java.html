@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SpecificationExtensions.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Data Expresspecs</a> &gt; <a href="index.source.html" class="el_package">expresspecs</a> &gt; <span class="el_source">SpecificationExtensions.java</span></div><h1>SpecificationExtensions.java</h1><pre class="source lang-java linenums">package expresspecs;
+
+import static expresspecs.BasicSpecifications.unrestricted;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import org.springframework.data.jpa.domain.Specification;
+
+import jakarta.persistence.criteria.Predicate;
+
+<span class="nc" id="L11">public class SpecificationExtensions {</span>
+
+	/**
+	 * Null-safe or() for Specifications that tolerates null values for either argument. If both arguments
+	 * are null, {@link BasicSpecifications#unrestricted()} is returned.
+	 */
+	public static &lt;T&gt; Specification&lt;T&gt; safeOr(@Nullable Specification&lt;T&gt; existing, @Nullable Specification&lt;T&gt; additional) {
+<span class="fc bfc" id="L18" title="All 4 branches covered.">		if (existing == null &amp;&amp; additional == null) {</span>
+<span class="fc" id="L19">			return unrestricted();</span>
+		}
+
+<span class="fc bfc" id="L22" title="All 2 branches covered.">		if (existing == null) {</span>
+<span class="fc" id="L23">			return additional;</span>
+		}
+
+<span class="fc bfc" id="L26" title="All 2 branches covered.">		if (additional == null) {</span>
+<span class="fc" id="L27">			return existing;</span>
+		}
+
+<span class="fc" id="L30">		return existing.or(additional);</span>
+	}
+
+	/**
+	 * Null-safe and() for Specifications that tolerates null values for either argument. If both arguments
+	 * are null, {@link BasicSpecifications#unrestricted()} is returned.
+	 */
+	public static &lt;T&gt; Specification&lt;T&gt; safeAnd(@Nullable Specification&lt;T&gt; existing, @Nullable Specification&lt;T&gt; additional) {
+<span class="fc bfc" id="L38" title="All 4 branches covered.">		if (existing == null &amp;&amp; additional == null) {</span>
+<span class="fc" id="L39">			return unrestricted();</span>
+		}
+
+<span class="fc bfc" id="L42" title="All 2 branches covered.">		if (existing == null) {</span>
+<span class="fc" id="L43">			return additional;</span>
+		}
+
+<span class="fc bfc" id="L46" title="All 2 branches covered.">		if (additional == null) {</span>
+<span class="fc" id="L47">			return existing;</span>
+		}
+
+<span class="fc" id="L50">		return existing.and(additional);</span>
+	}
+
+	/**
+	 * Wraps a {@link Specification} to ensure that results are distinct, but only
+	 * when necessary.
+	 * &lt;p&gt;
+	 * This decorator performs two critical checks before applying a {@code DISTINCT} keyword:
+	 * &lt;ol&gt;
+	 * &lt;li&gt;&lt;b&gt;Join Detection:&lt;/b&gt; It only applies distinct logic if the query has
+	 * actually performed a {@code JOIN}. This avoids the performance overhead of
+	 * distinct sorting on simple single-table queries.&lt;/li&gt;
+	 * &lt;li&gt;&lt;b&gt;Result Type Safety:&lt;/b&gt; It ensures that {@code DISTINCT} is not
+	 * applied to count queries (where the result type is {@link Long}), preventing
+	 * potential JPA provider exceptions and incorrect metadata counts.&lt;/li&gt;
+	 * &lt;/ol&gt;
+	 * &lt;p&gt;
+	 * &lt;b&gt;When to use:&lt;/b&gt; Use this when building user-facing search queries that
+	 * navigate {@code OneToMany} or {@code ManyToMany} relationships, where a
+	 * single parent entity would otherwise appear multiple times in the result list due to
+	 * multiple matching child records.
+	 * &lt;/p&gt;
+	 * &lt;b&gt;Example:&lt;/b&gt;
+	 *
+	 * &lt;pre&gt;{@code
+	 * Specification&lt;Customer&gt; spec = smartDistinct(hasRecentOrder().and(isPremium()));
+	 * List&lt;Customer&gt; results = repository.findAll(spec);
+	 * }&lt;/pre&gt;
+	 *
+	 * @param &lt;T&gt; The type of the entity the specification is checking.
+	 * @param spec The underlying specification to execute.
+	 * @return A new Specification that conditionally applies {@code DISTINCT}.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; smartDistinct(Specification&lt;T&gt; spec) {
+<span class="fc" id="L84">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L85">			Predicate predicate = spec.toPredicate(root, query, cb);</span>
+
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">			if (!root.getJoins().isEmpty()) {</span>
+<span class="fc" id="L88">				Class&lt;?&gt; resultType = query.getResultType();</span>
+<span class="pc bpc" id="L89" title="2 of 4 branches missed.">				if (resultType != Long.class &amp;&amp; resultType != long.class) {</span>
+<span class="fc" id="L90">					query.distinct(true);</span>
+				}
+			}
+<span class="fc" id="L93">			return predicate;</span>
+		};
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

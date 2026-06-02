@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SameCalendarDayForUtilDate.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Data Expresspecs</a> &gt; <a href="index.source.html" class="el_package">expresspecs.datetime</a> &gt; <span class="el_source">SameCalendarDayForUtilDate.java</span></div><h1>SameCalendarDayForUtilDate.java</h1><pre class="source lang-java linenums">package expresspecs.datetime;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.Date;
+
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+
+/**
+ * Matches {@link Date} and JDBC subclasses (e.g. {@link java.sql.Timestamp}) via {@link Date#isAssignableFrom(Class)}.
+ */
+<span class="fc" id="L15">final class SameCalendarDayForUtilDate implements SameCalendarDay {</span>
+
+	@Override
+	public boolean supports(Class&lt;?&gt; javaType) {
+<span class="pc bpc" id="L19" title="2 of 4 branches missed.">		return javaType != null &amp;&amp; Date.class.isAssignableFrom(javaType);</span>
+	}
+
+	@Override
+	public Predicate toPredicate(Path&lt;?&gt; path, LocalDate targetDate, CriteriaBuilder cb) {
+		@SuppressWarnings(&quot;unchecked&quot;)
+<span class="fc" id="L25">		Path&lt;Date&gt; typed = (Path&lt;Date&gt;) path;</span>
+<span class="fc" id="L26">		Instant start = targetDate.atStartOfDay(ZoneOffset.UTC).toInstant();</span>
+<span class="fc" id="L27">		Instant end = targetDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();</span>
+<span class="fc" id="L28">		return cb.and(</span>
+<span class="fc" id="L29">				cb.greaterThanOrEqualTo(typed, Date.from(start)),</span>
+<span class="fc" id="L30">				cb.lessThan(typed, Date.from(end)));</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

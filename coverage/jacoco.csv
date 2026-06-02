@@ -1,0 +1,17 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Spring Data Expresspecs,expresspecs.datetime,SameCalendarDayForInstant,0,32,0,0,0,6,0,3,0,3
+Spring Data Expresspecs,expresspecs.datetime,SameCalendarDayForLocalDateTime,21,7,0,0,4,2,1,2,1,2
+Spring Data Expresspecs,expresspecs.datetime,SameCalendarDayForSqlDate,6,7,0,0,1,2,1,2,1,2
+Spring Data Expresspecs,expresspecs.datetime,SameCalendarDayForUtilDate,1,39,2,2,0,8,2,3,0,3
+Spring Data Expresspecs,expresspecs.datetime,SameCalendarDayForLocalDate,0,14,0,0,0,4,0,3,0,3
+Spring Data Expresspecs,expresspecs.datetime,SameCalendarDayForZonedDateTime,23,7,0,0,4,2,1,2,1,2
+Spring Data Expresspecs,expresspecs.datetime,SameCalendarDayForOffsetDateTime,0,34,0,0,0,6,0,3,0,3
+Spring Data Expresspecs,expresspecs.datetime,DateTimeSpecifications,5,146,0,8,0,32,1,20,1,16
+Spring Data Expresspecs,expresspecs.datetime,SameCalendarDayFallback,23,3,0,0,5,1,2,1,2,1
+Spring Data Expresspecs,expresspecs,PropertyPath,8,189,0,12,0,34,2,19,2,13
+Spring Data Expresspecs,expresspecs,RangeSpecifications,0,93,0,10,0,24,0,16,0,11
+Spring Data Expresspecs,expresspecs,SpecificationExtensions,3,64,3,19,1,21,4,12,1,4
+Spring Data Expresspecs,expresspecs,CollectionSpecifications,2,71,1,1,1,17,1,12,0,12
+Spring Data Expresspecs,expresspecs,SQLUtils,0,22,0,2,0,6,0,2,0,1
+Spring Data Expresspecs,expresspecs,BasicSpecifications,0,209,0,12,0,52,0,36,0,30
+Spring Data Expresspecs,expresspecs,StringSpecifications,0,452,0,30,0,100,0,62,0,47

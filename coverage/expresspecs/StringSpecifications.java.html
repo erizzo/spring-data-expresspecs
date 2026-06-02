@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StringSpecifications.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Data Expresspecs</a> &gt; <a href="index.source.html" class="el_package">expresspecs</a> &gt; <span class="el_source">StringSpecifications.java</span></div><h1>StringSpecifications.java</h1><pre class="source lang-java linenums">package expresspecs;
+
+import static expresspecs.BasicSpecifications.unrestricted;
+import static expresspecs.SQLUtils.escapeLike;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.domain.Specification;
+
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import lombok.experimental.UtilityClass;
+
+/**
+ * Predicate factories for String-based JPA Specifications, including partial matches and case-insensitive equality.
+ *
+ * &lt;p&gt;Most of the methods return an {@linkplain BasicSpecifications#unrestricted() unrestricted specification} when the
+ * filter value is {@code null}, blank, or an empty collection, making them safe to use directly from optional
+ * query parameters without null-checking at the call site.
+ */
+@UtilityClass
+public class StringSpecifications {
+
+	static final char ESCAPE_CHAR = '\\';
+
+
+	/**
+	 * Creates a specification that matches entities where the specified property equals
+	 * {@code aValue}, ignoring case.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param aValue       Value to compare against.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; equalsIgnoreCase(String propertyPath, String aValue) {
+<span class="fc" id="L41">		return equalsIgnoreCase(PropertyPath.from(propertyPath), aValue);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property equals
+	 * {@code aValue}, ignoring case.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param aValue       Value to compare against.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; equalsIgnoreCase(PropertyPath propertyPath, String aValue) {
+<span class="fc bfc" id="L53" title="All 2 branches covered.">		if (aValue == null) {</span>
+<span class="fc" id="L54">			return unrestricted();</span>
+		}
+
+<span class="fc" id="L57">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L58">			Path&lt;String&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L59">			return cb.equal(cb.lower(path), aValue.toLowerCase(Locale.ROOT));</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified string property is empty:
+	 * either {@code null} or an empty string ({@code &quot;&quot;}).
+	 *
+	 * &lt;p&gt;Useful for schemas that store missing values as either {@code null} or empty string.
+	 * Produces the SQL predicate {@code (column IS NULL OR column = '')}.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to a string attribute.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; isNullOrEmpty(String propertyPath) {
+<span class="fc" id="L75">		return isNullOrEmpty(PropertyPath.from(propertyPath));</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified string property is empty:
+	 * either {@code null} or an empty string ({@code &quot;&quot;}).
+	 *
+	 * &lt;p&gt;Useful for schemas that store missing values as either {@code null} or empty string.
+	 * Produces the SQL predicate {@code (column IS NULL OR column = '')}.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Resolved property path to a string attribute.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; isNullOrEmpty(PropertyPath propertyPath) {
+<span class="fc" id="L89">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L90">			Path&lt;String&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L91">			return cb.or(cb.isNull(path), cb.equal(path, &quot;&quot;));</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified string property is not empty:
+	 * neither {@code null} nor an empty string ({@code &quot;&quot;}).
+	 *
+	 * &lt;p&gt;This is the logical complement of {@link #isNullOrEmpty(String)}.
+	 * Produces the SQL predicate {@code (column IS NOT NULL AND column &lt;&gt; '')}.
+	 *
+	 * &lt;p&gt;&lt;strong&gt;Oracle compatibility note:&lt;/strong&gt; This predicate does not behave correctly on Oracle.
+	 * Oracle coerces {@code ''} to {@code NULL} at storage time, so the {@code column &lt;&gt; ''} term
+	 * binds as {@code column &lt;&gt; NULL}, which is UNKNOWN under SQL three-valued logic. This causes
+	 * every row to be excluded, even rows with real values. On Oracle, use
+	 * {@link BasicSpecifications#notNull(String)} instead: since Oracle cannot store an empty string,
+	 * a non-null value is guaranteed to be non-empty.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to a string attribute.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; isNotNullOrEmpty(String propertyPath) {
+<span class="fc" id="L114">		return isNotNullOrEmpty(PropertyPath.from(propertyPath));</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified string property is not empty:
+	 * neither {@code null} nor an empty string ({@code &quot;&quot;}).
+	 *
+	 * &lt;p&gt;This is the logical complement of {@link #isNullOrEmpty(PropertyPath)}.
+	 * Produces the SQL predicate {@code (column IS NOT NULL AND column &lt;&gt; '')}.
+	 *
+	 * &lt;p&gt;&lt;strong&gt;Oracle compatibility note:&lt;/strong&gt; This predicate does not behave correctly on Oracle.
+	 * Oracle coerces {@code ''} to {@code NULL} at storage time, so the {@code column &lt;&gt; ''} term
+	 * binds as {@code column &lt;&gt; NULL}, which is UNKNOWN under SQL three-valued logic. This causes
+	 * every row to be excluded, even rows with real values. On Oracle, use
+	 * {@link BasicSpecifications#notNull(PropertyPath)} instead: since Oracle cannot store an empty string,
+	 * a non-null value is guaranteed to be non-empty.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Resolved property path to a string attribute.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; isNotNullOrEmpty(PropertyPath propertyPath) {
+<span class="fc" id="L135">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L136">			Path&lt;String&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L137">			return cb.and(cb.isNotNull(path), cb.notEqual(path, &quot;&quot;));</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property contains
+	 * {@code value}. Matching is case-sensitive.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param value        Substring to match within the property value.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; contains(String propertyPath, String value) {
+<span class="fc" id="L151">		return contains(PropertyPath.from(propertyPath), value);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property contains
+	 * {@code value}. Matching is case-sensitive.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param value        Substring to match within the property value.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; contains(PropertyPath propertyPath, String value) {
+<span class="fc bfc" id="L163" title="All 2 branches covered.">		if (StringUtils.isEmpty(value)) {</span>
+<span class="fc" id="L164">			return unrestricted();</span>
+		}
+
+<span class="fc" id="L167">		String escapedValue = escapeLike(value, ESCAPE_CHAR);</span>
+<span class="fc" id="L168">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L169">			Path&lt;String&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L170">			return cb.like(path, &quot;%&quot; + escapedValue + &quot;%&quot;, ESCAPE_CHAR);</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property contains
+	 * {@code value}. Matching ignores case.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param value        Substring to match within the property value.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; containsIgnoreCase(String propertyPath, String value) {
+<span class="fc" id="L184">		return containsIgnoreCase(PropertyPath.from(propertyPath), value);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property contains
+	 * {@code value}. Matching ignores case.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param value        Substring to match within the property value.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; containsIgnoreCase(PropertyPath propertyPath, String value) {
+<span class="fc bfc" id="L196" title="All 2 branches covered.">		if (StringUtils.isEmpty(value)) {</span>
+<span class="fc" id="L197">			return unrestricted();</span>
+		}
+
+<span class="fc" id="L200">		String escapedValue = escapeLike(value.toLowerCase(Locale.ROOT), ESCAPE_CHAR);</span>
+<span class="fc" id="L201">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L202">			Path&lt;String&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L203">			return cb.like(cb.lower(path), &quot;%&quot; + escapedValue + &quot;%&quot;, ESCAPE_CHAR);</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property does not
+	 * contain {@code value}. Matching is case-sensitive.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param value        Substring to exclude from the property value.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; doesNotContain(String propertyPath, String value) {
+<span class="fc" id="L217">		return doesNotContain(PropertyPath.from(propertyPath), value);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property does not
+	 * contain {@code value}. Matching is case-sensitive.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param value        Substring to exclude from the property value.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; doesNotContain(PropertyPath propertyPath, String value) {
+<span class="fc bfc" id="L229" title="All 2 branches covered.">		if (StringUtils.isEmpty(value)) {</span>
+<span class="fc" id="L230">			return unrestricted();</span>
+		}
+
+<span class="fc" id="L233">		String escapedValue = escapeLike(value, ESCAPE_CHAR);</span>
+<span class="fc" id="L234">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L235">			Path&lt;String&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L236">			return cb.notLike(path, &quot;%&quot; + escapedValue + &quot;%&quot;, ESCAPE_CHAR);</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property does not
+	 * contain {@code value}. Matching ignores case.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param value        Substring to exclude from the property value.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; doesNotContainIgnoreCase(String propertyPath, String value) {
+<span class="fc" id="L250">		return doesNotContainIgnoreCase(PropertyPath.from(propertyPath), value);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property does not
+	 * contain {@code value}. Matching ignores case.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param value        Substring to exclude from the property value.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; doesNotContainIgnoreCase(PropertyPath propertyPath, String value) {
+<span class="fc bfc" id="L262" title="All 2 branches covered.">		if (StringUtils.isEmpty(value)) {</span>
+<span class="fc" id="L263">			return unrestricted();</span>
+		}
+
+<span class="fc" id="L266">		String escapedValue = escapeLike(value.toLowerCase(Locale.ROOT), ESCAPE_CHAR);</span>
+<span class="fc" id="L267">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L268">			Path&lt;String&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L269">			return cb.notLike(cb.lower(path), &quot;%&quot; + escapedValue + &quot;%&quot;, ESCAPE_CHAR);</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property contains at least
+	 * one of the values in {@code searchTerms}. Matching ignores case.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param searchTerms  Candidate substrings for case-insensitive matching.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; containsAnyIgnoreCase(String propertyPath,
+			Collection&lt;String&gt; searchTerms) {
+<span class="fc" id="L284">		return containsAnyIgnoreCase(PropertyPath.from(propertyPath), searchTerms);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property contains at least
+	 * one of the values in {@code searchTerms}. Matching ignores case.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param searchTerms  Candidate substrings for case-insensitive matching.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; containsAnyIgnoreCase(PropertyPath propertyPath,
+			Collection&lt;String&gt; searchTerms) {
+<span class="fc bfc" id="L297" title="All 2 branches covered.">		if (CollectionUtils.isEmpty(searchTerms)) {</span>
+<span class="fc" id="L298">			return unrestricted();</span>
+		}
+
+<span class="fc" id="L301">		List&lt;String&gt; escapedTerms = searchTerms.stream()</span>
+<span class="fc bfc" id="L302" title="All 2 branches covered.">				.filter(term -&gt; !StringUtils.isEmpty(term))</span>
+<span class="fc" id="L303">				.map(term -&gt; escapeLike(term.toLowerCase(Locale.ROOT), ESCAPE_CHAR))</span>
+<span class="fc" id="L304">				.toList();</span>
+
+		// Special case: all terms are empty so nothing to match against
+<span class="fc bfc" id="L307" title="All 2 branches covered.">		if (escapedTerms.isEmpty()) {</span>
+<span class="fc" id="L308">			return unrestricted();</span>
+		}
+
+<span class="fc" id="L311">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L312">			Path&lt;String&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L313">			Predicate[] predicates = escapedTerms.stream()</span>
+<span class="fc" id="L314">					.map(term -&gt; cb.like(cb.lower(path), &quot;%&quot; + term + &quot;%&quot;, ESCAPE_CHAR))</span>
+<span class="fc" id="L315">					.toArray(Predicate[]::new);</span>
+<span class="fc" id="L316">			return cb.or(predicates);</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property starts with
+	 * {@code value}. Matching is case-sensitive.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param value        Prefix to match at the start of the property value.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; startsWith(String propertyPath, String value) {
+<span class="fc" id="L330">		return startsWith(PropertyPath.from(propertyPath), value);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property starts with
+	 * {@code value}. Matching is case-sensitive.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param value        Prefix to match at the start of the property value.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; startsWith(PropertyPath propertyPath, String value) {
+<span class="fc bfc" id="L342" title="All 2 branches covered.">		if (StringUtils.isEmpty(value)) {</span>
+<span class="fc" id="L343">			return unrestricted();</span>
+		}
+
+<span class="fc" id="L346">		String escapedValue = escapeLike(value, ESCAPE_CHAR);</span>
+<span class="fc" id="L347">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L348">			Path&lt;String&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L349">			return cb.like(path, escapedValue + &quot;%&quot;, ESCAPE_CHAR);</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property starts with
+	 * {@code value}. Matching ignores case.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param value        Prefix to match at the start of the property value.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; startsWithIgnoreCase(String propertyPath, String value) {
+<span class="fc" id="L363">		return startsWithIgnoreCase(PropertyPath.from(propertyPath), value);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property starts with
+	 * {@code value}. Matching ignores case.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param value        Prefix to match at the start of the property value.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; startsWithIgnoreCase(PropertyPath propertyPath, String value) {
+<span class="fc bfc" id="L375" title="All 2 branches covered.">		if (StringUtils.isEmpty(value)) {</span>
+<span class="fc" id="L376">			return unrestricted();</span>
+		}
+
+<span class="fc" id="L379">		String escapedValue = escapeLike(value.toLowerCase(Locale.ROOT), ESCAPE_CHAR);</span>
+<span class="fc" id="L380">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L381">			Path&lt;String&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L382">			return cb.like(cb.lower(path), escapedValue + &quot;%&quot;, ESCAPE_CHAR);</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property ends with
+	 * {@code value}. Matching is case-sensitive.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param value        Suffix to match at the end of the property value.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; endsWith(String propertyPath, String value) {
+<span class="fc" id="L396">		return endsWith(PropertyPath.from(propertyPath), value);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property ends with
+	 * {@code value}. Matching is case-sensitive.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param value        Suffix to match at the end of the property value.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; endsWith(PropertyPath propertyPath, String value) {
+<span class="fc bfc" id="L408" title="All 2 branches covered.">		if (StringUtils.isEmpty(value)) {</span>
+<span class="fc" id="L409">			return unrestricted();</span>
+		}
+
+<span class="fc" id="L412">		String escapedValue = escapeLike(value, ESCAPE_CHAR);</span>
+<span class="fc" id="L413">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L414">			Path&lt;String&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L415">			return cb.like(path, &quot;%&quot; + escapedValue, ESCAPE_CHAR);</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property ends with
+	 * {@code value}. Matching ignores case.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param value        Suffix to match at the end of the property value.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; endsWithIgnoreCase(String propertyPath, String value) {
+<span class="fc" id="L429">		return endsWithIgnoreCase(PropertyPath.from(propertyPath), value);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property ends with
+	 * {@code value}. Matching ignores case.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param value        Suffix to match at the end of the property value.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; endsWithIgnoreCase(PropertyPath propertyPath, String value) {
+<span class="fc bfc" id="L441" title="All 2 branches covered.">		if (StringUtils.isEmpty(value)) {</span>
+<span class="fc" id="L442">			return unrestricted();</span>
+		}
+
+<span class="fc" id="L445">		String escapedValue = escapeLike(value.toLowerCase(Locale.ROOT), ESCAPE_CHAR);</span>
+<span class="fc" id="L446">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L447">			Path&lt;String&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L448">			return cb.like(cb.lower(path), &quot;%&quot; + escapedValue, ESCAPE_CHAR);</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property contains at least
+	 * one of the values in {@code searchTerms}. Matching is case-sensitive.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param searchTerms  Candidate substrings for case-sensitive matching.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; containsAny(String propertyPath, Collection&lt;String&gt; searchTerms) {
+<span class="fc" id="L462">		return containsAny(PropertyPath.from(propertyPath), searchTerms);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property contains at least
+	 * one of the values in {@code searchTerms}. Matching is case-sensitive.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param searchTerms  Candidate substrings for case-sensitive matching.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; containsAny(PropertyPath propertyPath, Collection&lt;String&gt; searchTerms) {
+<span class="fc bfc" id="L474" title="All 2 branches covered.">		if (CollectionUtils.isEmpty(searchTerms)) {</span>
+<span class="fc" id="L475">			return unrestricted();</span>
+		}
+
+<span class="fc" id="L478">		List&lt;String&gt; escapedTerms = searchTerms.stream()</span>
+<span class="fc bfc" id="L479" title="All 2 branches covered.">				.filter(term -&gt; !StringUtils.isEmpty(term))</span>
+<span class="fc" id="L480">				.map(term -&gt; escapeLike(term, ESCAPE_CHAR))</span>
+<span class="fc" id="L481">				.toList();</span>
+
+		// Special case: all terms are empty so nothing to match against
+<span class="fc bfc" id="L484" title="All 2 branches covered.">		if (escapedTerms.isEmpty()) {</span>
+<span class="fc" id="L485">			return unrestricted();</span>
+		}
+
+<span class="fc" id="L488">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L489">			Path&lt;String&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L490">			Predicate[] predicates = escapedTerms.stream()</span>
+<span class="fc" id="L491">					.map(term -&gt; cb.like(path, &quot;%&quot; + term + &quot;%&quot;, ESCAPE_CHAR))</span>
+<span class="fc" id="L492">					.toArray(Predicate[]::new);</span>
+<span class="fc" id="L493">			return cb.or(predicates);</span>
+		};
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

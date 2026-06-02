@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SameCalendarDayForZonedDateTime.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Data Expresspecs</a> &gt; <a href="index.source.html" class="el_package">expresspecs.datetime</a> &gt; <span class="el_source">SameCalendarDayForZonedDateTime.java</span></div><h1>SameCalendarDayForZonedDateTime.java</h1><pre class="source lang-java linenums">package expresspecs.datetime;
+
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+
+<span class="fc" id="L11">final class SameCalendarDayForZonedDateTime implements SameCalendarDay {</span>
+
+	@Override
+	public boolean supports(Class&lt;?&gt; javaType) {
+<span class="fc" id="L15">		return ZonedDateTime.class.equals(javaType);</span>
+	}
+
+	@Override
+	public Predicate toPredicate(Path&lt;?&gt; path, LocalDate targetDate, CriteriaBuilder cb) {
+		@SuppressWarnings(&quot;unchecked&quot;)
+<span class="nc" id="L21">		Path&lt;ZonedDateTime&gt; typed = (Path&lt;ZonedDateTime&gt;) path;</span>
+<span class="nc" id="L22">		ZonedDateTime start = targetDate.atStartOfDay(ZoneOffset.UTC);</span>
+<span class="nc" id="L23">		ZonedDateTime end = targetDate.plusDays(1).atStartOfDay(ZoneOffset.UTC);</span>
+<span class="nc" id="L24">		return cb.and(cb.greaterThanOrEqualTo(typed, start), cb.lessThan(typed, end));</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

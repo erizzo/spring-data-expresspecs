@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BasicSpecifications.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Data Expresspecs</a> &gt; <a href="index.source.html" class="el_package">expresspecs</a> &gt; <span class="el_source">BasicSpecifications.java</span></div><h1>BasicSpecifications.java</h1><pre class="source lang-java linenums">package expresspecs;
+
+import java.util.Collection;
+
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.domain.Specification;
+
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Path;
+import lombok.experimental.UtilityClass;
+
+/**
+ * Basic predicate factories for JPA Specifications, such as equality, null checks, and boolean logic.
+ */
+@UtilityClass
+public class BasicSpecifications {
+
+	/**
+	 * Returns {@code spec} unchanged, serving as a type anchor for chained specification expressions.
+	 *
+	 * &lt;p&gt;When building a specification by chaining factory methods, Java cannot infer the entity type
+	 * {@code T} from a factory call alone (e.g. {@code isTrue(&quot;active&quot;)}) because there is no target
+	 * type to constrain inference. Passing the entity class pins {@code T}, so subsequent {@code .and()}
+	 * and {@code .or()} calls inherit the correct type and {@code var} works without explicit
+	 * {@code Specification&lt;MyEntity&gt;} declarations:
+	 *
+	 * &lt;pre&gt;{@code
+	 * var spec = where(MyEntity.class, isTrue(&quot;active&quot;))
+	 *         .and(containsIgnoreCase(&quot;name&quot;, partialName));
+	 * repository.findAll(spec);
+	 * }&lt;/pre&gt;
+	 *
+	 * @param &lt;T&gt;        The entity type being queried.
+	 * @param entityType The entity class, used only to pin the type parameter {@code T}.
+	 * @param spec       The first specification in the chain.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; where(@NonNull Class&lt;T&gt; entityType, @NonNull Specification&lt;T&gt; spec) {
+<span class="fc" id="L40">		return spec;</span>
+	}
+
+	/**
+	 * Returns an unrestricted specification that acts as a safe, backward-compatible replacement
+	 * for returning {@code null} out of specification factories, which Spring Boot 4's {@code findAll()}
+	 * no longer accepts.
+	 * &lt;p&gt;
+	 * This method exists for Spring Boot 3 support; Sprnig Boot 4 has it's own version of this
+	 * (see {@link Specification#unrestricted()}.
+	 *
+	 * @param &lt;T&gt; The entity type being queried.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; unrestricted() {
+<span class="fc" id="L54">		return (root, query, cb) -&gt; null;</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property is {@code true}.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to a boolean attribute.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; isTrue(String propertyPath) {
+<span class="fc" id="L65">		return isTrue(PropertyPath.from(propertyPath));</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property is {@code true}.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Resolved property path to a boolean attribute.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; isTrue(PropertyPath propertyPath) {
+<span class="fc" id="L75">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L76">			Path&lt;Boolean&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L77">			return cb.isTrue(path);</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property is {@code false}.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to a boolean attribute.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; isFalse(String propertyPath) {
+<span class="fc" id="L89">		return isFalse(PropertyPath.from(propertyPath));</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property is {@code false}.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Resolved property path to a boolean attribute.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; isFalse(PropertyPath propertyPath) {
+<span class="fc" id="L99">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L100">			Path&lt;Boolean&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L101">			return cb.isFalse(path);</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property is {@code null}.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to test for null.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; isNull(String propertyPath) {
+<span class="fc" id="L113">		return isNull(PropertyPath.from(propertyPath));</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property is {@code null}.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Resolved property path to test for null.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; isNull(PropertyPath propertyPath) {
+<span class="fc" id="L123">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L124">			Path&lt;?&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L125">			return cb.isNull(path);</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property is not {@code null}.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to test for non-null.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; notNull(String propertyPath) {
+<span class="fc" id="L137">		return notNull(PropertyPath.from(propertyPath));</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property is not {@code null}.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param propertyPath Resolved property path to test for non-null.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; notNull(PropertyPath propertyPath) {
+<span class="fc" id="L147">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L148">			Path&lt;?&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L149">			return cb.isNotNull(path);</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property equals {@code value},
+	 * or an {@linkplain #unrestricted() unrestricted specification} if {@code value} is {@code null} or empty.
+	 *
+	 * &lt;p&gt;If the intent is to match entities where the property itself is {@code null}, use {@link #isNull} instead,
+	 * as passing {@code null} here will produce an unrestricted specification rather than a {@code IS NULL} predicate.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param &lt;V&gt;          The property value type.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param value        Value to compare against.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T, V&gt; @NonNull Specification&lt;T&gt; is(String propertyPath, V value) {
+<span class="fc" id="L167">		return is(PropertyPath.from(propertyPath), value);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property equals {@code value},
+	 * or an {@linkplain #unrestricted() unrestricted specification} if {@code value} is {@code null} or empty.
+	 *
+	 * &lt;p&gt;If the intent is to match entities where the property itself is {@code null}, use {@link #isNull} instead,
+	 * as passing {@code null} here will produce an unrestricted specification rather than a {@code IS NULL} predicate.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param &lt;V&gt;          The property value type.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param value        Value to compare against.
+	 */
+	public static &lt;T, V&gt; @NonNull Specification&lt;T&gt; is(PropertyPath propertyPath, V value) {
+<span class="fc bfc" id="L183" title="All 2 branches covered.">		if (ObjectUtils.isEmpty(value)) {</span>
+<span class="fc" id="L184">			return unrestricted();</span>
+		}
+
+<span class="fc" id="L187">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L188">			Path&lt;?&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L189">			return cb.equal(path, value);</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property does not equal {@code aValue},
+	 * or an {@linkplain #unrestricted() unrestricted specification} if {@code aValue} is {@code null} or empty.
+	 *
+	 * &lt;p&gt;If the intent is to match entities where the property itself is not {@code null}, use {@link #notNull}
+	 * instead, as passing {@code null} here will produce an unrestricted specification rather than a
+	 * {@code IS NOT NULL} predicate.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param &lt;V&gt;          The property value type.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param aValue       Value to compare against.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T, V&gt; @NonNull Specification&lt;T&gt; isNot(String propertyPath, V aValue) {
+<span class="fc" id="L208">		return isNot(PropertyPath.from(propertyPath), aValue);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property does not equal {@code aValue},
+	 * or an {@linkplain #unrestricted() unrestricted specification} if {@code aValue} is {@code null} or empty.
+	 *
+	 * &lt;p&gt;If the intent is to match entities where the property itself is not {@code null}, use {@link #notNull}
+	 * instead, as passing {@code null} here will produce an unrestricted specification rather than a
+	 * {@code IS NOT NULL} predicate.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param &lt;V&gt;          The property value type.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param aValue       Value to compare against.
+	 */
+	public static &lt;T, V&gt; @NonNull Specification&lt;T&gt; isNot(PropertyPath propertyPath, V aValue) {
+<span class="fc bfc" id="L225" title="All 2 branches covered.">		if (ObjectUtils.isEmpty(aValue)) {</span>
+<span class="fc" id="L226">			return unrestricted();</span>
+		}
+
+<span class="fc" id="L229">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L230">			Path&lt;?&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L231">			return cb.notEqual(path, aValue);</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where two of their own properties are equal
+	 * to each other (a column-to-column comparison, not a comparison against a fixed value).
+	 *
+	 * &lt;p&gt;Use this when the filter criterion is a relationship between two attributes on the same
+	 * entity row; for example, matching orders whose {@code promisedDate} has not passed its
+	 * {@code shippedDate}. For comparing a single property against a fixed value, use
+	 * {@link #is(PropertyPath, Object)} instead.
+	 *
+	 * @param &lt;T&gt;   The entity type being queried.
+	 * @param path1 Path to the first property.
+	 * @param path2 Path to the second property.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; areEqual(PropertyPath path1, PropertyPath path2) {
+<span class="fc" id="L249">		return (root, query, cb) -&gt; cb.equal(path1.asPath(root), path2.asPath(root));</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where two of their own properties are equal
+	 * to each other (a column-to-column comparison, not a comparison against a fixed value).
+	 * Accepts dot-delimited path strings (e.g., {@code &quot;address.city&quot;}).
+	 *
+	 * &lt;p&gt;Use this when the filter criterion is a relationship between two attributes on the same
+	 * entity row; for example, matching orders whose {@code promisedDate} has not passed its
+	 * {@code shippedDate}. For comparing a single property against a fixed value, use
+	 * {@link #is(PropertyPath, Object)} instead.
+	 *
+	 * @param &lt;T&gt;       The entity type being queried.
+	 * @param property1 Dot-delimited path to the first property.
+	 * @param property2 Dot-delimited path to the second property.
+	 */
+	public static &lt;T&gt; @NonNull Specification&lt;T&gt; areEqual(String property1, String property2) {
+<span class="fc" id="L267">		return areEqual(PropertyPath.from(property1), PropertyPath.from(property2));</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property equals any value in
+	 * {@code searchValues}, or an {@linkplain #unrestricted() unrestricted specification} if {@code searchValues}
+	 * is {@code null} or empty.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param &lt;V&gt;          The property value type.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param searchValues Candidate values for an {@code IN (...)} predicate.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T, V&gt; @NonNull Specification&lt;T&gt; isAny(String propertyPath, Collection&lt;V&gt; searchValues) {
+<span class="fc" id="L282">		return isAny(PropertyPath.from(propertyPath), searchValues);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property equals any value in
+	 * {@code searchValues}, or an {@linkplain #unrestricted() unrestricted specification} if {@code searchValues}
+	 * is {@code null} or empty.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param &lt;V&gt;          The property value type.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param searchValues Candidate values for an {@code IN (...)} predicate.
+	 */
+	public static &lt;T, V&gt; @NonNull Specification&lt;T&gt; isAny(PropertyPath propertyPath, Collection&lt;V&gt; searchValues) {
+<span class="fc bfc" id="L296" title="All 2 branches covered.">		if (CollectionUtils.isEmpty(searchValues)) {</span>
+<span class="fc" id="L297">			return unrestricted();</span>
+		}
+
+<span class="fc" id="L300">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L301">			Path&lt;V&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L302">			CriteriaBuilder.In&lt;V&gt; in = cb.in(path);</span>
+<span class="fc bfc" id="L303" title="All 2 branches covered.">			for (V v : searchValues) {</span>
+<span class="fc" id="L304">				in.value(v);</span>
+<span class="fc" id="L305">			}</span>
+<span class="fc" id="L306">			return in;</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property does not equal any value in
+	 * {@code searchValues}, or an {@linkplain #unrestricted() unrestricted specification} if {@code searchValues}
+	 * is {@code null} or empty.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param &lt;V&gt;          The property value type.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param searchValues Candidate values for a {@code NOT IN (...)} predicate.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T, V&gt; @NonNull Specification&lt;T&gt; isNotAny(String propertyPath, Collection&lt;V&gt; searchValues) {
+<span class="fc" id="L322">		return isNotAny(PropertyPath.from(propertyPath), searchValues);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property does not equal any value in
+	 * {@code searchValues}, or an {@linkplain #unrestricted() unrestricted specification} if {@code searchValues}
+	 * is {@code null} or empty.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param &lt;V&gt;          The property value type.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param searchValues Candidate values for a {@code NOT IN (...)} predicate.
+	 */
+	public static &lt;T, V&gt; @NonNull Specification&lt;T&gt; isNotAny(PropertyPath propertyPath, Collection&lt;V&gt; searchValues) {
+<span class="fc bfc" id="L336" title="All 2 branches covered.">		if (CollectionUtils.isEmpty(searchValues)) {</span>
+<span class="fc" id="L337">			return unrestricted();</span>
+		}
+
+<span class="fc" id="L340">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L341">			Path&lt;V&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L342">			CriteriaBuilder.In&lt;V&gt; in = cb.in(path);</span>
+<span class="fc bfc" id="L343" title="All 2 branches covered.">			for (V v : searchValues) {</span>
+<span class="fc" id="L344">				in.value(v);</span>
+<span class="fc" id="L345">			}</span>
+<span class="fc" id="L346">			return cb.not(in);</span>
+		};
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

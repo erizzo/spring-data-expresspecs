@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RangeSpecifications.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Data Expresspecs</a> &gt; <a href="index.source.html" class="el_package">expresspecs</a> &gt; <span class="el_source">RangeSpecifications.java</span></div><h1>RangeSpecifications.java</h1><pre class="source lang-java linenums">package expresspecs;
+
+import static expresspecs.BasicSpecifications.unrestricted;
+
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.domain.Specification;
+
+import jakarta.persistence.criteria.Path;
+import lombok.experimental.UtilityClass;
+
+/**
+ * Predicate factories for Range-based JPA Specifications, such as comparisons and bounds.
+ */
+@UtilityClass
+public class RangeSpecifications {
+
+	/**
+	 * Creates a specification that matches entities where the specified property is strictly less than {@code value},
+	 * or an {@linkplain BasicSpecifications#unrestricted() unrestricted specification} if {@code value} is {@code null}.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param &lt;C&gt;          The comparable type of the property.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param value        Value to compare against.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T, C extends Comparable&lt;? super C&gt;&gt; @NonNull Specification&lt;T&gt; lessThan(String propertyPath, C value) {
+<span class="fc" id="L28">		return lessThan(PropertyPath.from(propertyPath), value);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property is strictly less than {@code value},
+	 * or an {@linkplain BasicSpecifications#unrestricted() unrestricted specification} if {@code value} is {@code null}.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param &lt;C&gt;          The comparable type of the property.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param value        Value to compare against.
+	 */
+	public static &lt;T, C extends Comparable&lt;? super C&gt;&gt; @NonNull Specification&lt;T&gt; lessThan(PropertyPath propertyPath, C value) {
+<span class="fc bfc" id="L41" title="All 2 branches covered.">		if (value == null) {</span>
+<span class="fc" id="L42">			return unrestricted();</span>
+		}
+<span class="fc" id="L44">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L45">			Path&lt;C&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L46">			return cb.lessThan(path, value);</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property is strictly greater than {@code value},
+	 * or an {@linkplain BasicSpecifications#unrestricted() unrestricted specification} if {@code value} is {@code null}.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param &lt;C&gt;          The comparable type of the property.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param value        Value to compare against.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T, C extends Comparable&lt;? super C&gt;&gt; @NonNull Specification&lt;T&gt; greaterThan(String propertyPath, C value) {
+<span class="fc" id="L61">		return greaterThan(PropertyPath.from(propertyPath), value);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property is strictly greater than {@code value},
+	 * or an {@linkplain BasicSpecifications#unrestricted() unrestricted specification} if {@code value} is {@code null}.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param &lt;C&gt;          The comparable type of the property.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param value        Value to compare against.
+	 */
+	public static &lt;T, C extends Comparable&lt;? super C&gt;&gt; @NonNull Specification&lt;T&gt; greaterThan(PropertyPath propertyPath, C value) {
+<span class="fc bfc" id="L74" title="All 2 branches covered.">		if (value == null) {</span>
+<span class="fc" id="L75">			return unrestricted();</span>
+		}
+<span class="fc" id="L77">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L78">			Path&lt;C&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L79">			return cb.greaterThan(path, value);</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property is greater than or equal to
+	 * {@code value}, or an {@linkplain BasicSpecifications#unrestricted() unrestricted specification} if
+	 * {@code value} is {@code null}.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param &lt;C&gt;          The comparable type of the property.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param value        Value to compare against.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T, C extends Comparable&lt;? super C&gt;&gt; @NonNull Specification&lt;T&gt; atLeast(String propertyPath, C value) {
+<span class="fc" id="L95">		return atLeast(PropertyPath.from(propertyPath), value);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property is greater than or equal to
+	 * {@code value}, or an {@linkplain BasicSpecifications#unrestricted() unrestricted specification} if
+	 * {@code value} is {@code null}.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param &lt;C&gt;          The comparable type of the property.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param value        Value to compare against.
+	 */
+	public static &lt;T, C extends Comparable&lt;? super C&gt;&gt; @NonNull Specification&lt;T&gt; atLeast(PropertyPath propertyPath, C value) {
+<span class="fc bfc" id="L109" title="All 2 branches covered.">		if (value == null) {</span>
+<span class="fc" id="L110">			return unrestricted();</span>
+		}
+<span class="fc" id="L112">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L113">			Path&lt;C&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L114">			return cb.greaterThanOrEqualTo(path, value);</span>
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property is greater than or
+	 * equal to {@code startInclusive} and strictly less than {@code endExclusive}.
+	 *
+	 * &lt;p&gt;Unlike other factories in this class, {@code null} bounds are not permitted and will throw
+	 * {@link IllegalArgumentException}. This is intentional: because this method delegates to
+	 * {@link #atLeast} and {@link #lessThan}, a null bound would silently produce a one-sided range
+	 * rather than the two-sided range the caller requested, hiding a subtle behavioral change in the
+	 * resulting query. If only one bound is needed, call {@link #atLeast} or {@link #lessThan} directly.
+	 *
+	 * @param &lt;T&gt;            The entity type being queried.
+	 * @param &lt;C&gt;            The comparable type of the property.
+	 * @param propertyPath   Dot-delimited property path to compare.
+	 * @param startInclusive The inclusive lower bound; must not be {@code null}.
+	 * @param endExclusive   The exclusive upper bound; must not be {@code null}.
+	 * @throws IllegalArgumentException if either bound is {@code null}.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T, C extends Comparable&lt;? super C&gt;&gt; @NonNull Specification&lt;T&gt; between(
+			String propertyPath, C startInclusive, C endExclusive) {
+<span class="fc" id="L138">		return between(PropertyPath.from(propertyPath), startInclusive, endExclusive);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property is greater than or
+	 * equal to {@code startInclusive} and strictly less than {@code endExclusive}.
+	 *
+	 * &lt;p&gt;Unlike other factories in this class, {@code null} bounds are not permitted and will throw
+	 * {@link IllegalArgumentException}. This is intentional: because this method delegates to
+	 * {@link #atLeast} and {@link #lessThan}, a null bound would silently produce a one-sided range
+	 * rather than the two-sided range the caller requested, hiding a subtle behavioral change in the
+	 * resulting query. If only one bound is needed, call {@link #atLeast} or {@link #lessThan} directly.
+	 *
+	 * @param &lt;T&gt;            The entity type being queried.
+	 * @param &lt;C&gt;            The comparable type of the property.
+	 * @param propertyPath   Resolved property path to compare.
+	 * @param startInclusive The inclusive lower bound; must not be {@code null}.
+	 * @param endExclusive   The exclusive upper bound; must not be {@code null}.
+	 * @throws IllegalArgumentException if either bound is {@code null}.
+	 */
+	public static &lt;T, C extends Comparable&lt;? super C&gt;&gt; @NonNull Specification&lt;T&gt; between(
+			PropertyPath propertyPath, C startInclusive, C endExclusive) {
+<span class="fc bfc" id="L160" title="All 4 branches covered.">		if (startInclusive == null || endExclusive == null) {</span>
+<span class="fc" id="L161">			throw new IllegalArgumentException(&quot;between() requires non-null bounds; use atLeast() or lessThan() for a one-sided range&quot;);</span>
+		}
+<span class="fc" id="L163">		Specification&lt;T&gt; afterStart = atLeast(propertyPath, startInclusive);</span>
+<span class="fc" id="L164">		Specification&lt;T&gt; beforeEnd = lessThan(propertyPath, endExclusive);</span>
+
+<span class="fc" id="L166">		return afterStart.and(beforeEnd);</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
