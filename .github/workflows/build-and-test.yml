@@ -96,7 +96,7 @@ jobs:
   coverage:
     name: Coverage badge
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     permissions:
       contents: write
     steps:
@@ -119,10 +119,15 @@ jobs:
         badges-directory: badges
         generate-coverage-badge: true
 
+    - name: Stage files for GitHub Pages
+      run: |
+        mkdir -p gh-pages/badges
+        mkdir -p gh-pages/coverage
+        cp badges/jacoco.svg gh-pages/badges/jacoco.svg
+        cp -r target/site/jacoco/. gh-pages/coverage/
+
     - name: Publish to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: .
-        include_only: badges/jacoco.svg,target/site/jacoco
-        destination_dir: .
+        publish_dir: gh-pages

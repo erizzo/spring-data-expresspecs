@@ -9,7 +9,7 @@ This library provides a set of highly expressive, composable factory methods tha
 To be clear: this is a convenience library, not a framework. The patterns it encodes are not new or revolutionary, but having them pre-built, tested, and composable keeps application code focused on business logic rather than Criteria API mechanics. The resulting code reads like *intent* rather than plumbing.
 
 [![Build](https://github.com/erizzo/spring-data-expresspecs/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/erizzo/spring-data-expresspecs/actions/workflows/build-and-test.yml)
-[![Coverage](https://erizzo.github.io/spring-data-expresspecs/badges/jacoco.svg)](https://erizzo.github.io/spring-data-expresspecs/target/site/jacoco/)
+[![Coverage](https://erizzo.github.io/spring-data-expresspecs/badges/jacoco.svg)](https://erizzo.github.io/spring-data-expresspecs/coverage/)
 
 ## The Status Quo
 
