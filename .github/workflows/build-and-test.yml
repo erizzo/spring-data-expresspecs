@@ -110,7 +110,7 @@ jobs:
         cache: maven
 
     - name: Generate coverage report
-      run: ./mvnw -B --no-transfer-progress verify -Psb4
+      run: ./mvnw -B --no-transfer-progress verify -Psb4,tc
 
     - name: Generate coverage badge
       uses: cicirello/jacoco-badge-generator@v2
