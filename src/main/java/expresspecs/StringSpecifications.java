@@ -6,7 +6,6 @@ import static expresspecs.SQLUtils.escapeLike;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
@@ -19,7 +18,7 @@ import lombok.experimental.UtilityClass;
 /**
  * Predicate factories for String-based JPA Specifications, including partial matches and case-insensitive equality.
  *
- * <p>All factories return an {@linkplain BasicSpecifications#unrestricted() unrestricted specification} when the
+ * <p>Most of the methods return an {@linkplain BasicSpecifications#unrestricted() unrestricted specification} when the
  * filter value is {@code null}, blank, or an empty collection, making them safe to use directly from optional
  * query parameters without null-checking at the call site.
  */
@@ -27,6 +26,7 @@ import lombok.experimental.UtilityClass;
 public class StringSpecifications {
 
 	static final char ESCAPE_CHAR = '\\';
+
 
 	/**
 	 * Creates a specification that matches entities where the specified property equals
@@ -57,6 +57,84 @@ public class StringSpecifications {
 		return (root, query, cb) -> {
 			Path<String> path = propertyPath.asPath(root);
 			return cb.equal(cb.lower(path), aValue.toLowerCase(Locale.ROOT));
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified string property is empty:
+	 * either {@code null} or an empty string ({@code ""}).
+	 *
+	 * <p>Useful for schemas that store missing values as either {@code null} or empty string.
+	 * Produces the SQL predicate {@code (column IS NULL OR column = '')}.
+	 *
+	 * @param <T>          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to a string attribute.
+	 * @see PropertyPath#from(String)
+	 */
+	public static <T> @NonNull Specification<T> isNullOrEmpty(String propertyPath) {
+		return isNullOrEmpty(PropertyPath.from(propertyPath));
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified string property is empty:
+	 * either {@code null} or an empty string ({@code ""}).
+	 *
+	 * <p>Useful for schemas that store missing values as either {@code null} or empty string.
+	 * Produces the SQL predicate {@code (column IS NULL OR column = '')}.
+	 *
+	 * @param <T>          The entity type being queried.
+	 * @param propertyPath Resolved property path to a string attribute.
+	 */
+	public static <T> @NonNull Specification<T> isNullOrEmpty(PropertyPath propertyPath) {
+		return (root, query, cb) -> {
+			Path<String> path = propertyPath.asPath(root);
+			return cb.or(cb.isNull(path), cb.equal(path, ""));
+		};
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified string property is not empty:
+	 * neither {@code null} nor an empty string ({@code ""}).
+	 *
+	 * <p>This is the logical complement of {@link #isNullOrEmpty(String)}.
+	 * Produces the SQL predicate {@code (column IS NOT NULL AND column <> '')}.
+	 *
+	 * <p><strong>Oracle compatibility note:</strong> This predicate does not behave correctly on Oracle.
+	 * Oracle coerces {@code ''} to {@code NULL} at storage time, so the {@code column <> ''} term
+	 * binds as {@code column <> NULL}, which is UNKNOWN under SQL three-valued logic. This causes
+	 * every row to be excluded, even rows with real values. On Oracle, use
+	 * {@link BasicSpecifications#notNull(String)} instead: since Oracle cannot store an empty string,
+	 * a non-null value is guaranteed to be non-empty.
+	 *
+	 * @param <T>          The entity type being queried.
+	 * @param propertyPath Dot-delimited property path to a string attribute.
+	 * @see PropertyPath#from(String)
+	 */
+	public static <T> @NonNull Specification<T> isNotNullOrEmpty(String propertyPath) {
+		return isNotNullOrEmpty(PropertyPath.from(propertyPath));
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified string property is not empty:
+	 * neither {@code null} nor an empty string ({@code ""}).
+	 *
+	 * <p>This is the logical complement of {@link #isNullOrEmpty(PropertyPath)}.
+	 * Produces the SQL predicate {@code (column IS NOT NULL AND column <> '')}.
+	 *
+	 * <p><strong>Oracle compatibility note:</strong> This predicate does not behave correctly on Oracle.
+	 * Oracle coerces {@code ''} to {@code NULL} at storage time, so the {@code column <> ''} term
+	 * binds as {@code column <> NULL}, which is UNKNOWN under SQL three-valued logic. This causes
+	 * every row to be excluded, even rows with real values. On Oracle, use
+	 * {@link BasicSpecifications#notNull(PropertyPath)} instead: since Oracle cannot store an empty string,
+	 * a non-null value is guaranteed to be non-empty.
+	 *
+	 * @param <T>          The entity type being queried.
+	 * @param propertyPath Resolved property path to a string attribute.
+	 */
+	public static <T> @NonNull Specification<T> isNotNullOrEmpty(PropertyPath propertyPath) {
+		return (root, query, cb) -> {
+			Path<String> path = propertyPath.asPath(root);
+			return cb.and(cb.isNotNull(path), cb.notEqual(path, ""));
 		};
 	}
 

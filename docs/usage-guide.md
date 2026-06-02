@@ -195,10 +195,13 @@ For all available predicates and their descriptions, see [BasicSpecifications.ja
 
 ### String Specifications
 
-For text-based searching (LIKE clauses, ignore case, etc.). Methods are provided for `contains`, `containsAny`, `doesNotContain`, `startsWith`, and `endsWith`, each available in both case-sensitive and case-insensitive variants, plus `equalsIgnoreCase` for case-insensitive equality. For case-sensitive string equality, `BasicSpecifications.is()` works directly.
+For text-based searching (`LIKE` clauses, for example). Methods are provided for partial string matching (both case-sensitive and case-insensitive variants), null/emptiness checking, and `equalsIgnoreCase` for case-insensitive equality. For case-sensitive string equality, `BasicSpecifications.is()` works directly.
 
 > [!NOTE]
-> All `StringSpecifications` methods automatically append wildcard characters (`%`) and escape SQL `LIKE` special characters (like `_` and `%`) in your search terms, preventing query errors or unintended wildcard matches.
+> All methods that perform partial string matching automatically append wildcard characters (`%`) and escape SQL `LIKE` wildcards (`_` and `%`) in your search terms, preventing query errors or unintended wildcard matches.
+
+Here are some examples; see [StringSpecifications.java](../src/main/java/expresspecs/StringSpecifications.java) for
+all available predicates and their descriptions.
 
 ```java
 import static expresspecs.StringSpecifications.*;
@@ -211,9 +214,19 @@ Specification<Customer> spec = doesNotContain(cityPath, "Heights");
 Specification<Customer> spec = containsAny(Customer.Fields.name, List.of("Bugs", "Daffy"));
 
 Specification<Customer> spec = startsWithIgnoreCase(Customer.Fields.name, "WILE");
+
+Specification<Customer> spec = isNullOrEmpty("address.zipCode");
+Specification<Customer> spec = isNotNullOrEmpty(Customer.Fields.name);
 ```
 
-For all available predicates and their descriptions, see [StringSpecifications.java](../src/main/java/expresspecs/StringSpecifications.java).
+> [!WARNING]
+> `isNotNullOrEmpty` does not behave correctly on Oracle. Oracle coerces `''` to `NULL` at storage
+> time, so the `column <> ''` predicate binds as `column <> NULL`, which is UNKNOWN under SQL
+> three-valued logic (`NOT UNKNOWN` is also UNKNOWN), silently excluding every row including those
+> with real values. If your application targets Oracle, avoid `isNotNullOrEmpty` and express the
+> condition another way (for example, checking only `isNotNull`, since Oracle cannot store an
+> empty string and a non-null column value is therefore guaranteed to be non-empty).
+
 
 ### Range & DateTime Specifications
 
