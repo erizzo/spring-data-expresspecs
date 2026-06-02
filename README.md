@@ -1,5 +1,8 @@
 # Spring Data ExpresSpecs
 
+[![Build](https://github.com/erizzo/spring-data-expresspecs/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/erizzo/spring-data-expresspecs/actions/workflows/build-and-test.yml)
+[![Coverage](https://erizzo.github.io/spring-data-expresspecs/badges/jacoco.svg)](https://erizzo.github.io/spring-data-expresspecs/target/site/jacoco/)
+
 > The name is a mashup of *express* and *specs*, capturing two ideas at once: the specs are
 > *expressive* (readable, intent-revealing factory methods instead of raw `CriteriaBuilder` noise),
 > and they're like an *express* train (fast, direct) to Specification/Criteria queries without boilerplate.
