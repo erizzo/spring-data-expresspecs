@@ -17,7 +17,6 @@ final class SameCalendarDayFallback implements SameCalendarDay {
 	public Predicate toPredicate(Path<?> path, LocalDate targetDate, CriteriaBuilder cb) {
 		Class<?> javaType = path.getJavaType();
 		String typeName = javaType == null ? "(unknown)" : javaType.getName();
-		throw new IllegalArgumentException(
-				"DateTimeSpecifications.onDate does not support leaf property type "+ typeName);
+		throw new UnsupportedDatePropertyException(javaType, "onDate does not support property type "+ typeName);
 	}
 }
