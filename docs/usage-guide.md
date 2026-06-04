@@ -263,6 +263,8 @@ Specification<Customer> spec = yearIs(Customer.Fields.createdTimestamp, 2024);
 | `java.util.Date` / `java.sql.Timestamp` | UTC half-open range (same UTC window, compared as `java.util.Date`)                                  |
 | `LocalDateTime`                         | Wall-clock half-open range: `[targetDate at midnight, targetDate+1 at midnight)`, no zone conversion |
 
+Any other mapped Java type causes `IllegalArgumentException` when the specification runs (for example `java.util.Calendar`).
+
 **Date-only types** (`LocalDate`, `java.sql.Date`) use a simple equality check because the stored value already represents just a calendar date.
 
 **Zone-aware types** (`Instant`, `OffsetDateTime`, `ZonedDateTime`, `java.util.Date`, `java.sql.Timestamp`) use a UTC midnight-to-midnight window. "On 2025-03-15" means any instant in `[2025-03-15T00:00:00Z, 2025-03-16T00:00:00Z)`. A value stored as `2025-03-16T01:00+02:00` (which is `2025-03-15T23:00Z`) matches; a value stored as `2025-03-16T00:00:00Z` does not.
@@ -270,7 +272,7 @@ Specification<Customer> spec = yearIs(Customer.Fields.createdTimestamp, 2024);
 **Zone-naive types** (`LocalDateTime`) compare the stored value directly against the wall-clock midnight boundaries with no zone conversion. `2025-03-15T23:45` matches but `2025-03-16T00:00` does not, regardless of where the server or database is located.
 
 > [!NOTE]
-> If the property type is not one of the above, `onDate` falls back to wall-clock `LocalDateTime` bounds. Whether the resulting predicate behaves correctly depends on how your JPA provider coerces `LocalDateTime` values to the mapped column type.
+> Unsupported property types throw `IllegalArgumentException` with a message that names the leaf type and lists supported alternatives. Through Spring Data JPA, that exception may be wrapped in a `DataAccessException` (for example `InvalidDataAccessApiUsageException`).
 
 For all available predicates and their descriptions, see [RangeSpecifications.java](../src/main/java/expresspecs/RangeSpecifications.java) and [DateTimeSpecifications.java](../src/main/java/expresspecs/datetime/DateTimeSpecifications.java).
 

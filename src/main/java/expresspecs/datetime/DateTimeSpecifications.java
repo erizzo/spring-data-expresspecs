@@ -177,15 +177,16 @@ public class DateTimeSpecifications {
 	 *   <li>{@link LocalDateTime}: half-open range using {@linkplain LocalDate#atStartOfDay() start of day}
 	 *   through the following midnight in the <em>same</em> {@link LocalDateTime} calendar (no zone
 	 *   conversion).</li>
-	 *   <li>Other types: half-open range using {@link LocalDateTime} bounds
-	 *   {@code targetDate.atStartOfDay()} (inclusive) through {@code targetDate.plusDays(1).atStartOfDay()}
-	 *   (exclusive). The property is compared to those bound values; the effective filter depends on the
-	 *   JPA provider and how JDBC coerces {@link LocalDateTime} to the mapped column type.</li>
+	 *   <li>Any other leaf property type: {@link IllegalArgumentException} when the specification is
+	 *   evaluated, because {@code onDate} does not define calendar-day semantics for that type.</li>
 	 * </ul>
 	 *
 	 * @param <T>          The entity type being queried.
 	 * @param propertyPath Resolved property path to compare.
 	 * @param targetDate   The date to match.
+	 * @throws IllegalArgumentException if the leaf property type is not one of the supported temporal types
+	 * (see list in this method's description). When the specification is run through Spring Data JPA,
+	 * this exception may be wrapped in a {@link org.springframework.dao.DataAccessException}.
 	 */
 	public static <T> @NonNull Specification<T> onDate(PropertyPath propertyPath, LocalDate targetDate) {
 		if (targetDate == null) {
@@ -204,8 +205,7 @@ public class DateTimeSpecifications {
 				.stream()
 				.filter(s -> s.supports(propertyType))
 				.findFirst()
-				// This would be a programming error in the fallback strategy
-				.orElseThrow(() -> new AssertionError("Fallback strategy must support any leaf type"));
+				.orElseThrow(() -> new AssertionError("SameCalendarDay strategy list must end with a catch-all"));
 	}
 
 }

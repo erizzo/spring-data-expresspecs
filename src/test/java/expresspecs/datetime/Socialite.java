@@ -2,7 +2,9 @@ package expresspecs.datetime;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.Calendar;
 import java.util.Date;
 
 import jakarta.persistence.Entity;
@@ -42,6 +44,8 @@ public class Socialite {
 
 	private LocalDate localDate;
 
+	private LocalDateTime localDateTime;
+
 	@SuppressWarnings("deprecation")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date javaUtilDateAsTimestamp;
@@ -55,6 +59,8 @@ public class Socialite {
 	private java.sql.Date sqlDate;
 
 	private Timestamp sqlTimestamp;
+
+	private Calendar javaUtilCalendar;
 
 	private ZonedDateTime zonedDateTime;
 }

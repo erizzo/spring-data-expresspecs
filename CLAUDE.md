@@ -84,6 +84,14 @@ See **[docs/testing.md](docs/testing.md)** for Maven commands, profiles, Testcon
 
 The `sb3` Maven profile switches the Spring Boot BOM version and activates the `src/test/springboot3/java` test source tree. When adding new features, verify behaviour under both profiles (H2 integration tests). Testcontainers profiles are excluded - they require `sb4`.
 
+## API and cross-cutting refactors
+
+Do **not** change public library API or shared contracts that ripple across many implementations (for example new parameters on a **public interface** implemented in multiple places) **unless the user explicitly approves that design** in the thread. Prefer a **narrow** change (single class, package-private helper, or one call site) when it satisfies the request. If the right fix needs a wide contract change, **propose options and ask first** before editing.
+
+## Trust the working tree; ask when unsure
+
+If the code on disk **differs** from what you remember or expected, **do not assume** that gap is a mistake to fix on your own. When it is unclear whether a difference is intentional, **ask the user** before changing it.
+
 ## Style rules
 
 **No em dashes:** Do not use the em dash character (U+2014, `—`) anywhere: documentation, Markdown files, Javadoc, or code comments (`//`, `/* */`, `/** */`). Use a comma, colon, semicolon, parentheses, or a hyphen with spaces instead.
