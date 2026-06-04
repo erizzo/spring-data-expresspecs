@@ -9,14 +9,17 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import expresspecs.datetime.Socialite;
+import expresspecs.datetime.SocialiteRepository;
+import expresspecs.example.ComponentScanMarker;
 import rizzoweb.spring.jpa.EntityManagerWrapper;
 
 
 @Configuration
 @EnableAutoConfiguration
-@ComponentScan(basePackageClasses = expresspecs.example.ComponentScanMarker.class)
-@EntityScan(basePackageClasses = expresspecs.example.ComponentScanMarker.class)
-@EnableJpaRepositories(basePackageClasses = expresspecs.example.ComponentScanMarker.class)
+@ComponentScan(basePackageClasses = ComponentScanMarker.class)
+@EntityScan(basePackageClasses = { ComponentScanMarker.class, Socialite.class })
+@EnableJpaRepositories(basePackageClasses = { ComponentScanMarker.class, SocialiteRepository.class })
 public class SB4JPATestConfig {
 
 	@Bean
