@@ -1,0 +1,25 @@
+---
+description: No public or multi-site API refactors without explicit user approval; propose narrower fixes first
+alwaysApply: true
+---
+
+# API and cross-cutting refactors require explicit approval
+
+## Do not do without explicit user go-ahead
+
+Do **not** implement or merge edits that:
+
+- Change **public** library surface (exported types, public methods, `module-info` exports, or anything consumers rely on), or
+- Change **shared contracts** touched in many places at once (for example a **public interface** with **multiple implementations** in this repo, or a new parameter on such an interface), or
+- Refactor **across many modules or packages** solely to support a small feature, when a **local** change would work.
+
+If the user’s goal can be met by changing **one call site**, **one package-private class**, or **one strategy implementation** without widening the blast radius, **prefer that** and say so briefly.
+
+## When the user asks for a behavior change
+
+1. Prefer **minimal diffs** that preserve existing contracts.
+2. If the clean solution **would** require a wide contract change, **stop and ask**: describe the tradeoff (local hack vs API change) and wait for approval before editing across implementations.
+
+## After approval
+
+If the user explicitly approves a contract change, follow the rest of the project rules (tests, Javadoc, `CLAUDE.md`, and workspace sync as applicable).

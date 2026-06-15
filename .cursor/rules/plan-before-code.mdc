@@ -1,5 +1,5 @@
 ---
-description: Answer-first for design questions; no repo edits without explicit implementation ask
+description: Answer-first for design questions; no unasked edits; ask when repo state or intent is unclear
 alwaysApply: true
 ---
 
@@ -25,3 +25,9 @@ For non-trivial implementation the user *does* request, if several files or desi
 ## No rabbit holes
 
 Do **not** expand scope (extra APIs, example rewrites, new helpers, docs, broad test matrix runs) unless the user asked for that scope or agreed to it in the same thread.
+
+## Do not assume the working tree is wrong
+
+When what you read in the repo **differs** from an earlier turn, from another path, or from what you expected, **do not treat that as an automatic error** to correct without confirmation. Omitted annotations, different names, or unusual structure may be **deliberate**.
+
+If you are not sure whether to **restore**, **add**, or **change** something, **ask the user** in one short question before editing.

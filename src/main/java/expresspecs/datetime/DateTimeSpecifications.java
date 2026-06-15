@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.List;
 
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.jspecify.annotations.NonNull;
@@ -17,7 +16,6 @@ import org.springframework.data.jpa.domain.Specification;
 import expresspecs.PropertyPath;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Path;
 import lombok.experimental.UtilityClass;
 
 /**
@@ -34,18 +32,6 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 public class DateTimeSpecifications {
-
-	// The ordering of this list is important
-	private static final List<SameCalendarDay> SAME_CALENDAR_DAY_STRATEGIES = List.of(
-			new SameCalendarDayForLocalDate(),
-			new SameCalendarDayForSqlDate(),
-			new SameCalendarDayForInstant(),
-			new SameCalendarDayForOffsetDateTime(),
-			new SameCalendarDayForZonedDateTime(),
-			new SameCalendarDayForLocalDateTime(),
-			new SameCalendarDayForUtilDate(),
-			new SameCalendarDayFallback());
-
 
 	private HibernateCriteriaBuilder hibernateBuilder(CriteriaBuilder builder) {
 		return (HibernateCriteriaBuilder) builder;
@@ -177,35 +163,24 @@ public class DateTimeSpecifications {
 	 *   <li>{@link LocalDateTime}: half-open range using {@linkplain LocalDate#atStartOfDay() start of day}
 	 *   through the following midnight in the <em>same</em> {@link LocalDateTime} calendar (no zone
 	 *   conversion).</li>
-	 *   <li>Other types: half-open range using {@link LocalDateTime} bounds
-	 *   {@code targetDate.atStartOfDay()} (inclusive) through {@code targetDate.plusDays(1).atStartOfDay()}
-	 *   (exclusive). The property is compared to those bound values; the effective filter depends on the
-	 *   JPA provider and how JDBC coerces {@link LocalDateTime} to the mapped column type.</li>
+	 *   <li>Any other leaf property type: {@link UnsupportedDatePropertyException} (a subtype of
+	 *   {@link IllegalArgumentException}) when the specification is evaluated, because {@code onDate}
+	 *   does not define calendar-day semantics for that type.</li>
 	 * </ul>
 	 *
 	 * @param <T>          The entity type being queried.
 	 * @param propertyPath Resolved property path to compare.
 	 * @param targetDate   The date to match.
+	 * @throws UnsupportedDatePropertyException if the leaf property type is not one of the supported temporal types
+	 * (see list in this method's description). When the specification is run through Spring Data JPA,
+	 * this exception may be wrapped in a {@link org.springframework.dao.DataAccessException}.
 	 */
 	public static <T> @NonNull Specification<T> onDate(PropertyPath propertyPath, LocalDate targetDate) {
 		if (targetDate == null) {
 			return unrestricted();
 		}
 
-		return (root, query, cb) -> {
-			Path<?> path = propertyPath.asPath(root);
-			Class<?> javaType = path.getJavaType();
-			return getSameCalendarDayStrategy(javaType).toPredicate(path, targetDate, cb);
-		};
-	}
-
-	private static SameCalendarDay getSameCalendarDayStrategy(Class<?> propertyType) {
-		return SAME_CALENDAR_DAY_STRATEGIES
-				.stream()
-				.filter(s -> s.supports(propertyType))
-				.findFirst()
-				// This would be a programming error in the fallback strategy
-				.orElseThrow(() -> new AssertionError("Fallback strategy must support any leaf type"));
+		return new OnDateSpecification<>(propertyPath, targetDate);
 	}
 
 }
