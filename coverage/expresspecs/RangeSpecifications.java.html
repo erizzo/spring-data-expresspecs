@@ -116,6 +116,41 @@ public class RangeSpecifications {
 	}
 
 	/**
+	 * Creates a specification that matches entities where the specified property is less than or equal to
+	 * {@code value}, or an {@linkplain BasicSpecifications#unrestricted() unrestricted specification} if
+	 * {@code value} is {@code null}.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param &lt;C&gt;          The comparable type of the property.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param value        Value to compare against.
+	 * @see PropertyPath#from(String)
+	 */
+	public static &lt;T, C extends Comparable&lt;? super C&gt;&gt; @NonNull Specification&lt;T&gt; atMost(String propertyPath, C value) {
+<span class="fc" id="L130">		return atMost(PropertyPath.from(propertyPath), value);</span>
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property is less than or equal to
+	 * {@code value}, or an {@linkplain BasicSpecifications#unrestricted() unrestricted specification} if
+	 * {@code value} is {@code null}.
+	 *
+	 * @param &lt;T&gt;          The entity type being queried.
+	 * @param &lt;C&gt;          The comparable type of the property.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param value        Value to compare against.
+	 */
+	public static &lt;T, C extends Comparable&lt;? super C&gt;&gt; @NonNull Specification&lt;T&gt; atMost(PropertyPath propertyPath, C value) {
+<span class="fc bfc" id="L144" title="All 2 branches covered.">		if (value == null) {</span>
+<span class="fc" id="L145">			return unrestricted();</span>
+		}
+<span class="fc" id="L147">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L148">			Path&lt;C&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L149">			return cb.lessThanOrEqualTo(path, value);</span>
+		};
+	}
+
+	/**
 	 * Creates a specification that matches entities where the specified property is greater than or
 	 * equal to {@code startInclusive} and strictly less than {@code endExclusive}.
 	 *
@@ -135,7 +170,7 @@ public class RangeSpecifications {
 	 */
 	public static &lt;T, C extends Comparable&lt;? super C&gt;&gt; @NonNull Specification&lt;T&gt; between(
 			String propertyPath, C startInclusive, C endExclusive) {
-<span class="fc" id="L138">		return between(PropertyPath.from(propertyPath), startInclusive, endExclusive);</span>
+<span class="fc" id="L173">		return between(PropertyPath.from(propertyPath), startInclusive, endExclusive);</span>
 	}
 
 	/**
@@ -157,13 +192,13 @@ public class RangeSpecifications {
 	 */
 	public static &lt;T, C extends Comparable&lt;? super C&gt;&gt; @NonNull Specification&lt;T&gt; between(
 			PropertyPath propertyPath, C startInclusive, C endExclusive) {
-<span class="fc bfc" id="L160" title="All 4 branches covered.">		if (startInclusive == null || endExclusive == null) {</span>
-<span class="fc" id="L161">			throw new IllegalArgumentException(&quot;between() requires non-null bounds; use atLeast() or lessThan() for a one-sided range&quot;);</span>
+<span class="fc bfc" id="L195" title="All 4 branches covered.">		if (startInclusive == null || endExclusive == null) {</span>
+<span class="fc" id="L196">			throw new IllegalArgumentException(&quot;between() requires non-null bounds; use atLeast() or lessThan() for a one-sided range&quot;);</span>
 		}
-<span class="fc" id="L163">		Specification&lt;T&gt; afterStart = atLeast(propertyPath, startInclusive);</span>
-<span class="fc" id="L164">		Specification&lt;T&gt; beforeEnd = lessThan(propertyPath, endExclusive);</span>
+<span class="fc" id="L198">		Specification&lt;T&gt; afterStart = atLeast(propertyPath, startInclusive);</span>
+<span class="fc" id="L199">		Specification&lt;T&gt; beforeEnd = lessThan(propertyPath, endExclusive);</span>
 
-<span class="fc" id="L166">		return afterStart.and(beforeEnd);</span>
+<span class="fc" id="L201">		return afterStart.and(beforeEnd);</span>
 	}
 
 }
