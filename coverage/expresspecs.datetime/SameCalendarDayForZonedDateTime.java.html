@@ -18,10 +18,10 @@ import jakarta.persistence.criteria.Predicate;
 	@Override
 	public Predicate toPredicate(Path&lt;?&gt; path, LocalDate targetDate, CriteriaBuilder cb) {
 		@SuppressWarnings(&quot;unchecked&quot;)
-<span class="nc" id="L21">		Path&lt;ZonedDateTime&gt; typed = (Path&lt;ZonedDateTime&gt;) path;</span>
-<span class="nc" id="L22">		ZonedDateTime start = targetDate.atStartOfDay(ZoneOffset.UTC);</span>
-<span class="nc" id="L23">		ZonedDateTime end = targetDate.plusDays(1).atStartOfDay(ZoneOffset.UTC);</span>
-<span class="nc" id="L24">		return cb.and(cb.greaterThanOrEqualTo(typed, start), cb.lessThan(typed, end));</span>
+<span class="fc" id="L21">		Path&lt;ZonedDateTime&gt; typed = (Path&lt;ZonedDateTime&gt;) path;</span>
+<span class="fc" id="L22">		ZonedDateTime start = targetDate.atStartOfDay(ZoneOffset.UTC);</span>
+<span class="fc" id="L23">		ZonedDateTime end = targetDate.plusDays(1).atStartOfDay(ZoneOffset.UTC);</span>
+<span class="fc" id="L24">		return cb.and(cb.greaterThanOrEqualTo(typed, start), cb.lessThan(typed, end));</span>
 	}
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

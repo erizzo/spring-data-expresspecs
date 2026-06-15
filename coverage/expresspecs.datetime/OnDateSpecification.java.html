@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OnDateSpecification.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Data Expresspecs</a> &gt; <a href="index.source.html" class="el_package">expresspecs.datetime</a> &gt; <span class="el_source">OnDateSpecification.java</span></div><h1>OnDateSpecification.java</h1><pre class="source lang-java linenums">package expresspecs.datetime;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.domain.Specification;
+
+import expresspecs.PropertyPath;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import lombok.RequiredArgsConstructor;
+
+/**
+ * {@link Specification} that matches entities whose temporal property falls on a given calendar
+ * {@link LocalDate}.
+ *
+ * &lt;p&gt;When the specification is translated to a {@linkplain jakarta.persistence.criteria.Predicate predicate},
+ * the property path's Java type selects the first {@link SameCalendarDay} implementation that
+ * {@linkplain SameCalendarDay#supports(Class) supports} that type. Unsupported types yield
+ * {@link UnsupportedDatePropertyException} at evaluation time.
+ *
+ * &lt;p&gt;{@link DateTimeSpecifications#onDate(PropertyPath, LocalDate)} is the typical entry point: it returns
+ * an instance of this class for a non-null date, and {@link expresspecs.BasicSpecifications#unrestricted()}
+ * when the date is {@code null}. The detailed semantics per supported property type are documented on that method.
+ *
+ * @param &lt;T&gt; entity root type
+ */
+@RequiredArgsConstructor
+public final class OnDateSpecification&lt;T&gt; implements Specification&lt;T&gt; {
+
+	private static final long serialVersionUID = 1L;
+
+	// The ordering of this list is important
+<span class="fc" id="L38">	private static final List&lt;SameCalendarDay&gt; SAME_CALENDAR_DAY_STRATEGIES = List.of(</span>
+			new SameCalendarDayForLocalDate(),
+			new SameCalendarDayForSqlDate(),
+			new SameCalendarDayForInstant(),
+			new SameCalendarDayForOffsetDateTime(),
+			new SameCalendarDayForZonedDateTime(),
+			new SameCalendarDayForLocalDateTime(),
+			new SameCalendarDayForUtilDate()
+			);
+
+	private final PropertyPath propertyPath;
+	private final LocalDate targetDate;
+
+
+	/**
+	 * @throws UnsupportedDatePropertyException if the property is of a type not supported (eg, java.util.Calendar)
+	 */
+	@Override
+	public Predicate toPredicate(@NonNull Root&lt;T&gt; root, @NonNull CriteriaQuery&lt;?&gt; query, @NonNull CriteriaBuilder cb) {
+<span class="fc" id="L57">		Path&lt;?&gt; path = propertyPath.asPath(root);</span>
+<span class="fc" id="L58">		Class&lt;?&gt; javaType = path.getJavaType();</span>
+<span class="fc" id="L59">		SameCalendarDay strategy = getSameCalendarDayStrategy(javaType);</span>
+
+<span class="fc bfc" id="L61" title="All 2 branches covered.">		if (strategy == null) {</span>
+<span class="fc" id="L62">			throw new UnsupportedDatePropertyException(propertyPath, javaType, root);</span>
+		}
+
+<span class="fc" id="L65">		return strategy.toPredicate(path, targetDate, cb);</span>
+	}
+
+	private static SameCalendarDay getSameCalendarDayStrategy(Class&lt;?&gt; propertyType) {
+<span class="fc" id="L69">		return SAME_CALENDAR_DAY_STRATEGIES</span>
+<span class="fc" id="L70">				.stream()</span>
+<span class="fc" id="L71">				.filter(s -&gt; s.supports(propertyType))</span>
+<span class="fc" id="L72">				.findFirst()</span>
+<span class="fc" id="L73">				.orElse(null);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

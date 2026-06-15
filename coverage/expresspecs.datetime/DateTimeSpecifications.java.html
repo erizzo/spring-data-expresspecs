@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.List;
 
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.jspecify.annotations.NonNull;
@@ -17,7 +16,6 @@ import org.springframework.data.jpa.domain.Specification;
 import expresspecs.PropertyPath;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Path;
 import lombok.experimental.UtilityClass;
 
 /**
@@ -35,20 +33,8 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class DateTimeSpecifications {
 
-	// The ordering of this list is important
-<span class="fc" id="L39">	private static final List&lt;SameCalendarDay&gt; SAME_CALENDAR_DAY_STRATEGIES = List.of(</span>
-			new SameCalendarDayForLocalDate(),
-			new SameCalendarDayForSqlDate(),
-			new SameCalendarDayForInstant(),
-			new SameCalendarDayForOffsetDateTime(),
-			new SameCalendarDayForZonedDateTime(),
-			new SameCalendarDayForLocalDateTime(),
-			new SameCalendarDayForUtilDate(),
-			new SameCalendarDayFallback());
-
-
 	private HibernateCriteriaBuilder hibernateBuilder(CriteriaBuilder builder) {
-<span class="fc" id="L51">		return (HibernateCriteriaBuilder) builder;</span>
+<span class="fc" id="L37">		return (HibernateCriteriaBuilder) builder;</span>
 	}
 
 	/**
@@ -61,7 +47,7 @@ public class DateTimeSpecifications {
 	 * @see PropertyPath#from(String)
 	 */
 	public static &lt;T&gt; @NonNull Specification&lt;T&gt; yearIs(String propertyPath, Integer year) {
-<span class="fc" id="L64">		return yearIs(PropertyPath.from(propertyPath), year);</span>
+<span class="fc" id="L50">		return yearIs(PropertyPath.from(propertyPath), year);</span>
 	}
 
 	/**
@@ -73,12 +59,12 @@ public class DateTimeSpecifications {
 	 * @param year         The year to match.
 	 */
 	public static &lt;T&gt; @NonNull Specification&lt;T&gt; yearIs(PropertyPath propertyPath, Integer year) {
-<span class="fc bfc" id="L76" title="All 2 branches covered.">		if (year == null) {</span>
-<span class="fc" id="L77">			return unrestricted();</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">		if (year == null) {</span>
+<span class="fc" id="L63">			return unrestricted();</span>
 		}
-<span class="fc" id="L79">		return (root, query, cb) -&gt; {</span>
-<span class="fc" id="L80">			Expression&lt;Integer&gt; yearExpr = hibernateBuilder(cb).year(propertyPath.asPath(root));</span>
-<span class="fc" id="L81">			return cb.equal(yearExpr, year);</span>
+<span class="fc" id="L65">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L66">			Expression&lt;Integer&gt; yearExpr = hibernateBuilder(cb).year(propertyPath.asPath(root));</span>
+<span class="fc" id="L67">			return cb.equal(yearExpr, year);</span>
 		};
 	}
 
@@ -92,7 +78,7 @@ public class DateTimeSpecifications {
 	 * @see PropertyPath#from(String)
 	 */
 	public static &lt;T&gt; @NonNull Specification&lt;T&gt; monthIs(String propertyPath, Integer month) {
-<span class="fc" id="L95">		return monthIs(PropertyPath.from(propertyPath), month);</span>
+<span class="fc" id="L81">		return monthIs(PropertyPath.from(propertyPath), month);</span>
 	}
 
 	/**
@@ -104,12 +90,12 @@ public class DateTimeSpecifications {
 	 * @param month        The month to match (1–12).
 	 */
 	public static &lt;T&gt; @NonNull Specification&lt;T&gt; monthIs(PropertyPath propertyPath, Integer month) {
-<span class="fc bfc" id="L107" title="All 2 branches covered.">		if (month == null) {</span>
-<span class="fc" id="L108">			return unrestricted();</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">		if (month == null) {</span>
+<span class="fc" id="L94">			return unrestricted();</span>
 		}
-<span class="fc" id="L110">		return (root, query, cb) -&gt; {</span>
-<span class="fc" id="L111">			Expression&lt;Integer&gt; monthExpr = hibernateBuilder(cb).month(propertyPath.asPath(root));</span>
-<span class="fc" id="L112">			return cb.equal(monthExpr, month);</span>
+<span class="fc" id="L96">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L97">			Expression&lt;Integer&gt; monthExpr = hibernateBuilder(cb).month(propertyPath.asPath(root));</span>
+<span class="fc" id="L98">			return cb.equal(monthExpr, month);</span>
 		};
 	}
 
@@ -123,7 +109,7 @@ public class DateTimeSpecifications {
 	 * @see PropertyPath#from(String)
 	 */
 	public static &lt;T&gt; @NonNull Specification&lt;T&gt; dayOfMonthIs(String propertyPath, Integer dayOfMonth) {
-<span class="fc" id="L126">		return dayOfMonthIs(PropertyPath.from(propertyPath), dayOfMonth);</span>
+<span class="fc" id="L112">		return dayOfMonthIs(PropertyPath.from(propertyPath), dayOfMonth);</span>
 	}
 
 	/**
@@ -135,12 +121,12 @@ public class DateTimeSpecifications {
 	 * @param dayOfMonth   The day of month to match (1–31).
 	 */
 	public static &lt;T&gt; @NonNull Specification&lt;T&gt; dayOfMonthIs(PropertyPath propertyPath, Integer dayOfMonth) {
-<span class="fc bfc" id="L138" title="All 2 branches covered.">		if (dayOfMonth == null) {</span>
-<span class="fc" id="L139">			return unrestricted();</span>
+<span class="fc bfc" id="L124" title="All 2 branches covered.">		if (dayOfMonth == null) {</span>
+<span class="fc" id="L125">			return unrestricted();</span>
 		}
-<span class="fc" id="L141">		return (root, query, cb) -&gt; {</span>
-<span class="fc" id="L142">			Expression&lt;Integer&gt; dayExpr = hibernateBuilder(cb).day(propertyPath.asPath(root));</span>
-<span class="fc" id="L143">			return cb.equal(dayExpr, dayOfMonth);</span>
+<span class="fc" id="L127">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L128">			Expression&lt;Integer&gt; dayExpr = hibernateBuilder(cb).day(propertyPath.asPath(root));</span>
+<span class="fc" id="L129">			return cb.equal(dayExpr, dayOfMonth);</span>
 		};
 	}
 
@@ -155,7 +141,7 @@ public class DateTimeSpecifications {
 	 * @see PropertyPath#from(String)
 	 */
 	public static &lt;T&gt; @NonNull Specification&lt;T&gt; onDate(String propertyPath, LocalDate targetDate) {
-<span class="fc" id="L158">		return onDate(PropertyPath.from(propertyPath), targetDate);</span>
+<span class="fc" id="L144">		return onDate(PropertyPath.from(propertyPath), targetDate);</span>
 	}
 
 	/**
@@ -177,35 +163,24 @@ public class DateTimeSpecifications {
 	 *   &lt;li&gt;{@link LocalDateTime}: half-open range using {@linkplain LocalDate#atStartOfDay() start of day}
 	 *   through the following midnight in the &lt;em&gt;same&lt;/em&gt; {@link LocalDateTime} calendar (no zone
 	 *   conversion).&lt;/li&gt;
-	 *   &lt;li&gt;Other types: half-open range using {@link LocalDateTime} bounds
-	 *   {@code targetDate.atStartOfDay()} (inclusive) through {@code targetDate.plusDays(1).atStartOfDay()}
-	 *   (exclusive). The property is compared to those bound values; the effective filter depends on the
-	 *   JPA provider and how JDBC coerces {@link LocalDateTime} to the mapped column type.&lt;/li&gt;
+	 *   &lt;li&gt;Any other leaf property type: {@link UnsupportedDatePropertyException} (a subtype of
+	 *   {@link IllegalArgumentException}) when the specification is evaluated, because {@code onDate}
+	 *   does not define calendar-day semantics for that type.&lt;/li&gt;
 	 * &lt;/ul&gt;
 	 *
 	 * @param &lt;T&gt;          The entity type being queried.
 	 * @param propertyPath Resolved property path to compare.
 	 * @param targetDate   The date to match.
+	 * @throws UnsupportedDatePropertyException if the leaf property type is not one of the supported temporal types
+	 * (see list in this method's description). When the specification is run through Spring Data JPA,
+	 * this exception may be wrapped in a {@link org.springframework.dao.DataAccessException}.
 	 */
 	public static &lt;T&gt; @NonNull Specification&lt;T&gt; onDate(PropertyPath propertyPath, LocalDate targetDate) {
-<span class="fc bfc" id="L191" title="All 2 branches covered.">		if (targetDate == null) {</span>
-<span class="fc" id="L192">			return unrestricted();</span>
+<span class="fc bfc" id="L179" title="All 2 branches covered.">		if (targetDate == null) {</span>
+<span class="fc" id="L180">			return unrestricted();</span>
 		}
 
-<span class="fc" id="L195">		return (root, query, cb) -&gt; {</span>
-<span class="fc" id="L196">			Path&lt;?&gt; path = propertyPath.asPath(root);</span>
-<span class="fc" id="L197">			Class&lt;?&gt; javaType = path.getJavaType();</span>
-<span class="fc" id="L198">			return getSameCalendarDayStrategy(javaType).toPredicate(path, targetDate, cb);</span>
-		};
-	}
-
-	private static SameCalendarDay getSameCalendarDayStrategy(Class&lt;?&gt; propertyType) {
-<span class="fc" id="L203">		return SAME_CALENDAR_DAY_STRATEGIES</span>
-<span class="fc" id="L204">				.stream()</span>
-<span class="fc" id="L205">				.filter(s -&gt; s.supports(propertyType))</span>
-<span class="fc" id="L206">				.findFirst()</span>
-				// This would be a programming error in the fallback strategy
-<span class="pc" id="L208">				.orElseThrow(() -&gt; new AssertionError(&quot;Fallback strategy must support any leaf type&quot;));</span>
+<span class="fc" id="L183">		return new OnDateSpecification&lt;&gt;(propertyPath, targetDate);</span>
 	}
 
 }
