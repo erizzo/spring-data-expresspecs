@@ -167,7 +167,7 @@ public interface OnDateTypeCoverageTests extends DataIntegrationTest<Customer> {
 	}
 
 	@Test
-	default void onDate_Fallback_throwsIllegalArgumentException() {
+	default void onDate_UndupportedPropertyType() {
 		Calendar dec3 = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		dec3.set(2007, Calendar.DECEMBER, 3, 10, 15, 30);
 		dec3.set(Calendar.MILLISECOND, 0);
@@ -179,10 +179,11 @@ public interface OnDateTypeCoverageTests extends DataIntegrationTest<Customer> {
 
 		assertThatThrownBy(() -> getSocialiteRepo().findAll(spec))
 				.isInstanceOf(DataAccessException.class)
-				.hasCauseInstanceOf(IllegalArgumentException.class)
+				.hasCauseInstanceOf(UnsupportedDatePropertyException.class)
 				.cause()
 				.hasMessageContaining("java.util.Calendar")
-				.hasMessageContaining("DateTimeSpecifications.onDate");
+				.hasMessageContaining(Socialite.class.getSimpleName())
+				.hasMessageContaining(Socialite.Fields.javaUtilCalendar);
 	}
 
 	/**

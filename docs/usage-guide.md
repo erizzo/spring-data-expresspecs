@@ -227,7 +227,6 @@ Specification<Customer> spec = isNotNullOrEmpty(Customer.Fields.name);
 > condition another way (for example, checking only `isNotNull`, since Oracle cannot store an
 > empty string and a non-null column value is therefore guaranteed to be non-empty).
 
-
 ### Range & DateTime Specifications
 
 For numbers, dates, and comparisons.
@@ -263,7 +262,7 @@ Specification<Customer> spec = yearIs(Customer.Fields.createdTimestamp, 2024);
 | `java.util.Date` / `java.sql.Timestamp` | UTC half-open range (same UTC window, compared as `java.util.Date`)                                  |
 | `LocalDateTime`                         | Wall-clock half-open range: `[targetDate at midnight, targetDate+1 at midnight)`, no zone conversion |
 
-Any other mapped Java type causes `IllegalArgumentException` when the specification runs (for example `java.util.Calendar`).
+Any other mapped Java type causes an runtime exception when the specification predicate is evaluated (for example `java.util.Calendar`).
 
 **Date-only types** (`LocalDate`, `java.sql.Date`) use a simple equality check because the stored value already represents just a calendar date.
 

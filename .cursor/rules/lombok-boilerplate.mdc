@@ -1,0 +1,21 @@
+---
+description: Prefer Lombok for constructors, getters, and setters instead of hand-written boilerplate
+alwaysApply: true
+---
+
+# Lombok over hand-written accessors and constructors
+
+When adding or editing Java types in this repository, **prefer Lombok** to generate repetitive members instead of spelling them out in source.
+
+**Use Lombok for**
+
+- **Getters and setters:** `@Getter`, `@Setter` (type or field level), or `@Data` / `@Value` when the rest of the bundle matches the design.
+- **Constructors:** `@RequiredArgsConstructor`, `@NoArgsConstructor`, `@AllArgsConstructor`, or `@Builder` (with `@Builder.Default` where needed) instead of manual constructor bodies that only assign fields.
+
+**When explicit code is still appropriate**
+
+- Logic in a constructor (validation, copying defensively, computing fields).
+- `record` types: rely on the compact canonical constructor and built-in accessors; do not duplicate accessors with Lombok unless there is a clear need.
+- Members Lombok cannot express, or APIs that must stay stable and are intentionally hand-written.
+
+After introducing or changing Lombok annotations on a type, ensure the project still compiles (`jdt problems` or `./mvnw clean test` as appropriate).

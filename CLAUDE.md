@@ -95,3 +95,5 @@ If the code on disk **differs** from what you remember or expected, **do not ass
 ## Style rules
 
 **No em dashes:** Do not use the em dash character (U+2014, `—`) anywhere: documentation, Markdown files, Javadoc, or code comments (`//`, `/* */`, `/** */`). Use a comma, colon, semicolon, parentheses, or a hyphen with spaces instead.
+
+**Lombok:** Prefer Lombok (`@Getter`, `@Setter`, `@RequiredArgsConstructor`, `@NoArgsConstructor`, `@AllArgsConstructor`, `@Builder`, `@Data`, `@Value`, etc.) to generate constructors, getters, and setters instead of hand-written boilerplate. Keep explicit constructors when they contain real logic (validation, defensive copies). For `record` types, use the language features instead of duplicating accessors with Lombok unless there is a clear need.

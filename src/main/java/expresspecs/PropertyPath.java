@@ -7,6 +7,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import jakarta.persistence.criteria.From;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Path;
@@ -122,6 +124,11 @@ public record PropertyPath(List<String> properties) {
 	 */
 	public static <X, Y, E, W> PropertyPath of(SingularAttribute<X, Y> first, PluralAttribute<Y, ?, E> second, Attribute<E, W> third) {
 		return new PropertyPath(List.of(first.getName(), second.getName(), third.getName()));
+	}
+
+	@Override
+	public String toString() {
+		return StringUtils.join(properties, '.');
 	}
 
 	@SuppressWarnings("unchecked")
