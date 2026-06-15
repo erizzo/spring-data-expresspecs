@@ -58,6 +58,18 @@ class RangeSpecificationsTests {
 	}
 
 	@Test
+	void atMost_NullValue_ReturnsUnrestricted() {
+		Specification<Object> result = RangeSpecifications.atMost("price", null);
+		assertThat(result).isUnrestricted();
+	}
+
+	@Test
+	void atMost_NullValue_PropertyPath_ReturnsUnrestricted() {
+		Specification<Object> result = RangeSpecifications.atMost(PropertyPath.from("price"), null);
+		assertThat(result).isUnrestricted();
+	}
+
+	@Test
 	void between_NullStart_ThrowsIllegalArgument() {
 		assertThatIllegalArgumentException()
 				.isThrownBy(() -> RangeSpecifications.between("price", null, 100));

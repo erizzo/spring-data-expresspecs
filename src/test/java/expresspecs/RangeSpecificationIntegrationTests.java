@@ -41,6 +41,24 @@ public interface RangeSpecificationIntegrationTests extends BaseIntegrationTest<
 	}
 
 	@Test
+	default void atMost() {
+		var atLimit = Customer.builder()
+						.creditLimit(1000)
+						.build();
+		atLimit = persistAndFlush(atLimit);
+
+		var overLimit = Customer.builder()
+						.creditLimit(1001)
+						.build();
+		overLimit = persistAndFlush(overLimit);
+
+		Specification<Customer> spec = RangeSpecifications.atMost(Customer.Fields.creditLimit, 1000);
+		List<Customer> results = getRepo().findAll(spec);
+
+		assertThat(results).containsExactly(atLimit);
+	}
+
+	@Test
 	default void between() {
 		var bigSpender = Customer.builder()
 						.creditLimit(10000)

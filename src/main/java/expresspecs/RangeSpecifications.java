@@ -116,6 +116,41 @@ public class RangeSpecifications {
 	}
 
 	/**
+	 * Creates a specification that matches entities where the specified property is less than or equal to
+	 * {@code value}, or an {@linkplain BasicSpecifications#unrestricted() unrestricted specification} if
+	 * {@code value} is {@code null}.
+	 *
+	 * @param <T>          The entity type being queried.
+	 * @param <C>          The comparable type of the property.
+	 * @param propertyPath Dot-delimited property path to compare.
+	 * @param value        Value to compare against.
+	 * @see PropertyPath#from(String)
+	 */
+	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> atMost(String propertyPath, C value) {
+		return atMost(PropertyPath.from(propertyPath), value);
+	}
+
+	/**
+	 * Creates a specification that matches entities where the specified property is less than or equal to
+	 * {@code value}, or an {@linkplain BasicSpecifications#unrestricted() unrestricted specification} if
+	 * {@code value} is {@code null}.
+	 *
+	 * @param <T>          The entity type being queried.
+	 * @param <C>          The comparable type of the property.
+	 * @param propertyPath Resolved property path to compare.
+	 * @param value        Value to compare against.
+	 */
+	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> atMost(PropertyPath propertyPath, C value) {
+		if (value == null) {
+			return unrestricted();
+		}
+		return (root, query, cb) -> {
+			Path<C> path = propertyPath.asPath(root);
+			return cb.lessThanOrEqualTo(path, value);
+		};
+	}
+
+	/**
 	 * Creates a specification that matches entities where the specified property is greater than or
 	 * equal to {@code startInclusive} and strictly less than {@code endExclusive}.
 	 *
