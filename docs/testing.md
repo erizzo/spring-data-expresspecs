@@ -4,7 +4,7 @@ This document describes how tests are organized, how to run them (including Test
 
 ## Spring Boot 3 and 4 compatibility
 
-This library supports both **Spring Boot 3.5** and **Spring Boot 4.0** from a single codebase. The production code depends only on the JPA Criteria API and Spring Data JPA's `Specification` interface, APIs that are identical across both Spring Boot versions. No version-specific code is needed at runtime.
+This library supports **Spring Boot 3.5**, **4.0**, and **4.1** from a single codebase. The production code depends only on the JPA Criteria API and Spring Data JPA's `Specification` interface, APIs that are identical across all supported Spring Boot versions. No version-specific code is needed at runtime.
 
 The challenge is in the **test infrastructure**. Spring Boot 4 relocated several key test classes (like `@DataJpaTest`) to new packages.
 
@@ -28,6 +28,8 @@ src/
 - `sb3`: uses Spring Boot 3.5, adds `src/test/springboot3/java`
 - `tc`: adds Testcontainers dependencies and `src/test/containers/java`; **SB4 only** (see below)
 - `oracle`: adds the Oracle Free Testcontainers module and `src/test/containers-oracle/java`; must be combined with `tc`; **SB4 only**
+
+**Spring Boot 4.1 compatibility** is verified in CI by overriding the `sb4` profile's version property on the command line (`-Dspring-boot.version=4.1.0`). No separate Maven profile or source tree is needed since the Spring Boot 4.0-to-4.1 migration introduces no API-level changes relevant to this library.
 
 **Common test code** (`src/test/java`) contains abstract base test classes (e.g., `BaseJPAIntegrationTest`), entities, and an `EntityManagerWrapper`.
 Date/time specification factories and their tests live under `expresspecs.datetime` (`src/main/java/expresspecs/datetime/`, `src/test/java/expresspecs/datetime/`).

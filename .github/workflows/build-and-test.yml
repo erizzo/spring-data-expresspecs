@@ -24,7 +24,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        profile: [sb4, sb3]
+        # Each leg builds one profile. The optional `spring-boot-version` entry
+        # pins a specific Spring Boot version via a command-line property override
+        # (which wins over the profile-defined property in the POM), letting us run
+        # a Spring Boot 4.x compatibility check without committing a separate profile.
+        # The unpinned sb4 leg tracks whatever the POM default is.
+        include:
+          - profile: sb4
+          - profile: sb3
+          - profile: sb4
+            spring-boot-version: '4.1.0'
 
     steps:
     - uses: actions/checkout@v4
@@ -35,8 +44,8 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Build with Maven (${{ matrix.profile }})
-      run: ./mvnw -B --no-transfer-progress package -P${{ matrix.profile }}
+    - name: Build with Maven (${{ matrix.profile }}${{ matrix.spring-boot-version && format(', Spring Boot {0}', matrix.spring-boot-version) || '' }})
+      run: ./mvnw -B --no-transfer-progress package -P${{ matrix.profile }} ${{ matrix.spring-boot-version && format('-Dspring-boot.version={0}', matrix.spring-boot-version) || '' }}
 
   # Testcontainers against PostgreSQL, MySQL, MariaDB, and SQL Server (Docker on the runner).
   # Split from the main build matrix so PRs still get fast sb3/sb4 package checks without

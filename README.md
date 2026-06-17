@@ -146,7 +146,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long>, JpaSp
 
 ### Compatibility
 
-**Spring Boot:** Supports Spring Boot 3.5 and 4.0.
+**Spring Boot:** Supports Spring Boot 3.5, 4.0, and 4.1. CI verifies all three versions (H2 integration tests) on every build.
 
 **Databases:** This library uses only standard JPA Criteria API and Hibernate, so it's compatible with any database that Hibernate supports (not only the ones
 listed below). This table shows what databases the code is *actively verified against* (using [Testcontainers](https://testcontainers.com/)) using the full test
