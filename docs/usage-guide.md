@@ -16,6 +16,7 @@ This guide covers setup, compatibility, typing options, factory usage, edge case
     - [`onDate` behavior by property type](#ondate-behavior-by-property-type)
   - [Collection Specifications](#collection-specifications)
 - [Streamlining Optional Filters](#streamlining-optional-filters)
+- [Returning Projections](#returning-projections)
 - [The Magic of `smartDistinct`](#the-magic-of-smartdistinct)
 - [Complete Example Source Code](#complete-example-source-code)
 
@@ -334,6 +335,67 @@ public Page<Customer> findSpecialCustomers(Set<String> zipCodes, Integer minCred
 > [!NOTE]
 > Most factory methods behave this way, though there are a few exceptions. Consult the Javadoc on each method for details.
 
+## Returning Projections
+
+Sometimes you do not want full entities back, just a few fields shaped into a lightweight DTO or interface view. Spring Data's `JpaSpecificationExecutor` supports this through its `findBy(Specification, queryFunction)` method: the first argument is your Specification (the `WHERE` clause), and the second is a function that shapes the result, including projecting each matching row to a different type.
+
+Written by hand, that second argument is a noisy lambda over Spring Data's fluent query API:
+
+```java
+List<CustomerDTO> dtos = repository.findBy(isActive(), q -> q.as(CustomerDTO.class).all());
+```
+
+`SpecificationProjections` supplies ready-made query functions so the call reads as a phrase instead. This is the one part of the library that shapes results rather than building predicates:
+
+```java
+import static expresspecs.SpecificationProjections.*;
+
+List<CustomerDTO> dtos = repository.findBy(isActive(), projectedAs(CustomerDTO.class));
+```
+
+The factory mirrors the most common terminal operations of the fluent query. The plain `projectedAs` forms cover the common multi-result cases; the rarer single-result and streaming cases carry an explicit prefix:
+
+| Function                      | Returns          | Use when                                          |
+| ----------------------------- | ---------------- | ------------------------------------------------- |
+| `projectedAs(Type)`           | `List<Type>`     | you want all matches                              |
+| `projectedAs(Type, Pageable)` | `Page<Type>`     | you want a page, with the usual paging metadata   |
+| `oneProjectedAs(Type)`        | `Optional<Type>` | at most one row matches (throws if more than one) |
+| `firstProjectedAs(Type)`      | `Optional<Type>` | several may match and you want the first          |
+| `streamProjectedAs(Type)`     | `Stream<Type>`   | you want to stream results lazily                 |
+
+`streamProjectedAs` returns a `Stream` backed by an open result set, so consume it within the surrounding transaction and close it (for example with a try-with-resources block).
+
+A typical paged service method:
+
+```java
+public Page<CustomerDTO> getActiveCustomers(Pageable page) {
+    return repository.findBy(isActive(), projectedAs(CustomerDTO.class, page));
+}
+```
+
+The projected type can be a plain class (DTO) or an interface projection; both are supported by Spring Data's `.as(...)`.
+
+
+
+There are some limitations/characteristics of Spring Data's projection support itself to be aware of; these are not specific to `SpecificationProjections` or the query functions it provides; they apply to any projection used with `findBy`, no matter how you build the query function:
+
+> [!NOTE]
+> A **class-based DTO** binds result columns to its constructor parameters *by name*, which requires
+> compiling with the `-parameters` flag (`<parameters>true</parameters>` on the Maven compiler
+> plugin, which is the Spring Boot default). Without it, the projection fails at runtime with
+> `ConverterNotFoundException`. Java `record` types and interface projections are unaffected, since
+> they carry their component/accessor names regardless.
+
+> [!NOTE]
+> A class or record DTO projection is **flat**: it maps the root entity's own columns. To project
+> fields from an *associated* entity (for example `customer.address.zipCode`), use an interface
+> projection, which can traverse associations, either by returning a nested projection interface or
+> by flattening with `@Value("#{target.address.zipCode}")`.
+
+
+
+For all available functions and their descriptions, see [SpecificationProjections.java](../src/main/java/expresspecs/SpecificationProjections.java).
+
 ## The Magic of `smartDistinct`
 
 When you join across a `OneToMany` collection (like searching for a `Customer` who has `orders` placed after a certain date), JPA will often return duplicate `Customer` rows. 
@@ -366,3 +428,4 @@ To see a complete, fully working example of how all these pieces fit together, c
 - **Repository:** [CustomerRepository.java](../src/test/java/expresspecs/example/CustomerRepository.java)
 - **DSL Factory:** [CustomerSpecifications.java](../src/test/java/expresspecs/example/CustomerSpecifications.java)
 - **Service Layer:** [CustomersService.java](../src/test/java/expresspecs/example/CustomersService.java)
+- **Projection DTO:** [CustomerDTO.java](../src/test/java/expresspecs/example/CustomerDTO.java)

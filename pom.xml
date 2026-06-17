@@ -120,6 +120,16 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
+                    <!--
+                        Retain method/constructor parameter names in the bytecode. Spring Data's
+                        class-based DTO projections (e.g. findBy(spec, q -> q.as(SomeDto.class)...))
+                        bind result columns to constructor parameters by name. Since Spring Framework
+                        6.1 removed LocalVariableTableParameterNameDiscoverer, those names are only
+                        available when compiled with -parameters; without this, such projections fail
+                        with ConverterNotFoundException. Records are unaffected (they carry component
+                        names regardless), but plain class DTOs require this flag.
+                    -->
+                    <parameters>true</parameters>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
