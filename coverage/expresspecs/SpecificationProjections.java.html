@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SpecificationProjections.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Data Expresspecs</a> &gt; <a href="index.source.html" class="el_package">expresspecs</a> &gt; <span class="el_source">SpecificationProjections.java</span></div><h1>SpecificationProjections.java</h1><pre class="source lang-java linenums">package expresspecs;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor.SpecificationFluentQuery;
+
+/**
+ * Factory methods for the projection function argument of
+ * {@code JpaSpecificationExecutor.findBy(Specification, Function)}. Where the rest of this library
+ * expresses the {@code WHERE} clause as a {@link org.springframework.data.jpa.domain.Specification},
+ * these helpers express how the matching rows are projected and shaped into results, replacing the
+ * noisy fluent-query lambda with a single call that reads as a phrase.
+ */
+<span class="nc" id="L20">public class SpecificationProjections {</span>
+
+	/**
+	 * Builds a query function that returns all matching entities projected as the given type,
+	 * for use with {@code JpaSpecificationExecutor.findBy(Specification, Function)}.
+	 * &lt;p&gt;
+	 * The projection type may be a DTO (closed projection bound by constructor arguments) or an
+	 * interface (open projection), as supported by Spring Data's
+	 * {@link SpecificationFluentQuery#as(Class)}. This lets callers fetch only the columns they need
+	 * instead of full entities, without writing a separate query method.
+	 * &lt;/p&gt;
+	 * &lt;b&gt;Example:&lt;/b&gt;
+	 *
+	 * &lt;pre&gt;{@code
+	 * List&lt;CustomerDTO&gt; dtos = repository.findBy(isActive(), projectedAs(CustomerDTO.class));
+	 * }&lt;/pre&gt;
+	 *
+	 * @param &lt;EntityType&gt; the entity type the underlying query operates on.
+	 * @param &lt;ProjectedType&gt; the type each result is projected into.
+	 * @param projectedType the class to project each matching entity into.
+	 * @return a function that, given the fluent query, returns the projected results as a {@link List}.
+	 */
+	public static &lt;EntityType, ProjectedType&gt; @NonNull Function&lt;SpecificationFluentQuery&lt;EntityType&gt;, List&lt;ProjectedType&gt;&gt; projectedAs(@NonNull Class&lt;ProjectedType&gt; projectedType) {
+<span class="nc" id="L43">		return q -&gt; q.as(projectedType).all();</span>
+	}
+
+	/**
+	 * Builds a query function that returns a page of matching entities projected as the given type,
+	 * for use with {@code JpaSpecificationExecutor.findBy(Specification, Function)}.
+	 * &lt;p&gt;
+	 * This is the paged and sorted counterpart of {@link #projectedAs(Class)}. The supplied
+	 * {@link Pageable} controls page size, offset, and sort order, and the result carries the usual
+	 * pagination metadata. The projection type may be a DTO or an interface, as supported by Spring
+	 * Data's {@link SpecificationFluentQuery#as(Class)}.
+	 * &lt;/p&gt;
+	 * &lt;b&gt;Example:&lt;/b&gt;
+	 *
+	 * &lt;pre&gt;{@code
+	 * Page&lt;CustomerDTO&gt; dtos = repository.findBy(isActive(), projectedAs(CustomerDTO.class, pageable));
+	 * }&lt;/pre&gt;
+	 *
+	 * @param &lt;EntityType&gt; the entity type the underlying query operates on.
+	 * @param &lt;ProjectedType&gt; the type each result is projected into.
+	 * @param projectedType the class to project each matching entity into.
+	 * @param page the paging and sorting information to apply.
+	 * @return a function that, given the fluent query, returns the projected results as a {@link Page}.
+	 */
+	public static &lt;EntityType, ProjectedType&gt; @NonNull Function&lt;SpecificationFluentQuery&lt;EntityType&gt;, Page&lt;ProjectedType&gt;&gt; projectedAs(@NonNull Class&lt;ProjectedType&gt; projectedType, @NonNull Pageable page) {
+<span class="fc" id="L68">		return q -&gt; q.as(projectedType).page(page);</span>
+	}
+
+	/**
+	 * Builds a query function that returns the single matching entity projected as the given type,
+	 * for use with {@code JpaSpecificationExecutor.findBy(Specification, Function)}.
+	 * &lt;p&gt;
+	 * The projection type may be a DTO or an interface, as supported by Spring Data's
+	 * {@link SpecificationFluentQuery#as(Class)}. The result is empty when nothing matches; an
+	 * exception is thrown when more than one row matches.
+	 * &lt;/p&gt;
+	 * &lt;b&gt;Example:&lt;/b&gt;
+	 *
+	 * &lt;pre&gt;{@code
+	 * Optional&lt;CustomerDTO&gt; dto = repository.findBy(hasEmail(email), oneProjectedAs(CustomerDTO.class));
+	 * }&lt;/pre&gt;
+	 *
+	 * @param &lt;EntityType&gt; the entity type the underlying query operates on.
+	 * @param &lt;ProjectedType&gt; the type the result is projected into.
+	 * @param projectedType the class to project the matching entity into.
+	 * @return a function that, given the fluent query, returns the single projected result as an {@link Optional}.
+	 */
+	public static &lt;EntityType, ProjectedType&gt; @NonNull Function&lt;SpecificationFluentQuery&lt;EntityType&gt;, Optional&lt;ProjectedType&gt;&gt; oneProjectedAs(@NonNull Class&lt;ProjectedType&gt; projectedType) {
+<span class="fc" id="L91">		return q -&gt; q.as(projectedType).one();</span>
+	}
+
+	/**
+	 * Builds a query function that returns the first matching entity projected as the given type,
+	 * for use with {@code JpaSpecificationExecutor.findBy(Specification, Function)}.
+	 * &lt;p&gt;
+	 * Unlike {@link #oneProjectedAs(Class)}, this tolerates multiple matches and returns the first,
+	 * so it is typically paired with a sort. The projection type may be a DTO or an interface, as
+	 * supported by Spring Data's {@link SpecificationFluentQuery#as(Class)}. The result is empty when
+	 * nothing matches.
+	 * &lt;/p&gt;
+	 * &lt;b&gt;Example:&lt;/b&gt;
+	 *
+	 * &lt;pre&gt;{@code
+	 * Optional&lt;CustomerDTO&gt; dto = repository.findBy(isActive(), firstProjectedAs(CustomerDTO.class));
+	 * }&lt;/pre&gt;
+	 *
+	 * @param &lt;EntityType&gt; the entity type the underlying query operates on.
+	 * @param &lt;ProjectedType&gt; the type the result is projected into.
+	 * @param projectedType the class to project the matching entity into.
+	 * @return a function that, given the fluent query, returns the first projected result as an {@link Optional}.
+	 */
+	public static &lt;EntityType, ProjectedType&gt; @NonNull Function&lt;SpecificationFluentQuery&lt;EntityType&gt;, Optional&lt;ProjectedType&gt;&gt; firstProjectedAs(@NonNull Class&lt;ProjectedType&gt; projectedType) {
+<span class="fc" id="L115">		return q -&gt; q.as(projectedType).first();</span>
+	}
+
+	/**
+	 * Builds a query function that returns the matching entities projected as the given type as a
+	 * lazily-evaluated {@link Stream}, for use with
+	 * {@code JpaSpecificationExecutor.findBy(Specification, Function)}.
+	 * &lt;p&gt;
+	 * The projection type may be a DTO or an interface, as supported by Spring Data's
+	 * {@link SpecificationFluentQuery#as(Class)}. The returned stream is backed by an open result set
+	 * and must be consumed within the surrounding transaction and closed when done, for example with
+	 * a try-with-resources block.
+	 * &lt;/p&gt;
+	 * &lt;b&gt;Example:&lt;/b&gt;
+	 *
+	 * &lt;pre&gt;{@code
+	 * try (Stream&lt;CustomerDTO&gt; dtos = repository.findBy(isActive(), streamProjectedAs(CustomerDTO.class))) {
+	 *     dtos.forEach(...);
+	 * }
+	 * }&lt;/pre&gt;
+	 *
+	 * @param &lt;EntityType&gt; the entity type the underlying query operates on.
+	 * @param &lt;ProjectedType&gt; the type each result is projected into.
+	 * @param projectedType the class to project each matching entity into.
+	 * @return a function that, given the fluent query, returns the projected results as a {@link Stream}.
+	 */
+	public static &lt;EntityType, ProjectedType&gt; @NonNull Function&lt;SpecificationFluentQuery&lt;EntityType&gt;, Stream&lt;ProjectedType&gt;&gt; streamProjectedAs(@NonNull Class&lt;ProjectedType&gt; projectedType) {
+<span class="fc" id="L142">		return q -&gt; q.as(projectedType).stream();</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
