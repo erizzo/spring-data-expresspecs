@@ -38,19 +38,20 @@ public Specification<Customer> hasZipCodeOrMinCredit(List<String> zipCodes, int 
         Predicate active = cb.isTrue(root.get("isActive"));
         Predicate highCredit = cb.greaterThan(root.get("creditLimit"), minCredit);
         Predicate zipBranch;
-        
+
         if (CollectionUtils.isEmpty(zipCodes)) {
           // IN () is undefined / false; OR reduces to credit branch only
           zipBranch = cb.disjunction();
         } else {
           zipBranch = address.get("zipCode").in(zipCodes);
         }
-        
+
         Predicate orPart = cb.or(zipBranch, highCredit);
         return cb.and(orPart, active);
     };
 }
 ```
+
 *A contrived example, but you get the point.*
 
 ## We Can Do Better
@@ -84,6 +85,32 @@ and sits entirely in your own codebase. See the [Usage Guide](docs/usage-guide.m
 - **Type-safe & Composable:** Create a domain-specific vocabulary of reusable query fragments.
 - **Spring Boot 3 & 4 Compatible:** A single, consistent API that works seamlessly across major Spring Boot versions.
 - **Smart Distinct:** Avoids the tricky Spring Data pagination `count` bugs by only applying `DISTINCT` when a Join is present and it is safe to do so.
+
+## ExpresSpecs vs. Querydsl
+
+[Querydsl](https://querydsl.com) is the most well-known alternative for type-safe dynamic queries with Spring Data JPA, so it's worth being clear about how ExpresSpecs differs and where each one fits.
+
+Querydsl is a full query DSL. An annotation processor generates `Q`-types, a static metamodel for your entities, and you write entire queries, including joins, projections, subqueries, grouping, and ordering, against that metamodel with compile-time checking of the whole query shape. That's a real investment (build-time code generation, a generated source tree to manage), but it pays off for applications with complex reporting-style queries, DTO projections, or query needs that go well beyond a `WHERE` clause.
+
+ExpresSpecs is intentionally narrower. It generates no code and introduces no metamodel; it's a set of static factory methods that build standard Spring Data `Specification` objects, which are themselves just `CriteriaBuilder` predicates under the hood. It targets the single most common pain point: applications with search/filter screens that need to combine many optional criteria, often across relationships, into a `WHERE` clause.
+
+**Choose ExpresSpecs when:**
+
+- Your queries are primarily filtering: combining a handful of optional criteria (equality, ranges, text search, null checks, collection membership) over one or two entity graphs.
+- You're already using, or willing to use, Spring Data's `Specification` / `JpaSpecificationExecutor`, and just want to stop writing `CriteriaBuilder` boilerplate.
+- You'd rather not add an annotation processor or generated source step to your build.
+- You want a small, focused dependency you can drop into an existing repository method.
+
+**Choose Querydsl when:**
+
+- You need complex projections, such as aggregations, computed columns, or DTOs assembled from multiple joined entities, as first-class parts of the query*.
+- You need subqueries, grouping/aggregation, or dynamic ordering as first-class parts of the query.
+- You want the entire query, not just the predicate, checked at compile time against your schema.
+- Your application's query needs go meaningfully beyond filtering.
+
+The two aren't mutually exclusive: it's reasonable to use ExpresSpecs for filter-building in most repositories and reach for Querydsl (or plain JPQL/native queries) for the handful of reporting-style queries that need more.
+
+*Note that simple DTO/interface projections don't require Querydsl: Spring Data JPA  `JpaSpecificationExecutor` provides `findBy(Specification, queryFunction)` method. Class `SpecificationProjections` provides common, basic query functions that can be used with that method to maintain expressive, simple syntax when projecting. See [Returning Projections](docs/usage-guide.md#returning-projections) in the Usage Guide for details.
 
 ## Getting Started
 
@@ -125,13 +152,13 @@ public interface CustomerRepository extends JpaRepository<Customer, Long>, JpaSp
 listed below). This table shows what databases the code is *actively verified against* (using [Testcontainers](https://testcontainers.com/)) using the full test
 suite on every build:
 
-| Database | Testcontainers Image |
-|---|---|
-| PostgreSQL | `postgres:17-alpine` |
-| MySQL | `mysql:8.4` |
-| MariaDB | `mariadb:11.4` |
+| Database             | Testcontainers Image                         |
+| -------------------- | -------------------------------------------- |
+| PostgreSQL           | `postgres:17-alpine`                         |
+| MySQL                | `mysql:8.4`                                  |
+| MariaDB              | `mariadb:11.4`                               |
 | Microsoft SQL Server | `mcr.microsoft.com/mssql/server:2022-latest` |
-| Oracle | `gvenzl/oracle-free:23-slim-faststart` |
+| Oracle               | `gvenzl/oracle-free:23-slim-faststart`       |
 
 If you want to run the test suite against a different database version, these images can be overridden. See [Overriding Testcontainers images](docs/testing.md#overriding-testcontainers-images) in docs/testing.md for details.
 

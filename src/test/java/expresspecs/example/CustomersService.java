@@ -4,17 +4,21 @@ import static expresspecs.BasicSpecifications.isAny;
 import static expresspecs.BasicSpecifications.isTrue;
 import static expresspecs.BasicSpecifications.where;
 import static expresspecs.RangeSpecifications.atLeast;
+import static expresspecs.SpecificationProjections.projectedAs;
 import static expresspecs.StringSpecifications.containsIgnoreCase;
 import static expresspecs.example.CustomerSpecifications.hasAnyOrders;
 import static expresspecs.example.CustomerSpecifications.isActive;
 import static expresspecs.example.CustomerSpecifications.nameContainsIgnoreCase;
 import java.util.List;
-
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import expresspecs.BasicSpecifications;
+import expresspecs.SpecificationProjections;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -58,5 +62,17 @@ public class CustomersService {
 							isActive()
 							.and(nameContainsIgnoreCase(partialName))
 							.and(hasAnyOrders()));
+	}
+
+	/**
+	 * Returns a page of active customers as DTOs. This method demonstrates two things:
+	 * <ul>
+	 *   <li>Using the {@link SpecificationProjections#projectedAs(Class, Pageable)} helper to return a projection instead
+	 *   of the entities.</li>
+	 *   <li>Paging and sorting with Specifications.
+	 * </ul>
+	 */
+	public Page<CustomerDTO> getActiveCustomers(@NonNull Pageable page) {
+		return repository.findBy(isActive(), projectedAs(CustomerDTO.class, page));
 	}
 }
