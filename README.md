@@ -125,14 +125,14 @@ includes a runnable example you can follow.
 <dependency>
     <groupId>com.rizzoweb</groupId>
     <artifactId>spring-data-expresspecs</artifactId>
-    <version>0.1</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 
 **Gradle:**
 
 ```groovy
-implementation 'com.rizzoweb:spring-data-expresspecs:0.1'
+implementation 'com.rizzoweb:spring-data-expresspecs:0.2.0'
 ```
 
 ### Your JPA Repository
