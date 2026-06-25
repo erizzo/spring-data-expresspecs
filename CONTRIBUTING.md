@@ -1,27 +1,42 @@
 # Contributing
 
-The production API is compatible with both Spring Boot 3.5 and 4; however the _tests_ use Maven profiles and separate
-test source trees. For details about the profiles, directory layout, Testcontainers, and what runs in CI, see **[docs/testing.md](docs/testing.md)**.
+Thanks for your interest in improving Spring Data ExpresSpecs! Contributions of all kinds are welcome: bug reports, documentation fixes, new Specification factory methods, and tests.
 
-### Publishing a Release to Maven Central
+## Reporting issues
 
-1. **Update the version**: in `pom.xml`, change `<version>` from `x.y.z-SNAPSHOT` to the release version (e.g. `0.1.0`). Commit and push.
-2. **Create a GitHub Release**: in the GitHub UI, create a new release targeting that commit. Name the tag `v0.1.0` (matching the POM version) and publish it.
-3. **CI publishes automatically**: the release workflow imports the GPG key, signs all artifacts, and deploys to Maven Central. Monitor progress in the Actions tab and at [central.sonatype.com](https://central.sonatype.com).
-4. **Bump to next snapshot**: after the release is confirmed on Central, update `pom.xml` to the next development version (e.g. `0.2.0-SNAPSHOT`) and commit.
+Please open a [GitHub issue](https://github.com/erizzo/spring-data-expresspecs/issues) for bugs or feature requests. For bugs, a minimal reproducing example (the domain entity, the Specification call, and the resulting or expected query) is the most helpful thing you can include.
 
-#### Prerequisites (one-time setup)
+## Prerequisites
 
-The following GitHub Actions secrets must be set on the repository:
+- JDK 17 or later.
+- No local Maven install is required; use the bundled wrapper (`./mvnw`).
 
-| Secret | Description |
-|---|---|
-| `CENTRAL_USERNAME` | Token username from Central Portal → Account → Generate User Token |
-| `CENTRAL_PASSWORD` | Token password (same place) |
-| `GPG_PRIVATE_KEY` | ASCII-armored GPG private key (`gpg --export-secret-keys --armor <key-id>`) |
-| `GPG_PASSPHRASE` | Passphrase for the GPG key |
+## Building and testing
 
-The GPG public key must be uploaded to `keys.openpgp.org` so Central can verify signatures:
 ```bash
-gpg --keyserver keys.openpgp.org --send-keys <key-id>
+./mvnw clean install   # build
+./mvnw clean test      # run the H2 tests for the default Spring Boot version only
 ```
+
+The command above is a quick smoke test, **not** the full suite. The production API is compatible with both Spring Boot 3.5 and 4, and the tests use Maven profiles and separate source trees to cover both versions plus real databases via Testcontainers (the `sb3`, `sb4`, `tc`, and `oracle` profiles). A change is not adequately tested until it passes across all of them.
+
+**Before opening a pull request you must run the complete test suite as described in [docs/testing.md](docs/testing.md).** That document is the authoritative reference for the profiles, directory layout, Testcontainers setup, and what CI runs; follow it rather than relying on the single command above.
+
+## Submitting a pull request
+
+1. Fork the repository and create a topic branch off `main`.
+2. Make your change, keeping it focused, and add tests that cover it.
+3. Run the **complete test suite** across all profiles (`sb3`, `sb4`, `tc`, and `oracle`) as described in [docs/testing.md](docs/testing.md), not just the default `./mvnw clean test`, and make sure every run is green.
+4. Open a pull request describing the change and the motivation behind it.
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the [Apache License 2.0](LICENSE), the same license that covers this project.
+
+## Coding style
+
+- This is a convenience library whose whole point is readable, intent-revealing code; favor expressiveness over terseness.
+- Match the conventions already present in the surrounding code: naming, formatting, and idioms. Do not reformat existing code as part of an unrelated change.
+- Indent with **tabs**, not spaces. Many editors default to spaces, so check your settings before committing to avoid re-indenting whole files.
+- Prefer Lombok (`@Getter`, `@Setter`, `@RequiredArgsConstructor`, `@Builder`, `@Data`, `@Value`, etc.) over hand-written constructors, getters, and setters. Keep explicit constructors when they hold real logic such as validation or defensive copies, and for `record` types use the language features rather than duplicating accessors.
+- Follow the null/empty-safety convention: factory methods return `BasicSpecifications.unrestricted()` rather than `null` for absent inputs.

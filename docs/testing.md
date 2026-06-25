@@ -35,6 +35,15 @@ src/
 Date/time specification factories and their tests live under `expresspecs.datetime` (`src/main/java/expresspecs/datetime/`, `src/test/java/expresspecs/datetime/`).
 **Version-specific test code** contains only the Spring configurations and thin, empty subclasses of the base test classes.
 
+## Kinds of tests
+
+The suite has two complementary kinds of tests, both living in `src/test/java`:
+
+- **Unit tests** (`*SpecificationsTests`, plus `PropertyPathTests`, `SQLUtilsTests`): fast, mock-based tests using Mockito. They verify the `Predicate`/`CriteriaBuilder` interactions a factory method produces without touching a database, and they run with no profile or Docker required.
+- **Integration tests** (`*IntegrationTests`, extending `BaseJPAIntegrationTest`): execute real queries through Hibernate against an actual database. By default these run on in-memory **H2**; under the `tc` and `oracle` profiles the same tests run against real databases via Testcontainers (see [Why Database-Specific Tests?](#why-database-specific-tests)).
+
+When adding a factory method or fixing a bug, cover it at both levels: a unit test that pins down the predicate construction, and an integration test that proves the generated SQL actually runs and returns the right rows.
+
 ## Running the tests
 
 Always use `clean` before `test` (for example `./mvnw clean test` with the profiles below), not `./mvnw test`, so a stale `target/` directory from a previous run doesn't affect test results. This is a consequence of supporting 2 incompatible versions of Spring and the conflicting classes the maven profiles produce.
