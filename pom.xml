@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.rizzoweb</groupId>
     <artifactId>spring-data-expresspecs</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0-SNAPSHOT</version>
 
     <name>Spring Data Expresspecs</name>
     <description>Composable, type-safe factory methods for building Spring Data JPA Specification objects, eliminating CriteriaBuilder boilerplate with automatic join handling and null-safe chaining.</description>
