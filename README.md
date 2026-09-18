@@ -123,16 +123,16 @@ includes a runnable example you can follow.
 
 ```xml
 <dependency>
-    <groupId>com.rizzoweb</groupId>
+    <groupId>dev.expresspecs</groupId>
     <artifactId>spring-data-expresspecs</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 
 **Gradle:**
 
 ```groovy
-implementation 'com.rizzoweb:spring-data-expresspecs:0.2.0'
+implementation 'dev.expresspecs:spring-data-expresspecs:0.3.0'
 ```
 
 ### Your JPA Repository
