@@ -26,16 +26,16 @@ This guide covers setup, compatibility, typing options, factory usage, edge case
 
 ```xml
 <dependency>
-    <groupId>com.rizzoweb</groupId>
+    <groupId>dev.expresspecs</groupId>
     <artifactId>spring-data-expresspecs</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 
 **Gradle:**
 
 ```groovy
-implementation 'com.rizzoweb:spring-data-expresspecs:0.2.0'
+implementation 'dev.expresspecs:spring-data-expresspecs:0.3.0'
 ```
 
 Snapshot builds are available from the Maven Central snapshot repository:
@@ -49,8 +49,6 @@ Snapshot builds are available from the Maven Central snapshot repository:
     </repository>
 </repositories>
 ```
-
-Then use version `0.2-SNAPSHOT`.
 
 ## Compatibility
 
