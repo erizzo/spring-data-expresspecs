@@ -125,14 +125,14 @@ includes a runnable example you can follow.
 <dependency>
     <groupId>dev.expresspecs</groupId>
     <artifactId>spring-data-expresspecs</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1</version>
 </dependency>
 ```
 
 **Gradle:**
 
 ```groovy
-implementation 'dev.expresspecs:spring-data-expresspecs:0.3.0'
+implementation 'dev.expresspecs:spring-data-expresspecs:0.3.1'
 ```
 
 ### Your JPA Repository

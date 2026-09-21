@@ -28,14 +28,14 @@ This guide covers setup, compatibility, typing options, factory usage, edge case
 <dependency>
     <groupId>dev.expresspecs</groupId>
     <artifactId>spring-data-expresspecs</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1</version>
 </dependency>
 ```
 
 **Gradle:**
 
 ```groovy
-implementation 'dev.expresspecs:spring-data-expresspecs:0.3.0'
+implementation 'dev.expresspecs:spring-data-expresspecs:0.3.1'
 ```
 
 Snapshot builds are available from the Maven Central snapshot repository:
