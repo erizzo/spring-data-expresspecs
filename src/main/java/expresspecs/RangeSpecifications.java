@@ -154,7 +154,10 @@ public class RangeSpecifications {
 	 * Creates a specification that matches entities where the specified property is greater than or
 	 * equal to {@code startInclusive} and strictly less than {@code endExclusive}.
 	 *
-	 * <p>Unlike other factories in this class, {@code null} bounds are not permitted and will throw
+	 * <p>If both bounds are {@code null}, an {@linkplain BasicSpecifications#unrestricted() unrestricted
+	 * specification} is returned, consistent with other factories in this class.
+	 *
+	 * <p>Unlike other factories in this class, a single {@code null} bound is not permitted and will throw
 	 * {@link IllegalArgumentException}. This is intentional: because this method delegates to
 	 * {@link #atLeast} and {@link #lessThan}, a null bound would silently produce a one-sided range
 	 * rather than the two-sided range the caller requested, hiding a subtle behavioral change in the
@@ -163,9 +166,9 @@ public class RangeSpecifications {
 	 * @param <T>            The entity type being queried.
 	 * @param <C>            The comparable type of the property.
 	 * @param propertyPath   Dot-delimited property path to compare.
-	 * @param startInclusive The inclusive lower bound; must not be {@code null}.
-	 * @param endExclusive   The exclusive upper bound; must not be {@code null}.
-	 * @throws IllegalArgumentException if either bound is {@code null}.
+	 * @param startInclusive The inclusive lower bound; may be {@code null} only if {@code endExclusive} is also {@code null}.
+	 * @param endExclusive   The exclusive upper bound; may be {@code null} only if {@code startInclusive} is also {@code null}.
+	 * @throws IllegalArgumentException if exactly one bound is {@code null}.
 	 * @see PropertyPath#from(String)
 	 */
 	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> between(
@@ -177,7 +180,10 @@ public class RangeSpecifications {
 	 * Creates a specification that matches entities where the specified property is greater than or
 	 * equal to {@code startInclusive} and strictly less than {@code endExclusive}.
 	 *
-	 * <p>Unlike other factories in this class, {@code null} bounds are not permitted and will throw
+	 * <p>If both bounds are {@code null}, an {@linkplain BasicSpecifications#unrestricted() unrestricted
+	 * specification} is returned, consistent with other factories in this class.
+	 *
+	 * <p>Unlike other factories in this class, a single {@code null} bound is not permitted and will throw
 	 * {@link IllegalArgumentException}. This is intentional: because this method delegates to
 	 * {@link #atLeast} and {@link #lessThan}, a null bound would silently produce a one-sided range
 	 * rather than the two-sided range the caller requested, hiding a subtle behavioral change in the
@@ -186,14 +192,17 @@ public class RangeSpecifications {
 	 * @param <T>            The entity type being queried.
 	 * @param <C>            The comparable type of the property.
 	 * @param propertyPath   Resolved property path to compare.
-	 * @param startInclusive The inclusive lower bound; must not be {@code null}.
-	 * @param endExclusive   The exclusive upper bound; must not be {@code null}.
-	 * @throws IllegalArgumentException if either bound is {@code null}.
+	 * @param startInclusive The inclusive lower bound; may be {@code null} only if {@code endExclusive} is also {@code null}.
+	 * @param endExclusive   The exclusive upper bound; may be {@code null} only if {@code startInclusive} is also {@code null}.
+	 * @throws IllegalArgumentException if exactly one bound is {@code null}.
 	 */
 	public static <T, C extends Comparable<? super C>> @NonNull Specification<T> between(
 			PropertyPath propertyPath, C startInclusive, C endExclusive) {
+		if (startInclusive == null && endExclusive == null) {
+			return unrestricted();
+		}
 		if (startInclusive == null || endExclusive == null) {
-			throw new IllegalArgumentException("between() requires non-null bounds; use atLeast() or lessThan() for a one-sided range");
+			throw new IllegalArgumentException("between() requires both bounds or neither; use atLeast() or lessThan() for a one-sided range");
 		}
 		Specification<T> afterStart = atLeast(propertyPath, startInclusive);
 		Specification<T> beforeEnd = lessThan(propertyPath, endExclusive);

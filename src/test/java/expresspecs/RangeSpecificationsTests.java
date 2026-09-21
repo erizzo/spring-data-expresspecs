@@ -93,4 +93,16 @@ class RangeSpecificationsTests {
 				.isThrownBy(() -> RangeSpecifications.between(PropertyPath.from("price"), 1, null));
 	}
 
+	@Test
+	void between_BothNull_ReturnsUnrestricted() {
+		Specification<Object> result = RangeSpecifications.between("price", null, null);
+		assertThat(result).isUnrestricted();
+	}
+
+	@Test
+	void between_BothNull_PropertyPath_ReturnsUnrestricted() {
+		Specification<Object> result = RangeSpecifications.between(PropertyPath.from("price"), null, null);
+		assertThat(result).isUnrestricted();
+	}
+
 }
