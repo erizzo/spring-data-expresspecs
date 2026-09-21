@@ -89,6 +89,20 @@ public interface RangeSpecificationIntegrationTests extends BaseIntegrationTest<
 	}
 
 	@Test
+	default void between_BothNull_ReturnsAll() {
+		var bigSpender = persistAndFlush(Customer.builder()
+						.creditLimit(10000)
+						.build());
+		var cheapskate = persistAndFlush(Customer.builder()
+						.creditLimit(100)
+						.build());
+
+		Specification<Customer> spec = RangeSpecifications.between(Customer.Fields.creditLimit, null, null);
+		List<Customer> results = getRepo().findAll(spec);
+		assertThat(results).containsExactlyInAnyOrder(bigSpender, cheapskate);
+	}
+
+	@Test
 	default void atLeast_NestedProperty() {
 		var newbie = customer("newb");
 
