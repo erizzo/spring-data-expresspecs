@@ -33,7 +33,7 @@ jobs:
           - profile: sb4
           - profile: sb3
           - profile: sb4
-            spring-boot-version: '4.1.0'
+            spring-boot-version: '4.1.1'
 
     steps:
     - uses: actions/checkout@v4

@@ -60,6 +60,8 @@ Always use `./mvnw clean test` (not `./mvnw test`) when running tests via Maven.
 
 - `expresspecs.datetime.DateTimeSpecifications` — date-based predicates (e.g., `onDate`).
 
+- `expresspecs.util.UtcDateToLocalDateConverter`: JPA `AttributeConverter` for date-only columns held in `java.util.Date` (stores the UTC calendar date, matching `onDate`).
+
 - `CollectionSpecifications` — collection-membership and size predicates.
 
 - `SpecificationExtensions` — `safeAnd`, `safeOr`, and `smartDistinct`. `smartDistinct` wraps a Specification to apply DISTINCT only when joins are present *and* the query return type is not `Long`, sidestepping the Spring Data pagination-with-join bug.

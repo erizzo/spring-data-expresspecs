@@ -257,15 +257,15 @@ Specification<Customer> spec = yearIs(Customer.Fields.createdTimestamp, 2024);
 
 `onDate` constructs the appropriate SQL predicate based on the Java type of the mapped entity property. The behavior differs by type because different temporal types carry different amounts of information.
 
-| Property type                           | Predicate                                                                                            |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `LocalDate`                             | Equality: property equals `targetDate`                                                               |
-| `java.sql.Date`                         | Equality: property equals the SQL-date equivalent of `targetDate`                                    |
-| `Instant`                               | UTC half-open range: `[targetDate 00:00 UTC, targetDate+1 00:00 UTC)`                                |
-| `OffsetDateTime`                        | UTC half-open range (same UTC window, expressed as `OffsetDateTime` at `+00:00`)                     |
-| `ZonedDateTime`                         | UTC half-open range (same UTC window, expressed as `ZonedDateTime` at UTC)                           |
-| `java.util.Date` / `java.sql.Timestamp` | UTC half-open range (same UTC window, compared as `java.util.Date`)                                  |
-| `LocalDateTime`                         | Wall-clock half-open range: `[targetDate at midnight, targetDate+1 at midnight)`, no zone conversion |
+| Property type                           | Predicate                                                                                                                               |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `LocalDate`                             | Equality: property equals `targetDate`                                                                                                  |
+| `java.sql.Date`                         | Equality: property equals the SQL-date equivalent of `targetDate`                                                                       |
+| `Instant`                               | UTC half-open range: `[targetDate 00:00 UTC, targetDate+1 00:00 UTC)`                                                                   |
+| `OffsetDateTime`                        | UTC half-open range (same UTC window, expressed as `OffsetDateTime` at `+00:00`)                                                        |
+| `ZonedDateTime`                         | UTC half-open range (same UTC window, expressed as `ZonedDateTime` at UTC)                                                              |
+| `java.util.Date` / `java.sql.Timestamp` | UTC half-open range (same UTC window, compared as `java.util.Date`); for date-only columns see [below](#javautildate-date-only-columns) |
+| `LocalDateTime`                         | Wall-clock half-open range: `[targetDate at midnight, targetDate+1 at midnight)`, no zone conversion                                    |
 
 Any other mapped Java type causes an runtime exception when the specification predicate is evaluated (for example `java.util.Calendar`).
 
@@ -279,6 +279,17 @@ Any other mapped Java type causes an runtime exception when the specification pr
 > Unsupported property types throw `IllegalArgumentException` with a message that names the leaf type and lists supported alternatives. Through Spring Data JPA, that exception may be wrapped in a `DataAccessException` (for example `InvalidDataAccessApiUsageException`).
 
 For all available predicates and their descriptions, see [RangeSpecifications.java](../src/main/java/expresspecs/RangeSpecifications.java) and [DateTimeSpecifications.java](../src/main/java/expresspecs/datetime/DateTimeSpecifications.java).
+
+#### `java.util.Date` date-only columns
+
+A `java.util.Date` field mapped with the deprecated `@Temporal(TemporalType.DATE)` gives `onDate` results that depend on the JVM time zone and the Hibernate version (Hibernate 7.4 can match the wrong day when the JVM runs behind UTC). Prefer mapping date-only columns as `LocalDate`. If the field must stay a `java.util.Date`, map it with the library's `UtcDateToLocalDateConverter` instead of `@Temporal`:
+
+```java
+@Convert(converter = UtcDateToLocalDateConverter.class)
+private Date birthDate;
+```
+
+The converter stores the date in UTC, matching the UTC days `onDate` uses, so values load as midnight UTC. For a full example, see `javaUtilDateAsDate` in [Socialite.java](../src/test/java/expresspecs/datetime/Socialite.java) and `onDate_JavaUtilDateAsDateField` in [OnDateTypeCoverageTests.java](../src/test/java/expresspecs/datetime/OnDateTypeCoverageTests.java).
 
 ### Collection Specifications
 
