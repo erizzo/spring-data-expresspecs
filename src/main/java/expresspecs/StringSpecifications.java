@@ -1,7 +1,7 @@
 package expresspecs;
 
 import static expresspecs.BasicSpecifications.unrestricted;
-import static expresspecs.SQLUtils.escapeLike;
+import static expresspecs.util.SQLUtils.escapeLike;
 
 import java.util.Collection;
 import java.util.List;

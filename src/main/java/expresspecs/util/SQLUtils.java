@@ -1,4 +1,4 @@
-package expresspecs;
+package expresspecs.util;
 
 import lombok.experimental.UtilityClass;
 
