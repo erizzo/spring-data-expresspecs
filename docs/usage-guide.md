@@ -28,14 +28,14 @@ This guide covers setup, compatibility, typing options, factory usage, edge case
 <dependency>
     <groupId>dev.expresspecs</groupId>
     <artifactId>spring-data-expresspecs</artifactId>
-    <version>0.3.1</version>
+    <version>0.4.0</version>
 </dependency>
 ```
 
 **Gradle:**
 
 ```groovy
-implementation 'dev.expresspecs:spring-data-expresspecs:0.3.1'
+implementation 'dev.expresspecs:spring-data-expresspecs:0.4.0'
 ```
 
 Snapshot builds are available from the Maven Central snapshot repository:
@@ -56,7 +56,7 @@ Snapshot builds are available from the Maven Central snapshot repository:
 
 ExpresSepcs supports Spring Boot 3.5, 4.0 and 4.1. Tests are run against all 3 versions during builds.
 
-As of ExpresSpecs version 0.3, Spring Boot 4.1.1 is tested. That version update exposed a bug when mapping `java.util.Date` properties to SQL `DATE` columns using the now-deprecated `@Temporal` annotation. As a result, examples of using `@Temporal` have been removed and replaced with a custom `@jakarta.persistence.Convert` converter that you can use if you need to map `java.util.Date` to `DATE`. See the tests for an example.
+As of ExpresSpecs version 0.4, Spring Boot 4.1.1 is tested. That version update exposed a bug when mapping `java.util.Date` properties to SQL `DATE` columns using the now-deprecated `@Temporal` annotation. As a result, examples of using `@Temporal` have been removed and replaced with a custom `@jakarta.persistence.Convert` converter that you can use if you need to map `java.util.Date` to `DATE`. See the tests for an example.
 
 ### Databases
 
