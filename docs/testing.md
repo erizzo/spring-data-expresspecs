@@ -29,7 +29,7 @@ src/
 - `tc`: adds Testcontainers dependencies and `src/test/containers/java`; **SB4 only** (see below)
 - `oracle`: adds the Oracle Free Testcontainers module and `src/test/containers-oracle/java`; must be combined with `tc`; **SB4 only**
 
-**Spring Boot 4.1 compatibility** is verified in CI by overriding the `sb4` profile's version property on the command line (`-Dspring-boot.version=4.1.0`). No separate Maven profile or source tree is needed since the Spring Boot 4.0-to-4.1 migration introduces no API-level changes relevant to this library.
+**Spring Boot 4.1 compatibility** is verified in CI by overriding the `sb4` profile's version property on the command line (`-Dspring-boot.version=4.1.1`). No separate Maven profile or source tree is needed since the Spring Boot 4.0-to-4.1 migration introduces no API-level changes relevant to this library.
 
 **Common test code** (`src/test/java`) contains abstract base test classes (e.g., `BaseJPAIntegrationTest`), entities, and an `EntityManagerWrapper`.
 Date/time specification factories and their tests live under `expresspecs.datetime` (`src/main/java/expresspecs/datetime/`, `src/test/java/expresspecs/datetime/`).

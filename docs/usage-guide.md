@@ -52,9 +52,15 @@ Snapshot builds are available from the Maven Central snapshot repository:
 
 ## Compatibility
 
-**Spring Boot:** Supports Spring Boot 3.5 and 4.0.
+### Spring Boot
 
-**Databases:** This library uses only standard JPA Criteria API and Hibernate, so it is compatible with any database that Hibernate supports (not just the ones listed below). The table shows what is actively verified against (using [Testcontainers](https://testcontainers.com/)) using the full test suite on every build:
+ExpresSepcs supports Spring Boot 3.5, 4.0 and 4.1. Tests are run against all 3 versions during builds.
+
+As of ExpresSpecs version 0.3, Spring Boot 4.1.1 is tested. That version update exposed a bug when mapping `java.util.Date` properties to SQL `DATE` columns using the now-deprecated `@Temporal` annotation. As a result, examples of using `@Temporal` have been removed and replaced with a custom `@jakarta.persistence.Convert` converter that you can use if you need to map `java.util.Date` to `DATE`. See the tests for an example.
+
+### Databases
+
+This library uses only standard JPA Criteria API and Hibernate, so it is compatible with any database that Hibernate supports (not just the ones listed below). The table shows what is actively verified against (using [Testcontainers](https://testcontainers.com/)) using the full test suite on every build:
 
 | Database             | Testcontainers Image                         |
 | -------------------- | -------------------------------------------- |
