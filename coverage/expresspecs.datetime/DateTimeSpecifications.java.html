@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
+import java.util.Date;
+
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.domain.Specification;
@@ -32,7 +34,7 @@ import lombok.experimental.UtilityClass;
 public class DateTimeSpecifications {
 
 	private HibernateCriteriaBuilder hibernateBuilder(CriteriaBuilder builder) {
-<span class="fc" id="L35">		return (HibernateCriteriaBuilder) builder;</span>
+<span class="fc" id="L37">		return (HibernateCriteriaBuilder) builder;</span>
 	}
 
 	/**
@@ -45,7 +47,7 @@ public class DateTimeSpecifications {
 	 * @see PropertyPath#from(String)
 	 */
 	public static &lt;T&gt; @NonNull Specification&lt;T&gt; yearIs(String propertyPath, Integer year) {
-<span class="fc" id="L48">		return yearIs(PropertyPath.from(propertyPath), year);</span>
+<span class="fc" id="L50">		return yearIs(PropertyPath.from(propertyPath), year);</span>
 	}
 
 	/**
@@ -57,12 +59,12 @@ public class DateTimeSpecifications {
 	 * @param year         The year to match.
 	 */
 	public static &lt;T&gt; @NonNull Specification&lt;T&gt; yearIs(PropertyPath propertyPath, Integer year) {
-<span class="fc bfc" id="L60" title="All 2 branches covered.">		if (year == null) {</span>
-<span class="fc" id="L61">			return unrestricted();</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">		if (year == null) {</span>
+<span class="fc" id="L63">			return unrestricted();</span>
 		}
-<span class="fc" id="L63">		return (root, query, cb) -&gt; {</span>
-<span class="fc" id="L64">			Expression&lt;Integer&gt; yearExpr = hibernateBuilder(cb).year(propertyPath.asPath(root));</span>
-<span class="fc" id="L65">			return cb.equal(yearExpr, year);</span>
+<span class="fc" id="L65">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L66">			Expression&lt;Integer&gt; yearExpr = hibernateBuilder(cb).year(propertyPath.asPath(root));</span>
+<span class="fc" id="L67">			return cb.equal(yearExpr, year);</span>
 		};
 	}
 
@@ -76,7 +78,7 @@ public class DateTimeSpecifications {
 	 * @see PropertyPath#from(String)
 	 */
 	public static &lt;T&gt; @NonNull Specification&lt;T&gt; monthIs(String propertyPath, Integer month) {
-<span class="fc" id="L79">		return monthIs(PropertyPath.from(propertyPath), month);</span>
+<span class="fc" id="L81">		return monthIs(PropertyPath.from(propertyPath), month);</span>
 	}
 
 	/**
@@ -88,12 +90,12 @@ public class DateTimeSpecifications {
 	 * @param month        The month to match (1–12).
 	 */
 	public static &lt;T&gt; @NonNull Specification&lt;T&gt; monthIs(PropertyPath propertyPath, Integer month) {
-<span class="fc bfc" id="L91" title="All 2 branches covered.">		if (month == null) {</span>
-<span class="fc" id="L92">			return unrestricted();</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">		if (month == null) {</span>
+<span class="fc" id="L94">			return unrestricted();</span>
 		}
-<span class="fc" id="L94">		return (root, query, cb) -&gt; {</span>
-<span class="fc" id="L95">			Expression&lt;Integer&gt; monthExpr = hibernateBuilder(cb).month(propertyPath.asPath(root));</span>
-<span class="fc" id="L96">			return cb.equal(monthExpr, month);</span>
+<span class="fc" id="L96">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L97">			Expression&lt;Integer&gt; monthExpr = hibernateBuilder(cb).month(propertyPath.asPath(root));</span>
+<span class="fc" id="L98">			return cb.equal(monthExpr, month);</span>
 		};
 	}
 
@@ -107,7 +109,7 @@ public class DateTimeSpecifications {
 	 * @see PropertyPath#from(String)
 	 */
 	public static &lt;T&gt; @NonNull Specification&lt;T&gt; dayOfMonthIs(String propertyPath, Integer dayOfMonth) {
-<span class="fc" id="L110">		return dayOfMonthIs(PropertyPath.from(propertyPath), dayOfMonth);</span>
+<span class="fc" id="L112">		return dayOfMonthIs(PropertyPath.from(propertyPath), dayOfMonth);</span>
 	}
 
 	/**
@@ -119,12 +121,12 @@ public class DateTimeSpecifications {
 	 * @param dayOfMonth   The day of month to match (1–31).
 	 */
 	public static &lt;T&gt; @NonNull Specification&lt;T&gt; dayOfMonthIs(PropertyPath propertyPath, Integer dayOfMonth) {
-<span class="fc bfc" id="L122" title="All 2 branches covered.">		if (dayOfMonth == null) {</span>
-<span class="fc" id="L123">			return unrestricted();</span>
+<span class="fc bfc" id="L124" title="All 2 branches covered.">		if (dayOfMonth == null) {</span>
+<span class="fc" id="L125">			return unrestricted();</span>
 		}
-<span class="fc" id="L125">		return (root, query, cb) -&gt; {</span>
-<span class="fc" id="L126">			Expression&lt;Integer&gt; dayExpr = hibernateBuilder(cb).day(propertyPath.asPath(root));</span>
-<span class="fc" id="L127">			return cb.equal(dayExpr, dayOfMonth);</span>
+<span class="fc" id="L127">		return (root, query, cb) -&gt; {</span>
+<span class="fc" id="L128">			Expression&lt;Integer&gt; dayExpr = hibernateBuilder(cb).day(propertyPath.asPath(root));</span>
+<span class="fc" id="L129">			return cb.equal(dayExpr, dayOfMonth);</span>
 		};
 	}
 
@@ -139,7 +141,7 @@ public class DateTimeSpecifications {
 	 * @see PropertyPath#from(String)
 	 */
 	public static &lt;T&gt; @NonNull Specification&lt;T&gt; onDate(String propertyPath, LocalDate targetDate) {
-<span class="fc" id="L142">		return onDate(PropertyPath.from(propertyPath), targetDate);</span>
+<span class="fc" id="L144">		return onDate(PropertyPath.from(propertyPath), targetDate);</span>
 	}
 
 	/**
@@ -152,11 +154,9 @@ public class DateTimeSpecifications {
 	 * &lt;p&gt;&lt;strong&gt;Semantics by leaf property type&lt;/strong&gt;
 	 *
 	 * &lt;ul&gt;
-	 *   &lt;li&gt;{@link Instant}, {@link OffsetDateTime}, {@link ZonedDateTime}, {@link java.util.Date}, and
+	 *   &lt;li&gt;{@link Instant}, {@link OffsetDateTime}, {@link ZonedDateTime}, {@link Date}, and
 	 *   {@link java.sql.Timestamp}: values are treated as instants on the UTC timeline. The range is
 	 *   {@code [targetDate at 00:00 UTC, targetDate.plusDays(1) at 00:00 UTC)} (half-open).&lt;/li&gt;
-	 *   &lt;li&gt;For a date-only column held in a {@link java.util.Date}, map it with {@link expresspecs.util.UtcDateToLocalDateConverter};
-	 *   see the usage guide section &quot;{@code java.util.Date} date-only columns&quot;.&lt;/li&gt;
 	 *   &lt;li&gt;{@link LocalDate}: {@linkplain jakarta.persistence.criteria.CriteriaBuilder#equal equal}
 	 *   to {@code targetDate}.&lt;/li&gt;
 	 *   &lt;li&gt;{@link java.sql.Date}: equal to {@link java.sql.Date#valueOf(LocalDate)} for {@code targetDate}.&lt;/li&gt;

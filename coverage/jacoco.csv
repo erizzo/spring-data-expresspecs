@@ -17,4 +17,3 @@ Spring Data Expresspecs,expresspecs,CollectionSpecifications,2,71,1,1,1,17,1,12,
 Spring Data Expresspecs,expresspecs,SQLUtils,0,22,0,2,0,6,0,2,0,1
 Spring Data Expresspecs,expresspecs,BasicSpecifications,0,209,0,12,0,52,0,36,0,30
 Spring Data Expresspecs,expresspecs,StringSpecifications,0,452,0,30,0,100,0,62,0,47
-Spring Data Expresspecs,expresspecs.util,UtcDateToLocalDateConverter,0,23,0,4,0,3,0,5,0,3
