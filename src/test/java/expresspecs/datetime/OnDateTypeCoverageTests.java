@@ -103,16 +103,16 @@ public interface OnDateTypeCoverageTests extends DataIntegrationTest<Customer> {
 	}
 
 	@Test
-	default void onDate_JavaUtilDateAsTimestampField() {
+	default void onDate_JavaUtilDateDefaultMapping() {
 		var dec3 = persistAndFlush(Socialite.builder()
-				.javaUtilDateAsTimestamp(Date.from(Instant.parse("2007-12-03T10:15:30Z")))
+				.javaUtilDateDefaultMapping(Date.from(Instant.parse("2007-12-03T10:15:30Z")))
 				.build());
 
 		persistAndFlush(Socialite.builder()
-				.javaUtilDateAsTimestamp(Date.from(Instant.parse("2007-12-04T10:15:30Z")))
+				.javaUtilDateDefaultMapping(Date.from(Instant.parse("2007-12-04T10:15:30Z")))
 				.build());
 
-		Specification<Socialite> spec = DateTimeSpecifications.onDate(Socialite.Fields.javaUtilDateAsTimestamp, LocalDate.of(2007, 12, 3));
+		Specification<Socialite> spec = DateTimeSpecifications.onDate(Socialite.Fields.javaUtilDateDefaultMapping, LocalDate.of(2007, 12, 3));
 		List<Socialite> results = getSocialiteRepo().findAll(spec);
 
 		assertThat(results).containsExactly(dec3);
@@ -134,6 +134,10 @@ public interface OnDateTypeCoverageTests extends DataIntegrationTest<Customer> {
 		assertThat(results).containsExactly(dec3);
 	}
 
+	/**
+	 * A {@code java.util.Date} date-only column mapped with {@link expresspecs.util.UtcDateToLocalDateConverter}
+	 * (see {@link Socialite}); this is the usage guide's example for "{@code java.util.Date} date-only columns".
+	 */
 	@Test
 	default void onDate_JavaUtilDateAsDateField() {
 		var dec3 = persistAndFlush(Socialite.builder()

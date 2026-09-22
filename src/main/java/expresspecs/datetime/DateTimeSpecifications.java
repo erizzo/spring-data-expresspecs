@@ -7,8 +7,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
-import java.util.Date;
-
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.domain.Specification;
@@ -154,9 +152,11 @@ public class DateTimeSpecifications {
 	 * <p><strong>Semantics by leaf property type</strong>
 	 *
 	 * <ul>
-	 *   <li>{@link Instant}, {@link OffsetDateTime}, {@link ZonedDateTime}, {@link Date}, and
+	 *   <li>{@link Instant}, {@link OffsetDateTime}, {@link ZonedDateTime}, {@link java.util.Date}, and
 	 *   {@link java.sql.Timestamp}: values are treated as instants on the UTC timeline. The range is
 	 *   {@code [targetDate at 00:00 UTC, targetDate.plusDays(1) at 00:00 UTC)} (half-open).</li>
+	 *   <li>For a date-only column held in a {@link java.util.Date}, map it with {@link expresspecs.util.UtcDateToLocalDateConverter};
+	 *   see the usage guide section "{@code java.util.Date} date-only columns".</li>
 	 *   <li>{@link LocalDate}: {@linkplain jakarta.persistence.criteria.CriteriaBuilder#equal equal}
 	 *   to {@code targetDate}.</li>
 	 *   <li>{@link java.sql.Date}: equal to {@link java.sql.Date#valueOf(LocalDate)} for {@code targetDate}.</li>
