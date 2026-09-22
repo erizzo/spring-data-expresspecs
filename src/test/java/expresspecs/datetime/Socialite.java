@@ -7,12 +7,12 @@ import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 
+import expresspecs.util.UtcDateToLocalDateConverter;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -46,16 +46,14 @@ public class Socialite {
 
 	private LocalDateTime localDateTime;
 
-	@SuppressWarnings("deprecation")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date javaUtilDateAsTimestamp;
+	/**
+	 * Unannotated: exercises Hibernate's default mapping for {@link java.util.Date}, which is a TIMESTAMP column.
+	 */
+	private Date javaUtilDateDefaultMapping;
 
-	@SuppressWarnings("deprecation")
-	@Temporal(TemporalType.DATE)
+	@Convert(converter = UtcDateToLocalDateConverter.class)
 	private Date javaUtilDateAsDate;
 
-	@SuppressWarnings("deprecation")
-	@Temporal(TemporalType.DATE)
 	private java.sql.Date sqlDate;
 
 	private Timestamp sqlTimestamp;
